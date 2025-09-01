@@ -1,0 +1,98 @@
+
+{% extends "core/base_public.html" %}
+{% block title %}Novo Projeto · Multiview{% endblock %}
+{% block content %}
+<section class="card">
+  <h1 class="page-title">Configurações / Definições do Projeto</h1>
+
+  {# mensagens flash #}
+  {% if messages %}
+    <ul class="mv-messages">
+      {% for message in messages %}
+        <li class="mv-message {{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}  {# <- útil para validações gerais #}
+
+    <div class="grid">
+      <div>
+        <label for="{{ form.nome.id_for_label }}">Nome</label>
+        {{ form.nome }} {{ form.nome.errors }}
+
+        <label for="{{ form.descricao.id_for_label }}">Descrição</label>
+        {{ form.descricao }} {{ form.descricao.errors }}
+
+        <label for="{{ form.data_voo.id_for_label }}">Data do voo</label>
+        {{ form.data_voo }} {{ form.data_voo.errors }}
+
+        <label for="{{ form.plataforma.id_for_label }}">Plataforma</label>
+        {{ form.plataforma }} {{ form.plataforma.errors }}
+
+        <label for="{{ form.camera_modelo.id_for_label }}">Modelo da câmera</label>
+        {{ form.camera_modelo }} {{ form.camera_modelo.errors }}
+
+        <label for="{{ form.camera_tipo.id_for_label }}">Tipo de câmera</label>
+        {{ form.camera_tipo }} {{ form.camera_tipo.errors }}
+      </div>
+
+      <div>
+        <label for="{{ form.georef.id_for_label }}">Georreferenciamento</label>
+        {{ form.georef }} {{ form.georef.errors }}
+
+        <label for="{{ form.epsg.id_for_label }}">EPSG</label>
+        {{ form.epsg }} <small>Ex.: EPSG:31983</small> {{ form.epsg.errors }}
+
+        <label for="{{ form.altura_voo_m.id_for_label }}">Altura de voo (m)</label>
+        {{ form.altura_voo_m }} {{ form.altura_voo_m.errors }}
+
+        <label for="{{ form.gsd_cm.id_for_label }}">GSD (cm/pixel)</label>
+        {{ form.gsd_cm }} {{ form.gsd_cm.errors }}
+
+        <label for="{{ form.overlap_frontal.id_for_label }}">Overlap frontal (%)</label>
+        {{ form.overlap_frontal }} {{ form.overlap_frontal.errors }}
+
+        <label for="{{ form.overlap_lateral.id_for_label }}">Overlap lateral (%)</label>
+        {{ form.overlap_lateral }} {{ form.overlap_lateral.errors }}
+      </div>
+    </div>
+
+    <hr>
+
+    <div>
+      <label>{{ form.usa_gcp }} Usar GCP</label>
+      <label for="{{ form.gcp_csv.id_for_label }}">Arquivo GCP (CSV/TXT)</label>
+      {{ form.gcp_csv }} {{ form.gcp_csv.errors }}
+      <small>Precisa de um exemplo? <a href="{% url 'projetos:gcp_modelo_csv' %}">Baixar CSV modelo</a></small>
+    </div>
+
+    <hr>
+
+    <div>
+      <label>Produtos</label><br>
+      <label>{{ form.prod_ortomosaico }} Ortomosaico</label>
+      <label>{{ form.prod_dsm }} DSM</label>
+      <label>{{ form.prod_dtm }} DTM</label>
+      <label>{{ form.prod_nuvem_pts }} Nuvem de pontos</label>
+      <label>{{ form.prod_contornos }} Curvas de nível</label>
+    </div>
+
+    <div style="margin-top:14px">
+      <button class="btn" type="submit">Salvar e ir para Upload</button>
+    </div>
+  </form>
+</section>
+
+<style>
+/* Só se sua base não tiver .grid ainda; caso já tenha, pode remover este bloco */
+.grid { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 720px){ .grid { grid-template-columns: 1fr; } }
+
+/* mensagens simples; ficam discretas se já houver estilo global */
+.mv-messages { list-style:none; margin:0 0 10px 0; padding:0; }
+.mv-message { background:#f6fff1; border:1px solid #dcefd3; padding:10px; border-radius:8px; }
+</style>
+{% endblock %}

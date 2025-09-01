@@ -1,0 +1,17 @@
+
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block titulo_pagina %}MultiView • Processamento{% endblock %}
+
+{% block conteudo %}
+  {% include "includes/titulo_pagina.html" with titulo="Processamento - Fila & Status" %}
+  <div class="area-usuarios" style="max-width:1100px;margin:0 auto;">
+    {% include "includes/tabela_padrao.html" with
+      cabecalhos="ID do Job,Dataset,Etapa,Status"
+      registros=jobs
+      chave_id="id"
+      campos="id,dataset,etapa,status"
+      selecionavel="False" %}
+  </div>
+{% endblock %}

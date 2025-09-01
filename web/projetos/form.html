@@ -1,0 +1,110 @@
+
+{% extends "core/base_public.html" %}
+{% block title %}{{ titulo }} · Multiview{% endblock %}
+{% block content %}
+<section class="card" style="max-width:920px">
+  <header style="text-align:center;margin-bottom:10px">
+    <h1 style="margin:0">{{ titulo }}</h1>
+  </header>
+
+  <form method="post" enctype="multipart/form-data" class="form-grid">
+    {% csrf_token %}
+
+    <fieldset class="grid-2">
+      <div>
+        <label>Nome do projeto</label>
+        {{ form.nome }}
+      </div>
+      <div>
+        <label>Data do voo</label>
+        {{ form.data_voo }}
+      </div>
+
+      <div>
+        <label>Plataforma</label>
+        {{ form.plataforma }}
+      </div>
+      <div>
+        <label>Modelo da câmera</label>
+        {{ form.camera_modelo }}
+      </div>
+
+      <div>
+        <label>Tipo de câmera</label>
+        {{ form.camera_tipo }}
+      </div>
+      <div>
+        <label>Geo-referenciamento</label>
+        {{ form.georef }}
+      </div>
+
+      <div>
+        <label>EPSG</label>
+        {{ form.epsg }}
+      </div>
+      <div>
+        <label>Altura de voo (m)</label>
+        {{ form.altura_voo_m }}
+      </div>
+
+      <div>
+        <label>GSD (cm)</label>
+        {{ form.gsd_cm }}
+      </div>
+      <div>
+        <label>Overlap frontal (%)</label>
+        {{ form.overlap_frontal }}
+      </div>
+
+      <div>
+        <label>Overlap lateral (%)</label>
+        {{ form.overlap_lateral }}
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>GCP</legend>
+      <div class="grid-2">
+        <div>
+          <label>{{ form.usa_gcp }} Usarei pontos de controle (GCP)</label>
+        </div>
+        <div>
+          <label>Arquivo GCP (.csv/.txt)</label>
+          {{ form.gcp_csv }}
+          <small>Você poderá marcar os pontos nas imagens depois, via editor.</small>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Produtos desejados</legend>
+      <div class="grid-3">
+        <label>{{ form.prod_ortomosaico }} Ortomosaico</label>
+        <label>{{ form.prod_dsm }} DSM</label>
+        <label>{{ form.prod_dtm }} DTM</label>
+        <label>{{ form.prod_nuvem_pts }} Nuvem de pontos</label>
+        <label>{{ form.prod_contornos }} Curvas de nível</label>
+      </div>
+    </fieldset>
+
+    <div class="actions">
+      <button type="submit">Salvar projeto</button>
+      <a href="{% url 'projetos:lista' %}" class="link">Cancelar</a>
+    </div>
+  </form>
+</section>
+
+<style>
+.form-grid label{font-weight:700;font-size:14px;display:block;margin-bottom:6px}
+.form-grid input, .form-grid select {
+  width:100%; border:1px solid #d6e5d6; border-radius:12px; padding:10px 12px;
+}
+fieldset{border:1px solid #e4eedf;border-radius:12px;padding:12px;margin:12px 0;background:#fff}
+legend{font-weight:800;padding:0 8px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.actions{display:flex;gap:12px;margin-top:10px}
+.actions .link{text-decoration:none;align-self:center}
+@media (max-width:780px){.grid-2,.grid-3{grid-template-columns:1fr}}
+</style>
+{% endblock %}

@@ -1,0 +1,48 @@
+/* Container padrão */
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* Topbar */
+.site-topbar {
+  background: #0b3d2e;
+  color: #fff;
+}
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+}
+.brand {
+  height: 36px;
+}
+.main-nav a {
+  color: #cdebdc;
+  margin-left: 16px;
+  text-decoration: none;
+}
+.main-nav a:hover { text-decoration: underline; }
+
+/* Rodapé */
+.site-footer .strip-dark {
+  height: 6px; background: #0b3d2e;
+}
+.site-footer .strip-mid {
+  height: 3px; background: #2e6b53;
+}
+.site-footer .footer-body {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0 24px 0;
+}
+.slogan-img { max-height: 52px; }
+.mv-footer { max-height: 44px; justify-self: end; }
+
+/* Público x App */
+.mv-public main { padding: 48px 0; }
+.mv-app main { padding: 24px 0 48px 0; }

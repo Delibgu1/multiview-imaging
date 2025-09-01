@@ -1,0 +1,39 @@
+
+{% extends "core/base_public.html" %}
+{% load static %}
+
+{% block title %}Entrar • Multiview{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+  <div class="login-hero" aria-hidden="true"></div>
+
+  <div class="login-card" role="form" aria-label="Formulário de login">
+    <img class="brand" src="{% static 'core/img/logo_multiview_verde.png' %}" alt="Multiview" style="height:28px;margin-bottom:12px;">
+    <h1>Acessar sua conta</h1>
+
+    {% if form.errors %}
+      <div class="alert" style="color:#b00020; margin-bottom:8px;">
+        Usuário ou senha inválidos.
+      </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      <label for="id_username">Usuário</label>
+      <input id="id_username" name="username" type="text" autofocus required>
+
+      <label for="id_password">Senha</label>
+      <input id="id_password" name="password" type="password" required>
+
+      <button type="submit">Entrar</button>
+      <div class="login-help">
+        <a href="{% url 'password_reset' %}">Esqueceu sua senha?</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,120 @@
+
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <title>Uploads de Datasets</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      :root { color-scheme: light dark; }
+      body { font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif; margin: 24px; }
+      .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; max-width: 720px; }
+      .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+      button { padding: 10px 14px; border-radius: 10px; border: 1px solid #bbb; cursor: pointer; }
+      progress { width: 100%; height: 14px; }
+      .muted { opacity: .8; font-size: 14px; }
+      .ok { color: #087f23; font-weight: 600; }
+      .err { color: #b00020; font-weight: 600; }
+      a { text-decoration: none; }
+      pre { background: #eee; padding: 8px; white-space: pre-wrap; }
+    </style>
+  </head>
+  <body>
+    <h1>Uploads de Datasets</h1>
+    <p class="muted">
+      Envie seus arquivos diretamente para o armazenamento (MinIO/S3). Após concluir, o dataset é cadastrado e um job de processamento é enfileirado.
+    </p>
+
+    <div class="card">
+      <div class="row">
+        <input id="file" type="file">
+        <button id="btn">Enviar</button>
+      </div>
+      <div style="margin:12px 0">
+        <progress id="bar" max="100" value="0"></progress>
+      </div>
+      <div id="msg" class="muted"></div>
+      <div id="link" style="margin-top:8px"></div>
+      <pre id="log"></pre>
+    </div>
+
+    <p style="margin-top:16px">
+      <a href="/datasets/">⟵ Voltar ao Catálogo</a>
+    </p>
+
+<script>
+const btn  = document.getElementById('btn');
+const file = document.getElementById('file');
+const bar  = document.getElementById('bar');
+const msg  = document.getElementById('msg');
+const link = document.getElementById('link');
+const logEl = document.getElementById('log');
+
+async function postJSON(url, data) {
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return await r.json();
+}
+
+btn.onclick = async () => {
+  try {
+    bar.value = 0; msg.textContent = ''; link.innerHTML=''; logEl.textContent = '';
+    const f = file.files[0];
+    if (!f) { alert('Escolha um arquivo'); return; }
+
+    // 1) pedir pré-assinatura
+    const pre = await postJSON('./presign/', {
+      filename: f.name,
+      content_type: f.type || 'application/octet-stream'
+    });
+
+    // compat: algumas versões retornam {presigned: {url, fields}}, outras {url, fields}
+    const pres = pre.presigned ? pre.presigned : pre;
+
+    // 2) montar form e enviar para o S3/MinIO
+    const form = new FormData();
+
+    // use exatamente os fields do presign (NÃO sobrescreva 'key'!)
+    Object.entries(pres.fields).forEach(([k, v]) => form.append(k, v));
+
+    // garanta Content-Type compatível com a policy (sem duplicar)
+    form.set('Content-Type', f.type || 'application/octet-stream');
+
+    // por último, o arquivo
+    form.append('file', f);
+
+    const s3Resp = await fetch(pres.url, { method: 'POST', body: form });
+    const s3Text = await s3Resp.text();
+    logEl.textContent = `[S3] status: ${s3Resp.status}\n${s3Text}`;
+
+    if (!s3Resp.ok) throw new Error('Falha no upload S3: ' + s3Resp.status);
+
+    bar.value = 100; // progresso completo
+
+    // 3) avisar o backend para criar o Dataset
+    const done = await postJSON('./complete/', {
+      key: pre.key,                 // a key veio no JSON do presign
+      filename: f.name,
+      size: f.size
+    });
+
+    msg.innerHTML = '<span class="ok">Upload concluído.</span> Dataset #' + done.dataset_id + ' criado.';
+
+    // link público (se configurado)
+    const publicBase = "{{ public_url_base }}";
+    if (publicBase) {
+      const href = publicBase + '/' + encodeURIComponent('{{ bucket }}') + '/' + pre.key;
+      link.innerHTML = 'Arquivo em: <a target="_blank" rel="noopener" href="'+href+'">'+href+'</a>';
+    }
+  } catch (e) {
+    console.error(e);
+    msg.innerHTML = '<span class="err">Erro:</span> ' + e.message;
+  }
+};
+</script>
+  </body>
+</html>

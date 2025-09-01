@@ -1,0 +1,33 @@
+
+{% extends "core/base_public.html" %}
+{% block title %}Projetos · Multiview{% endblock %}
+{% block content %}
+<section class="card" style="max-width:960px">
+  <header style="text-align:center;margin-bottom:8px">
+    <h1 style="margin:0">Projetos</h1>
+  </header>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+    <a href="{% url 'projetos:novo' %}" class="tile">
+      <div class="tile__title">Criar novo projeto</div>
+      <div class="tile__desc">Defina câmera, RTK/PPK, EPSG, GCPs e produtos desejados.</div>
+    </a>
+
+    <a href="{% url 'projetos:lista' %}" class="tile">
+      <div class="tile__title">Meus projetos</div>
+      <div class="tile__desc">Visualize e continue projetos já iniciados.</div>
+    </a>
+  </div>
+</section>
+
+<style>
+.tile{
+  display:block;background:#fff;border:1px solid #e4eedf;border-radius:14px;
+  padding:16px;text-decoration:none;color:#0e2a18;
+  box-shadow:0 6px 20px rgba(0,0,0,.08)
+}
+.tile:hover{box-shadow:0 8px 26px rgba(0,0,0,.12)}
+.tile__title{font-weight:800;font-size:18px;margin-bottom:6px}
+.tile__desc{color:#2b5138;font-size:14px}
+</style>
+{% endblock %}

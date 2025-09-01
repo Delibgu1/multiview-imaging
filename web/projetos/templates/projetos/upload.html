@@ -1,0 +1,9 @@
+{% extends "core/base_public.html" %}
+{% block title %}Upload de Imagens · Multiview{% endblock %}
+{% block content %}
+<section class="card">
+  <h1 class="page-title">Upload de imagens — {{ projeto.nome }}</h1>
+  <p class="subtitle">Bucket alvo: {{ s3_bucket }}</p>
+  <p>Esta é uma página placeholder. Aqui entra o componente JS de upload direto para S3/MinIO usando o endpoint <code>/projetos/{{ projeto.pk }}/upload/presign/</code>.</p>
+</section>
+{% endblock %}

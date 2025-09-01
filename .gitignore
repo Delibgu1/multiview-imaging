@@ -1,0 +1,17 @@
+﻿# Python/Django
+__pycache__/
+*.pyc
+.env
+*.sqlite3
+
+/web/staticfiles/
+/web/static/
+/infra/minio-data/
+/media/
+/uploads/
+/env/
+/venv/
+/.venv/
+.vscode/
+.idea/
+.DS_Store

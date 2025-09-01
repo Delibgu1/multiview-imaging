@@ -1,0 +1,156 @@
+
+# Variáveis comuns para web/worker
+x-env: &commons
+  # S3 / MinIO
+  S3_BUCKET: ${S3_BUCKET:-multiview-data}
+  S3_REGION: ${S3_REGION:-us-east-1}
+  # endpoint interno (rede docker) para o boto3
+  S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-http://minio:9000}
+  # endpoint público (navegador)
+  S3_BROWSER_ENDPOINT: ${S3_BROWSER_ENDPOINT:-http://localhost:9000}
+  # credenciais
+  S3_ACCESS_KEY: ${S3_ACCESS_KEY:-multiview}
+  S3_SECRET_KEY: ${S3_SECRET_KEY:-senha_123}
+
+  # Banco (use o host "db" e porta 5432 dentro da rede docker)
+  DATABASE_URL: ${DATABASE_URL:-postgis://multiview:multiview@db:5432/multiview}
+
+  # Redis
+  REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+
+  # Celery (forçamos Redis como broker/result)
+  CELERY_BROKER_URL: ${CELERY_BROKER_URL:-redis://redis:6379/0}
+  CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND:-redis://redis:6379/1}
+
+  # Outros serviços internos
+  TITILER_URL: ${TITILER_URL:-http://titiler:8000}
+  ODM_CLUSTER_URL: ${ODM_CLUSTER_URL:-http://clusterodm:3001}
+
+  # Django
+  DJANGO_DEBUG: ${DJANGO_DEBUG:-1}
+  DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+  SECRET_KEY: ${SECRET_KEY:-dev-secret}
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-multiview}
+      POSTGRES_USER: ${POSTGRES_USER:-multiview}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-multiview}
+    ports:
+      - "5433:5432"   # host:container
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-multiview} -d ${POSTGRES_DB:-multiview}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-multiview}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-senha_123}
+      MINIO_API_CORS_ALLOW_ORIGIN: http://localhost:8000,http://127.0.0.1:8000
+      MINIO_API_CORS_ALLOW_METHODS: GET,PUT,POST,DELETE,OPTIONS
+      MINIO_API_CORS_ALLOW_HEADERS: "*"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./minio-data:/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/ready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  titiler:
+    image: ghcr.io/developmentseed/titiler:latest
+    environment:
+      WORKERS_PER_CORE: 1
+    ports:
+      - "8081:8000"
+    restart: unless-stopped
+
+  nodeodm:
+    image: opendronemap/nodeodm:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - odmdata:/var/www/data
+    restart: unless-stopped
+
+  clusterodm:
+    image: opendronemap/clusterodm:latest
+    depends_on:
+      - nodeodm
+    command: ["--port","3001","--max-concurrency","2","--odm-host","nodeodm","--odm-port","3000"]
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+
+  web:
+    build: ../web
+    working_dir: /app
+    volumes:
+      - ../web:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      <<: *commons
+      DJANGO_SETTINGS_MODULE: core.settings
+      # Aliases p/ boto3 / libs que esperam convenções AWS
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-multiview}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-senha_123}
+      S3_REGION_NAME: ${S3_REGION:-us-east-1}
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-multiview}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-senha_123}
+      AWS_DEFAULT_REGION: ${S3_REGION:-us-east-1}
+    ports:
+      - "8000:8000"
+    command: bash -lc "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/projetos/ping/', timeout=3).status==200 else 1)" ]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 25s
+    restart: unless-stopped
+
+  worker:
+    build: ../web
+    command: celery -A core worker -Q photogrammetry -l INFO
+    environment:
+      <<: *commons
+    volumes:
+      - ../web:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      clusterodm:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  odmdata:

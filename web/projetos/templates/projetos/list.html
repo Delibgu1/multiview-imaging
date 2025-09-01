@@ -1,0 +1,101 @@
+
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>Projetos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
+    h1 { margin: 0 0 16px }
+    .toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
+    .btn { display:inline-block; padding:10px 14px; border-radius:8px; border:1px solid #0a7; background:#0a7; color:#fff; text-decoration:none; font-weight:600 }
+    .btn-outline { background:#fff; color:#0a7 }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 8px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+    th { background:#f8fafc; font-weight: 600; }
+    .muted { color: #6b7280; }
+    .actions a { margin-right: 8px; text-decoration: none; color: #0a7; }
+    nav.pager { display:flex; gap:8px; align-items:center; margin-top:16px; }
+    nav.pager a, nav.pager span { padding:6px 10px; border:1px solid #e5e7eb; border-radius:6px; text-decoration:none; color:#111; }
+    nav.pager .current { background:#0a7; color:#fff; border-color:#0a7; }
+    .empty { padding:24px; border:1px dashed #e5e7eb; border-radius:12px; background:#fafafa; }
+  </style>
+</head>
+<body>
+
+  <h1>Projetos</h1>
+
+  <div class="toolbar">
+    <a class="btn" href="{% url 'projetos:new' %}">+ Novo projeto</a>
+    <a class="btn btn-outline" href="{% url 'projetos:index' %}">Atualizar lista</a>
+  </div>
+
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if projetos %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Câmera</th>
+          <th>GeoRef</th>
+          <th>EPSG</th>
+          <th>Status</th>
+          <th>Criado</th>
+          <th class="actions">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in projetos %}
+          <tr>
+            <td>#{{ p.id }}</td>
+            <td>{{ p.nome }}</td>
+            <td class="muted">{{ p.get_camera_tipo_display }}</td>
+            <td class="muted">{{ p.get_georef_display }}</td>
+            <td class="muted">{{ p.epsg|default:"—" }}</td>
+            <td>{{ p.get_status_display }}</td>
+            <td class="muted">{{ p.criado_em|date:"d/m/Y H:i" }}</td>
+            <td class="actions">
+              <a href="{% url 'projetos:detail' p.pk %}">Abrir</a>
+              <a href="{% url 'projetos:upload' p.pk %}">Upload</a>
+              <a href="{% url 'projetos:new' %}?base={{ p.pk }}">Duplicar</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if is_paginated %}
+      <nav class="pager" aria-label="Paginação">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}">&larr; Anterior</a>
+        {% else %}
+          <span class="muted">&larr; Anterior</span>
+        {% endif %}
+
+        <span class="current">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}">Próxima &rarr;</a>
+        {% else %}
+          <span class="muted">Próxima &rarr;</span>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="empty">
+      Nenhum projeto ainda. Clique em <strong>“+ Novo projeto”</strong> para começar.
+    </div>
+  {% endif %}
+
+</body>
+</html>

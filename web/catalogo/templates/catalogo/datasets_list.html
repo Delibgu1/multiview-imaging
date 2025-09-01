@@ -1,0 +1,56 @@
+<!-- catalogo/templates/catalogo/datasets_list.html -->
+<table>
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Tamanho</th>
+      <th>Status</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for ds in datasets %}
+    <tr>
+      <td>{{ ds.nome }}</td>
+      <td>{{ ds.tamanho_b|default:"-" }}</td>
+      <td>{{ ds.status }}</td>
+      <td>
+        {% if ds.s3_key %}
+          <a href="#"
+             class="btn-download"
+             data-key="{{ ds.s3_key }}">
+            ⬇️ Baixar
+          </a>
+        {% else %}
+          —
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<script>
+document.querySelectorAll('.btn-download').forEach(btn => {
+  btn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const key = btn.dataset.key;
+    try {
+      const r = await fetch(`/downloads/presign/?key=${encodeURIComponent(key)}`, {
+        credentials: 'same-origin' // envia cookies de sessão p/ @login_required
+      });
+      if (!r.ok) {
+        const txt = await r.text();
+        alert('Erro ao gerar link: ' + r.status + ' - ' + txt);
+        return;
+      }
+      const { url } = await r.json();
+      // Dica: redirecione o navegador; evita CORS no fetch de leitura
+      window.location.href = url;
+    } catch (err) {
+      console.error(err);
+      alert('Falha ao obter link de download.');
+    }
+  });
+});
+</script>

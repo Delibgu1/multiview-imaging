@@ -1,0 +1,13 @@
+
+{% extends "core/base_public.html" %}
+{% block title %}Projeto {{ projeto.id }} · Multiview{% endblock %}
+{% block content %}
+<section class="card wide">
+  <h1 class="page-title">{{ projeto.nome }}</h1>
+  <p class="subtitle">Criado em {{ projeto.criado_em|date:"d/m/Y H:i" }}</p>
+  <div style="display:flex; gap:10px; margin-top:10px">
+    <a class="btn" href="{% url 'uploads:index' %}?projeto={{ projeto.id }}">Enviar imagens</a>
+    <a class="btn btn-ghost" href="#">Processar (em breve)</a>
+  </div>
+</section>
+{% endblock %}

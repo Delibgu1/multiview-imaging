@@ -1,0 +1,34 @@
+
+
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{% block title %}Multiview{% endblock %}</title>
+
+  <link rel="icon" href="{% static 'core/img/favicon.ico' %}">
+  <link rel="stylesheet" href="{% static 'core/css/site.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="mv-public">
+  <div class="page">
+
+    <header class="site-topbar">
+      <div class="container topbar-inner">
+        <img class="brand" src="{% static 'core/img/logo_multiview_verde.png' %}" alt="Multiview">
+        {% block topbar %}{% endblock %}
+      </div>
+    </header>
+
+    <main class="container">
+      {% block content %}{% endblock %}
+    </main>
+
+    {% include "core/partials/footer.html" %}
+  </div>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

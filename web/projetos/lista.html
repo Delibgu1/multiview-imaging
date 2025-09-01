@@ -1,0 +1,41 @@
+
+{% extends "core/base_public.html" %}
+{% block title %}Meus Projetos · Multiview{% endblock %}
+{% block content %}
+<section class="card" style="max-width:1100px">
+  <header style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <h1 style="margin:0">Meus Projetos</h1>
+    <a href="{% url 'projetos:novo' %}" class="tile" style="padding:8px 12px">+ Novo</a>
+  </header>
+
+  <div style="overflow:auto">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th><th>Nome</th><th>Câmera</th><th>GeoRef</th><th>EPSG</th><th>Criado</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for p in projetos %}
+        <tr>
+          <td>{{ p.id }}</td>
+          <td>{{ p.nome }}</td>
+          <td>{{ p.get_camera_tipo_display }}</td>
+          <td>{{ p.get_georef_display }}</td>
+          <td>{{ p.epsg|default:"—" }}</td>
+          <td>{{ p.criado_em|date:"d/m/Y H:i" }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6">Nenhum projeto ainda.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<style>
+.table{border-collapse:collapse;width:100%}
+.table th,.table td{border:1px solid #e4eedf;padding:10px;text-align:left}
+.table th{background:#f7fbf4}
+</style>
+{% endblock %}

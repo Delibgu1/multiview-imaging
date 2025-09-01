@@ -1,0 +1,16 @@
+
+{% extends "core/base_public.html" %}
+{% block title %}Novo projeto · Multiview{% endblock %}
+{% block content %}
+<section class="card wide">
+  <h1 class="page-title">Novo projeto</h1>
+  <p class="subtitle">Versão mínima do formulário (temporário).</p>
+  <form method="post" enctype="multipart/form-data" class="form-grid">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="actions">
+      <button type="submit">Salvar</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

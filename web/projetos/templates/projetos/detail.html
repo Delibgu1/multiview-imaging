@@ -1,0 +1,9 @@
+{% extends "core/base_public.html" %}
+{% block title %}Projeto · Multiview{% endblock %}
+{% block content %}
+<section class="card">
+  <h1 class="page-title">{{ projeto.nome }}</h1>
+  <p class="subtitle">Status: {{ projeto.get_status_display }}</p>
+  <p><a class="btn" href="{{ projeto.get_upload_url }}">Ir para Upload</a></p>
+</section>
+{% endblock %}

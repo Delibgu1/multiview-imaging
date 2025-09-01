@@ -1,0 +1,37 @@
+
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block titulo_pagina %}MultiView • Datasets{% endblock %}
+
+{% block conteudo %}
+  {% include "includes/titulo_pagina.html" with titulo="Datasets - Catálogo" %}
+  <div class="area-usuarios" style="max-width:1200px;margin:0 auto;">
+    <div class="botoes-linha" style="display:flex;gap:12px;margin-bottom:16px;">
+      {% include "includes/botao_padrao.html" with texto="Incluir/Upload" id="btn-incluir" estado="ativo" href="{% url 'uploads:upload_page' %}" externo="False" %}
+      {% include "includes/botao_padrao.html" with texto="Consultar" id="btn-consultar" estado="inativo" href="" externo="False" %}
+      {% include "includes/botao_padrao.html" with texto="Editar" id="btn-editar" estado="inativo" href="" externo="False" %}
+      {% include "includes/botao_padrao.html" with texto="Relatório" id="btn-relatorio" estado="ativo" href="#" externo="False" %}
+    </div>
+
+    {% include "includes/tabela_padrao.html" with
+      cabecalhos="ID,Nome,Tipo,Tamanho,Status"
+      registros=datasets
+      chave_id="id"
+      campos="id,nome,tipo,tamanho,status"
+      selecionavel="True" %}
+  </div>
+
+  <script>
+    document.addEventListener('tabela:selecionou', () => {
+      for (const id of ['btn-consultar','btn-editar']){
+        const b=document.getElementById(id); b.classList.remove('inativo'); b.classList.add('ativo'); b.setAttribute('href','#');
+      }
+    });
+    document.addEventListener('tabela:desselecionou', () => {
+      for (const id of ['btn-consultar','btn-editar']){
+        const b=document.getElementById(id); b.classList.remove('ativo'); b.classList.add('inativo'); b.removeAttribute('href');
+      }
+    });
+  </script>
+{% endblock %}

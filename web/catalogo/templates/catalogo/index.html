@@ -1,0 +1,43 @@
+
+{% extends "core/base_public.html" %}
+
+{% block title %}Meus Projetos de Imagem{% endblock %}
+
+{% block content %}
+<section class="card wide">
+  <h1 class="page-title">Meus Projetos de Imagem</h1>
+  <p class="subtitle">Acompanhe seus uploads, status e links de download.</p>
+
+  <div class="actions-row">
+    <!-- use url nomeada quando estiver 100% definida; por ora, caminho direto -->
+    <a class="btn-link" href="/datasets/uploads/">➕ Novo upload</a>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Status</th>
+        <th>Criado</th>
+        <th>S3 Key</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in datasets %}
+        <tr>
+          <td>{{ d.id }}</td>
+          <td>{{ d.nome }}</td>
+          <td>{{ d.get_status_display }}</td>
+          <td>{{ d.criado_em|date:"d/m/Y H:i" }}</td>
+          <td>{{ d.s3_key }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="5">Nenhum dataset ainda.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
