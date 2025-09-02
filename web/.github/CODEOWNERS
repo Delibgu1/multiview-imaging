@@ -1,0 +1,6 @@
+﻿core/templates/core/base_public.html     @seu-usuario-ou-time
+core/templates/core/login.html           @seu-usuario-ou-time
+core/templates/core/partials/footer.html @seu-usuario-ou-time
+core/static/core/css/site.css            @seu-usuario-ou-time
+core/static/core/css/auth.css            @seu-usuario-ou-time
+core/static/core/img/*                   @seu-usuario-ou-time

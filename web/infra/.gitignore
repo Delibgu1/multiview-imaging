@@ -1,0 +1,8 @@
+﻿.env
+*.env
+minio-data/
+*-data/
+*.log
+*.pid
+*.sock
+tmp/

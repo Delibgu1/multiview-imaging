@@ -1,0 +1,8 @@
+﻿version: "3.9"
+services:
+  minio:
+    volumes:
+      - minio_data:/data
+volumes:
+  minio_data:
+    driver: local
