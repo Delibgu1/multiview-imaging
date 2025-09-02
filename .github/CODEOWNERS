@@ -4,3 +4,10 @@ core/templates/core/partials/footer.html @seu-usuario-ou-time
 core/static/core/css/site.css            @seu-usuario-ou-time
 core/static/core/css/auth.css            @seu-usuario-ou-time
 core/static/core/img/*                   @seu-usuario-ou-time
+
+web/core/templates/core/base_public.html     @seu-usuario-ou-time
+web/core/templates/core/login.html           @seu-usuario-ou-time
+web/core/templates/core/partials/footer.html @seu-usuario-ou-time
+web/core/static/core/css/site.css            @seu-usuario-ou-time
+web/core/static/core/css/auth.css            @seu-usuario-ou-time
+web/core/static/core/img/*                   @seu-usuario-ou-time

@@ -1,27 +1,4 @@
 ﻿name: Login Guard
-on:
-  pull_request:
-    paths:
-      - 'core/templates/core/base_public.html'
-      - 'core/templates/core/login.html'
-      - 'core/templates/core/partials/footer.html'
-      - 'core/static/core/css/site.css'
-      - 'core/static/core/css/auth.css'
-      - 'core/static/core/img/**'
-jobs:
-  guard:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Fail unless approved label is present
-        uses: mheap/github-action-required-labels@v3
-        with:
-          mode: exactly
-          count: 1
-          labels: |
-            approved:login-change
-name: Login Guard
 
 on:
   pull_request:
@@ -32,6 +9,12 @@ on:
       - 'core/static/core/css/site.css'
       - 'core/static/core/css/auth.css'
       - 'core/static/core/img/**'
+      - 'web/core/templates/core/base_public.html'
+      - 'web/core/templates/core/login.html'
+      - 'web/core/templates/core/partials/footer.html'
+      - 'web/core/static/core/css/site.css'
+      - 'web/core/static/core/css/auth.css'
+      - 'web/core/static/core/img/**'
 
 jobs:
   guard:
