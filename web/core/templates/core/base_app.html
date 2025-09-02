@@ -1,40 +1,16 @@
 
+{% extends "core/base_public.html" %}
 {% load static %}
-<!doctype html>
-<html lang="pt-br">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>{% block title %}Multiview{% endblock %}</title>
 
-  <link rel="icon" href="{% static 'core/img/favicon.ico' %}">
-  <link rel="stylesheet" href="{% static 'core/css/site.css' %}">
-  {% block extra_css %}{% endblock %}
-</head>
-<body class="mv-app">
-  <div class="page">
+{% block topbar %}
+<nav class="main-nav">
+  <a href="{% url 'projetos:index' %}">Projetos</a>
+  <a href="#">Planos</a>
+  <a href="#">Arquivos de suporte</a>
+  <a href="{% url 'logout' %}">Sair</a>
+</nav>
+{% endblock %}
 
-    <header class="site-topbar">
-      <div class="container topbar-inner">
-        <a href="/" class="brand-link">
-          <img class="brand" src="{% static 'core/img/logo_multiview_verde.png' %}" alt="Multiview">
-        </a>
-        <nav class="main-nav">
-          <a href="{% url 'projetos:index' %}">Projetos</a>
-          <a href="#">Planos</a>
-          <a href="#">Arquivos de suporte</a>
-          <a href="{% url 'logout' %}">Sair</a>
-        </nav>
-      </div>
-    </header>
-
-    <main class="container">
-      {% block content %}{% endblock %}
-    </main>
-
-    {% include "core/partials/footer.html" %}
-  </div>
-
-  {% block extra_js %}{% endblock %}
-</body>
-</html>
+{% block content %}
+<!-- Suas páginas autenticadas colocarão conteúdo aqui -->
+{% endblock %}

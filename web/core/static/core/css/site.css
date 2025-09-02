@@ -1,0 +1,30 @@
+:root{
+  --mv-bg-multiview:#72A348; /* fundo de tela */
+  --mv-footer-top:#00371C;   /* faixa superior 5px */
+  --mv-footer-mid:#72A348;   /* faixa intermediária 7px */
+  --mv-footer-bg:#80CB2E;    /* fundo do rodapé */
+  --mv-text:#222;
+}
+/* Layout sem scroll: footer sempre no fim */
+html, body { height:100%; }
+body.layout-root{ display:flex; flex-direction:column; min-height:100vh; margin:0; }
+.mv-main{ flex:1 0 auto; display:flex; align-items:center; justify-content:center; padding:24px; }
+body.mv-bg--multiview{ background:var(--mv-bg-multiview); color:var(--mv-text); font:400 15px/1.45 system-ui,Segoe UI,Roboto,sans-serif }
+
+/* Rodapé em 3 faixas + conteúdo (3 colunas) */
+.mv-footer__band--top{height:5px;background:var(--mv-footer-top)}
+.mv-footer__band--mid{height:7px;background:var(--mv-footer-mid)}
+.mv-footer__content{
+  background:var(--mv-footer-bg);
+  color:#fff;
+  display:grid;
+  grid-template-columns:1fr 2fr 1fr;
+  align-items:center;
+  padding:10px 20px;
+}
+.mv-footer__slot--center{text-align:center;font-family:Roboto,system-ui,sans-serif}
+.mv-footer__line{line-height:1.25}
+.mv-footer__line--strong{font-weight:700}
+.mv-footer__slot--right{display:flex;justify-content:flex-end}
+.mv-footer__logo{height:80px;padding-left:30px}
+.mv-footer__slogan{height:60px;padding-right:30px}

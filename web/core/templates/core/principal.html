@@ -1,0 +1,71 @@
+{% extends 'core/base_public.html' %}
+{% load static %}
+{% block title %}Menu • Multiview{% endblock %}
+{% block head_extra %}
+  <link rel="stylesheet" href="{% static 'core/css/menu.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="mv-menu">
+  <header class="mv-menu__header">
+    <h1>Menu</h1>
+    <p>Escolha um módulo para começar</p>
+  </header>
+
+  <nav class="mv-menu__grid" aria-label="Menu principal">
+    <a class="mv-card" href="/projetos/">
+      <div class="mv-card__icon" aria-hidden="true">
+        <!-- folder icon -->
+        <svg viewBox="0 0 24 24"><path d="M10 4l2 2h8a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2h6z"/></svg>
+      </div>
+      <div class="mv-card__title">Projetos</div>
+      <div class="mv-card__desc">Crie e gerencie projetos</div>
+    </a>
+
+    <a class="mv-card" href="/uploads/">
+      <div class="mv-card__icon" aria-hidden="true">
+        <!-- upload icon -->
+        <svg viewBox="0 0 24 24"><path d="M12 3l4 4h-3v6h-2V7H8l4-4zm-7 14h14v2H5a2 2 0 01-2-2v-3h2v3z"/></svg>
+      </div>
+      <div class="mv-card__title">Uploads</div>
+      <div class="mv-card__desc">Envie imagens e GCPs</div>
+    </a>
+
+    <a class="mv-card" href="/processamento/">
+      <div class="mv-card__icon" aria-hidden="true">
+        <!-- gear icon -->
+        <svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 100 8 4 4 0 000-8zm9 4l-2.1.8.2 2.3-2.3.9-1.3 1.9-2.2-1-2.2 1-1.3-1.9-2.3-.9.2-2.3L3 12l2.1-.8-.2-2.3 2.3-.9 1.3-1.9 2.2 1 2.2-1 1.3 1.9 2.3.9-.2 2.3L21 12z"/></svg>
+      </div>
+      <div class="mv-card__title">Processamento</div>
+      <div class="mv-card__desc">Configurar e iniciar jobs</div>
+    </a>
+
+    <a class="mv-card" href="/analytics/">
+      <div class="mv-card__icon" aria-hidden="true">
+        <!-- chart icon -->
+        <svg viewBox="0 0 24 24"><path d="M3 3h2v18H3V3zm4 10h2v8H7v-8zm4-6h2v14h-2V7zm4 4h2v10h-2V11zm4 6h2v4h-2v-4z"/></svg>
+      </div>
+      <div class="mv-card__title">Análises</div>
+      <div class="mv-card__desc">Índices e relatórios</div>
+    </a>
+
+    <a class="mv-card" href="/conta/">
+      <div class="mv-card__icon" aria-hidden="true">
+        <!-- user/gear -->
+        <svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 10-5-5 5 5 0 005 5zm0 2c-4.33 0-8 2.17-8 5v1h16v-1c0-2.83-3.67-5-8-5z"/></svg>
+      </div>
+      <div class="mv-card__title">Conta</div>
+      <div class="mv-card__desc">Organização e usuários</div>
+    </a>
+
+    <a class="mv-card mv-card--danger" href="/logout/">
+      <div class="mv-card__icon" aria-hidden="true">
+        <!-- logout -->
+        <svg viewBox="0 0 24 24"><path d="M10 17l-1.41-1.41L12.17 12 8.59 8.41 10 7l5 5-5 5zM4 19h6v2H4a2 2 0 01-2-2V5a2 2 0 012-2h6v2H4z"/></svg>
+      </div>
+      <div class="mv-card__title">Sair</div>
+      <div class="mv-card__desc">Encerrar sessão</div>
+    </a>
+  </nav>
+</section>
+{% endblock %}
