@@ -7,15 +7,71 @@
   --mv-primary:#72A348;
   --mv-primary-600:#5C9431;
   --mv-danger:#A32F2F;
+  --mv-deep:#00371C;
+  --mv-foot:#80CB2E;
 }
-.mv-menu{width:min(1100px, 100%);margin-inline:auto}
-.mv-menu__header{color:#00371C;text-align:center;margin-bottom:12px}
-.mv-menu__header h1{margin:0 0 4px 0}
-.mv-menu__grid{
+
+/* Fundo igual ao login, só nesta página (este CSS é carregado apenas aqui) */
+body{ background: var(--mv-primary) !important; }
+
+/* ====== Layout principal ====== */
+.mv-page{
+  min-height: calc(100vh - 120px); /* espaço pro rodapé já existente */
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  padding: 6px 12px 16px;
+}
+
+/* ====== Topbar: ícone + nome + créditos/plano ====== */
+.mv-topbar{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  margin: 4px auto 0;
+  width:min(1200px, 100%);
+}
+
+.mv-userbox{
+  display:flex; align-items:center; gap:10px;
+  background: rgba(255,255,255,.25);
+  border: 1px solid rgba(0,0,0,.05);
+  backdrop-filter: blur(2px);
+  padding:8px 12px; border-radius:12px;
+  color: var(--mv-deep);
+}
+.mv-usericon .mv-icon{ width:28px; height:28px; fill: var(--mv-deep); }
+.mv-userinfo{ line-height:1.1; }
+.mv-username{ font-weight:800; }
+.mv-userplan{ font-size:.92rem; opacity:.95; }
+
+/* ====== Hero (drone + NDVI) ====== */
+.mv-hero{
+  width:min(1200px, 100%);
+  margin: 0 auto;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow: var(--mv-shadow);
+  border:1px solid var(--mv-border);
+  background:#8fd463;
+}
+.mv-hero-svg{
+  width:100%; height:260px; display:block;
+}
+
+/* ====== GRID com 4 cartões ====== */
+.mv-grid{
+  width:min(1200px, 100%);
+  margin: 0 auto;
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-  gap:14px;
+  gap:16px;
+  grid-template-columns: repeat(2, minmax(260px,1fr));
 }
+@media (max-width:900px){
+  .mv-grid{ grid-template-columns: 1fr; }
+}
+
+/* ====== Cartões (compatível com seu BEM e com a nova marcação) ====== */
 .mv-card{
   display:block;
   background:var(--mv-card);
@@ -27,10 +83,48 @@
   box-shadow:var(--mv-shadow);
   transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
 }
-.mv-card:hover{ transform: translateY(-2px); box-shadow:0 12px 36px rgba(16,24,40,.10); border-color:#d0d7de; }
-.mv-card__icon{ width:44px; height:44px; border-radius:12px; display:grid; place-items:center; background:#eef6ea; margin-bottom:10px; }
-.mv-card__icon svg{ width:24px; height:24px; fill:var(--mv-primary) }
-.mv-card__title{ font-weight:700; margin-bottom:4px; }
-.mv-card__desc{ font-size:14px; color:#475569 }
-.mv-card--danger .mv-card__icon{ background:#fdecec }
-.mv-card--danger .mv-card__icon svg{ fill:var(--mv-danger) }
+.mv-card:hover{
+  transform: translateY(-2px);
+  box-shadow:0 12px 36px rgba(16,24,40,.10);
+  border-color:#d0d7de;
+}
+.mv-card:focus-visible{
+  outline: 3px solid #0ea5e9;
+  outline-offset: 2px;
+  border-radius:16px;
+}
+
+/* Ícone do cartão: aceita .mv-card__icon (seu HTML antigo) e .mv-card-icon (novo) */
+.mv-card__icon,
+.mv-card-icon{
+  width:44px; height:44px; border-radius:12px;
+  display:grid; place-items:center;
+  background:#eef6ea; margin-bottom:10px;
+}
+.mv-card__icon svg,
+.mv-card-icon svg{
+  width:24px; height:24px; fill:var(--mv-primary);
+}
+
+/* Título/descrição: aceita os dois padrões de classe */
+.mv-card__title,
+.mv-card-title{ font-weight:800; margin-bottom:4px; color: var(--mv-deep); }
+
+.mv-card__desc,
+.mv-card-desc{ font-size:14px; color:#475569 }
+
+/* Variação "danger" (logout, etc.) — mantém seu padrão */
+.mv-card--danger .mv-card__icon,
+.mv-card--danger .mv-card-icon{ background:#fdecec }
+.mv-card--danger .mv-card__icon svg,
+.mv-card--danger .mv-card-icon svg{ fill:var(--mv-danger) }
+
+/* ====== Seções BEM antigas (mantidas p/ retrocompatibilidade) ====== */
+.mv-menu{ width:min(1100px, 100%); margin-inline:auto }
+.mv-menu__header{ color:#00371C; text-align:center; margin-bottom:12px }
+.mv-menu__header h1{ margin:0 0 4px 0 }
+.mv-menu__grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap:14px;
+}
