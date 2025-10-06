@@ -1,0 +1,74 @@
+
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{% block title %}SinergicaAgro · Multiview{% endblock %}</title>
+
+  {# CSS global do site #}
+  <link rel="stylesheet" href="{% static 'core/css/site.css' %}">
+  {# CSS que você já usa nas páginas com hero/menu #}
+  <link rel="stylesheet" href="{% static 'core/elementos/css/layout_base.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/menu.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/layout.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/buttons.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/actions.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/modal.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/components/user_chip.css' %}">
+
+  <script type="module">
+    import { bindHelp } from "{% static 'core/elementos/js/modals.js' %}";
+    window.mvBindHelp = bindHelp; // opcional: expõe para uso inline
+  </script>
+
+  {# CSS adicional por página #}
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="mv-bg mv-bg--multiview">
+  <div class="mv-bg__image"></div>
+
+  <header class="mv-topbar-global">
+    <div class="mv-topbar-global__wrap">
+      <a class="mv-brand" href="{% url 'core:principal' %}">
+        <img src="{% static 'core/img/Logo-multiview.png' %}" alt="Multiview" height="28">
+      </a>
+      <nav class="mv-nav">
+        {% if request.user.is_authenticated %}
+          <span class="mv-nav__hi">Olá, {{ request.user.get_short_name|default:request.user.username }}</span>
+          <a class="mv-btn mv-btn--ghost" href="{% url 'admin:index' %}">Admin</a>
+          <a class="mv-btn mv-btn--ghost" href="{% url 'core:logout' %}">Sair</a>
+        {% else %}
+          <a class="mv-btn mv-btn--primary" href="{% url 'core:login' %}">Entrar</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="mv-wrap">
+    {% if messages %}
+      <div class="mv-flashstack">
+        {% for m in messages %}<div class="mv-flash">{{ m }}</div>{% endfor %}
+      </div>
+    {% endif %}
+
+    {# CONTEÚDO DAS PÁGINAS #}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="mv-footer">
+    <div class="mv-wrap mv-footer__inner">
+      <div>© {{ now|date:"Y" }} SinergicaAgro · Multiview</div>
+      <div class="mv-footer__links">
+        <a href="#">Termos</a>
+        <a href="#">Privacidade</a>
+      </div>
+    </div>
+  </footer>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

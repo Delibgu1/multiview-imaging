@@ -1,0 +1,16 @@
+
+{% extends "core/base_app.html" %}
+{% load static %}
+{% block content %}
+  {% static 'core/img/icon/lista_projetos.svg' as icon_lista %}
+  {% include "core/elementos/title_header.html" with icon_url=icon_lista titulo="Objetivo do Projeto" %}
+  <section class="mv-body">
+    {% include "projetos/partials/dados/bloco_dados.html" %}
+    {% include "core/elementos/actions/actions_wizard.html" %}
+  </section>
+{% endblock %}
+{% block extra_js %}
+<script type="module">
+  window.mvBindHelp?.('js-help-aoi-btn','help-aoi');
+</script>
+{% endblock %}

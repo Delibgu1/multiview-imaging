@@ -1,0 +1,16 @@
+
+{% extends "core/base_public.html" %}
+{% load static %}
+
+{% block topbar %}
+<nav class="main-nav">
+  <a href="{% url 'projetos:index' %}">Projetos</a>
+  <a href="#">Planos</a>
+  <a href="#">Arquivos de suporte</a>
+  <a href="{% url 'logout' %}">Sair</a>
+</nav>
+{% endblock %}
+
+{% block content %}
+<!-- Suas páginas autenticadas colocarão conteúdo aqui -->
+{% endblock %}

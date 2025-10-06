@@ -1,0 +1,12 @@
+# This override replaces bind mounts to infra/minio-data with a named volume.
+# Keep your original docker-compose.yml intact.
+version: "3.9"
+
+services:
+  minio:
+    volumes:
+      - minio_data:/data
+
+volumes:
+  minio_data:
+    driver: local

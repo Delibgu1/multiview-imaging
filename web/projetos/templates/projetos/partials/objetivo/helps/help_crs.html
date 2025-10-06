@@ -1,0 +1,64 @@
+
+
+{% load static %}
+<dialog id="help-crs" class="mv-modal" aria-labelledby="help-crs-title" aria-modal="true">
+  <div class="mv-modal__content">
+    <button type="button" class="mv-modal__close js-close-help" aria-label="Fechar">×</button>
+
+    <h3 id="help-crs-title">CRS — Sistema de Coordenadas</h3>
+
+    <p><strong>Em uma frase:</strong> o CRS é o “idioma do mapa”: define como cada ponto é
+      colocado na Terra. No Brasil, o padrão oficial é <b>SIRGAS&nbsp;2000</b>. Para
+      trabalhar e <b>medir em metros</b>, use a versão <b>UTM</b> da zona do seu projeto.</p>
+
+    <h4>Quando usar cada um?</h4>
+    <ul>
+      <li><strong>SIRGAS&nbsp;2000 / UTM (recomendado para medição):</strong>
+        projetos <b>oficiais</b> (CAR, SIGEF, licenciamento, perícia),
+        cartografia/engenharia, relatórios onde área/ distância precisam estar corretas
+        em metros. É o sistema <b>padrão do Brasil</b>.</li>
+
+      <li><strong>WGS84 / UTM (recomendado para navegação/compatibilidade):</strong>
+        integração com <b>GPS, monitores de máquinas, KML/GPX</b>, aplicativos móveis e
+        telemetria — é o sistema mais comum nesses equipamentos. Também trabalha em metros
+        (por ser UTM), então medições continuam coerentes.</li>
+
+      <li><strong>WGS84 (graus) EPSG:4326:</strong> ótimo para visualização global e web,
+        mas <b>não use</b> para calcular áreas/ distâncias (está em graus). Prefira
+        sempre uma versão <b>UTM</b> (em metros) quando for medir.</li>
+    </ul>
+
+    <h4>Como escolher a zona UTM</h4>
+    <p>Use a zona onde seu projeto está (hemisfério Sul). O Brasil vai, grosso modo,
+      de <b>18S a 25S</b>. O mapa abaixo ajuda a localizar a zona.</p>
+
+    <h4>Exemplos práticos (EPSG)</h4>
+    <table class="mv-table">
+      <thead>
+        <tr><th>CRS</th><th>Zona</th><th>EPSG</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>SIRGAS&nbsp;2000 / UTM</td><td>22S</td><td><code>31982</code></td></tr>
+        <tr><td>SIRGAS&nbsp;2000 / UTM</td><td>23S</td><td><code>31983</code></td></tr>
+        <tr><td>SIRGAS&nbsp;2000 / UTM</td><td>24S</td><td><code>31984</code></td></tr>
+        <tr><td>SIRGAS&nbsp;2000 / UTM</td><td>25S</td><td><code>31985</code></td></tr>
+        <tr><td>WGS84 / UTM (Sul)</td><td>22S</td><td><code>32722</code></td></tr>
+        <tr><td>WGS84 / UTM (Sul)</td><td>23S</td><td><code>32723</code></td></tr>
+        <tr><td>WGS84 / UTM (Sul)</td><td>24S</td><td><code>32724</code></td></tr>
+        <tr><td>WGS84 / UTM (Sul)</td><td>25S</td><td><code>32725</code></td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>Dica prática:</strong> combine com o cliente qual CRS será entregue.
+      Para fluxo interno/medições, <b>SIRGAS&nbsp;2000/UTM</b> é excelente;
+      para navegação/maquinário, muitos pedem <b>WGS84/UTM</b>. Ambos funcionam — use o que
+      atende a necessidade, e mantenha consistência.</p>
+
+    <figure class="mv-figure">
+      <img src="{% static 'core/img/utm_fusos_br.png' %}"
+           alt="Fusos UTM que cobrem o Brasil (linhas verticais = 6°)">
+      <figcaption>Localize a zona UTM do projeto (18S–25S, hemisfério Sul).</figcaption>
+    </figure>
+  </div>
+</dialog>
+

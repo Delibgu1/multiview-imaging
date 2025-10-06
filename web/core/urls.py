@@ -1,19 +1,22 @@
-# multiview/multiview_imaging/web/core/urls.py
-from django.contrib import admin
+
+from django.urls import path
+from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path, include
-from django.contrib.auth import views as auth_views
-from django.http import HttpResponse
-from django.views.generic import RedirectView
+
+
+app_name = "core"
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-
-    # Auth (templates em core/templates/registration/)
-    path("login/", auth_views.LoginView.as_view(template_name="registration/login.html"), name="login"),
-    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
-    path("password_reset/", auth_views.PasswordResetView.as_view(), name="password_reset"),
-
-    # App
-    path("", RedirectView.as_view(pattern_name="projetos:index", permanent=False)),
-    path("projetos/", include(("projetos.urls", "projetos"), namespace="projetos")),
+    path("", views.home_redirect, name="home"),
+    path("login/", views.login_view, name="login"),
+    path("logout/", views.logout_view, name="logout"),
+    path("principal/", views.principal, name="principal"),
+    path("creditos/", views.creditos, name="creditos"),
+    path("guias/", views.guias, name="guias"),
+    path("usuario/", views.usuario, name="usuario"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -7,10 +7,41 @@
   <title>{% block title %}Multiview{% endblock %}</title>
   <link rel="icon" href="{% static 'core/img/favicon.ico' %}">
   <link rel="stylesheet" href="{% static 'core/css/site.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/layout.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/buttons.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/actions.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/modal.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/components/user_chip.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/components/title_header.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/components/progress.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/layout_base.css' %}">
+
+<script type="module">
+  import { bindHelp } from "{% static 'core/elementos/js/modals.js' %}";
+  window.mvBindHelp = bindHelp; // opcional: expõe para uso inline
+</script>
+
   {% block head_extra %}{% endblock %}
 </head>
-<body class="mv-bg--multiview layout-root">
-  <main class="mv-main">{% block content %}{% endblock %}</main>
-  {% include 'core/partials/footer.html' %}
+
+<body class="mv-bg--multiview">
+    <div class="mv-page">
+      {% block topbar %}{% endblock %}
+
+      <main class="mv-main">
+        {% block content %}{% endblock %}
+      </main>
+
+      {% block footer %}
+        <footer class="mv-footer">
+          {% include 'core/partials/footer.html' %}
+        </footer>
+      {% endblock %}
+    </div>
+
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
+

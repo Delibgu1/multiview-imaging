@@ -1,0 +1,88 @@
+{% extends "core/base_public.html" %}
+{% load static %}
+
+{% block title %}Menu Multiview{% endblock %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="{% static 'core/css/menu.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="mv-page">
+
+  <!-- Topbar (usuário) -->
+  <div class="mv-topbar">
+    <div class="mv-userbox">
+      <div class="mv-usericon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" class="mv-icon">
+          <circle cx="12" cy="8" r="4"></circle>
+          <path d="M4,20c0-4,4-6,8-6s8,2,8,6"></path>
+        </svg>
+      </div>
+      <div class="mv-userinfo">
+        <div class="mv-username">{{ display_name|default:request.user.username }}</div>
+        <div class="mv-userplan">
+          {% if credits %}Créditos: {{ credits }}
+          {% elif plan %}Plano: {{ plan }}
+          {% else %}Plano: Básico{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO (foto do drone) -->
+  <figure class="mv-hero" role="img" aria-label="Drone capturando imagens multispectrais sobre lavoura de soja">
+    <img
+      src="{% static 'core/img/foto_drone.png' %}"
+      alt="Drone capturando imagens multispectrais sobre lavoura de soja"
+      class="mv-hero__img"
+      loading="eager">
+    <figcaption class="sr-only">Captura multispectral sobre lavoura</figcaption>
+  </figure>
+
+  <!-- GRID DE CARDS -->
+  <div class="mv-grid">
+    <!-- AQUI É A MUDANÇA: vai direto para a lista de projetos -->
+    <a class="mv-card" href="{% url 'projetos:index' %}">
+      <div class="mv-card-icon">
+        <img src="{% static 'core/img/icon/projetos.svg' %}" alt="" aria-hidden="true">
+      </div>
+      <div>
+        <div class="mv-card-title">Projetos</div>
+        <div class="mv-card-desc">Gerencie uploads, processamentos e resultados.</div>
+      </div>
+    </a>
+
+    <a class="mv-card" href="{% url 'core:creditos' %}">
+      <div class="mv-card-icon">
+        <img src="{% static 'core/img/icon/creditos.svg' %}" alt="" aria-hidden="true">
+      </div>
+      <div>
+        <div class="mv-card-title">Créditos</div>
+        <div class="mv-card-desc">Adicionar créditos, plano e extrato da conta.</div>
+      </div>
+    </a>
+
+    <a class="mv-card" href="{% url 'core:guias' %}">
+      <div class="mv-card-icon">
+        <img src="{% static 'core/img/icon/guias.svg' %}" alt="" aria-hidden="true">
+      </div>
+      <div>
+        <div class="mv-card-title">Guias &amp; Boas Práticas</div>
+        <div class="mv-card-desc">Voo, GCPs, RTK/PPK, processamento, NDVI, relatórios.</div>
+      </div>
+    </a>
+
+    <a class="mv-card" href="{% url 'core:usuario' %}">
+      <div class="mv-card-icon">
+        <img src="{% static 'core/img/icon/usuario.svg' %}" alt="" aria-hidden="true">
+      </div>
+      <div>
+        <div class="mv-card-title">Usuário</div>
+        <div class="mv-card-desc">Empresas, membros e preferências.</div>
+      </div>
+    </a>
+  </div>
+
+</div>
+{% endblock %}

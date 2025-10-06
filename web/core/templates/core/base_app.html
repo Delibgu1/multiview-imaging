@@ -2,15 +2,15 @@
 {% extends "core/base_public.html" %}
 {% load static %}
 
-{% block topbar %}
-<nav class="main-nav">
-  <a href="{% url 'projetos:index' %}">Projetos</a>
-  <a href="#">Planos</a>
-  <a href="#">Arquivos de suporte</a>
-  <a href="{% url 'logout' %}">Sair</a>
-</nav>
+{% block head_extra %}
+  <link rel="stylesheet" href="{% static 'core/css/components/user_chip.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/components/title_header.css' %}">
+  <script type="module">
+    import { bindHelp } from "{% static 'core/elementos/js/modals.js' %}";
+    window.mvBindHelp = bindHelp;
+  </script>
 {% endblock %}
 
-{% block content %}
-<!-- Suas páginas autenticadas colocarão conteúdo aqui -->
+{% block topbar %}
+
 {% endblock %}

@@ -1,34 +1,74 @@
 
 # core/settings.py
 from pathlib import Path
+from glob import glob
 import os
 import dj_database_url
 
-# Só aplica OSGeo4W se estiver no Windows (dev local)
-if os.name == "nt":
-    try:
-        os.add_dll_directory(r"C:\OSGeo4W\bin")
-        os.environ["PATH"] = os.environ.get("PATH", "") + r";C:\OSGeo4W\bin"
-        os.environ.setdefault("PROJ_LIB", r"C:\OSGeo4W\share\proj")
-        os.environ.setdefault("GDAL_DATA", r"C:\OSGeo4W\share\gdal")
-    except Exception:
-        pass
-
-# === Paths / Base ===
+# -----------------------------------------------------------------------------
+# Caminhos base
+# -----------------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# -----------------------------------------------------------------------------
+# Integração OSGeo4W (Windows) – GDAL/GEOS/PROJ
+# Somente em Windows (desenvolvimento local). No Linux/Docker, ignore.
+# -----------------------------------------------------------------------------
+if os.name == "nt":
+    OSGEO_ROOT = os.environ.get("OSGEO4W_ROOT") or r"C:\OSGeo4W"
+    BIN_DIR = os.path.join(OSGEO_ROOT, "bin")
+    try:
+        os.add_dll_directory(BIN_DIR)
+    except Exception:
+        pass
+    def _pick_one(pattern: str):
+        files = sorted(glob(os.path.join(BIN_DIR, pattern)), reverse=True)
+        return files[0] if files else None
 
-# === Autenticação / Redirects ===
-LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "projetos:index"
-LOGOUT_REDIRECT_URL = "login"
+    # Escolhe automaticamente a DLL instalada (ex.: gdal311.dll)
+    _gdal = _pick_one("gdal*.dll")
+    _geos = _pick_one("geos_c*.dll") or _pick_one("geos_c.dll")
 
-# === Segurança / Debug ===
+    # Expõe como SETTINGS que o Django GIS lê!
+    # (Se não encontrar, mantenha None — Django cairá no fallback e veremos o erro claramente)
+    GDAL_LIBRARY_PATH = _gdal
+    GEOS_LIBRARY_PATH = _geos
+
+    # Variáveis de dados do PROJ/GDAL (usadas por dependências do GDAL)
+    os.environ.setdefault("PROJ_LIB", os.path.join(OSGEO_ROOT, "share", "proj"))
+    os.environ.setdefault("GDAL_DATA", os.path.join(OSGEO_ROOT, "share", "gdal"))
+
+    # Também ajuda o carregador tradicional de DLLs
+    os.environ["PATH"] = BIN_DIR + ";" + os.environ.get("PATH", "")
+# -----------------------------------------------------------------------------
+# Segurança / Debug
+# -----------------------------------------------------------------------------
 SECRET_KEY = os.getenv("SECRET_KEY", "dev")
 DEBUG = os.getenv("DJANGO_DEBUG", "0") == "1"
-ALLOWED_HOSTS = [h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,[::1]").split(",")]
 
-# === Apps ===
+ALLOWED_HOSTS = [
+    h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,[::1]").split(",")
+]
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1",
+    "http://127.0.0.1:8000",
+    "http://localhost",
+    "http://localhost:8000",
+]
+
+# Cookies inseguros em dev (HTTP):
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
+CSRF_USE_SESSIONS = False
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# -----------------------------------------------------------------------------
+# Apps
+# -----------------------------------------------------------------------------
+
+DEBUG = True
+
 INSTALLED_APPS = [
     # Django
     "django.contrib.admin",
@@ -37,24 +77,26 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django.contrib.gis",          # mantém PostGIS/GDAL
+    "django.contrib.gis",  # PostGIS/GDAL
+
+
 
     # Terceiros
     "rest_framework",
 
     # Projeto
-    "projetos",
     "core",
+    "projetos",
     "catalogo",
     "processamento",
     "uploads_datasets",
 ]
 
-DEBUG = True
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
-CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:8000", "http://localhost:8000"]
-
-# === Middleware ===
+if DEBUG:
+    INSTALLED_APPS += ["django_extensions"]
+# -----------------------------------------------------------------------------
+# Middleware
+# -----------------------------------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -65,30 +107,29 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# Cookies não seguros em dev (HTTP)
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-# (opcional) deixar explícito os defaults:
-CSRF_COOKIE_HTTPONLY = False
-CSRF_USE_SESSIONS = False
-
-# MIDDLEWARE deve conter o CsrfViewMiddleware (padrão do Django)
-# 'django.middleware.csrf.CsrfViewMiddleware',
-
-
-# === URLs / WSGI / ASGI ===
-ROOT_URLCONF = "core.urls"
+# -----------------------------------------------------------------------------
+# URLs / WSGI / ASGI
+# -----------------------------------------------------------------------------
+ROOT_URLCONF = "core.urls_root"
 WSGI_APPLICATION = "core.wsgi.application"
 ASGI_APPLICATION = "core.asgi.application"
 
-# === Templates ===
-BASE_DIR = Path(__file__).resolve().parent.parent
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1",
+    "http://127.0.0.1:8000",
+    "http://localhost",
+    "http://localhost:8000",
+]
+
+# -----------------------------------------------------------------------------
+# Templates
+# -----------------------------------------------------------------------------
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        # Coloque aqui o diretório de templates do core
-        "DIRS": [BASE_DIR / "core" / "templates"],
+        "DIRS": [BASE_DIR / "core" / "templates"],  # base_public.html, etc.
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -104,45 +145,99 @@ TEMPLATES = [
         },
     },
 ]
-# === Banco de Dados (PostGIS) ===
-DEFAULT_DB_URL = "postgis://multiview:multiview@db:5432/multiview"
-DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_DB_URL)
-DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
-DATABASES["default"]["ENGINE"] = "django.contrib.gis.db.backends.postgis"
 
-# Correção defensiva no Docker (garante host/porta corretos dentro da rede)
-if os.path.exists("/.dockerenv"):
-    d = DATABASES["default"]
-    host = (d.get("HOST") or "").strip().lower()
-    port = str(d.get("PORT") or "").strip()
-    if host in ("", "127.0.0.1", "localhost"):
-        d["HOST"] = "db"
-    if port in ("", "none", "5433", ""):
-        d["PORT"] = "5432"
+# -----------------------------------------------------------------------------
+# Banco de Dados (PostGIS)
+# - Usa DATABASE_URL se existir; senão cai no Postgres local 127.0.0.1
+# - Em Docker (/.dockerenv) sem DATABASE_URL: força host "db"
+# -----------------------------------------------------------------------------
+def env_first(*names, default=None):
+    import os
+    for n in names:
+        v = os.getenv(n)
+        if v: return v
+    return default
 
-# === Idioma / Fuso ===
+DEFAULT_DB = {
+    "ENGINE": "django.contrib.gis.db.backends.postgis",
+    "NAME": env_first("DATABASE_NAME","DB_NAME","POSTGRES_DB","PGDATABASE", default="multiview"),
+    "USER": env_first("DATABASE_USER","DB_USER","POSTGRES_USER","PGUSER", default="mv"),
+    "PASSWORD": env_first("DATABASE_PASSWORD","DB_PASSWORD","POSTGRES_PASSWORD","PGPASSWORD", default="mvpass123!"),
+    "HOST": env_first("DATABASE_HOST","DB_HOST","POSTGRES_HOST","PGHOST", default="127.0.0.1"),
+    "PORT": env_first("DATABASE_PORT","DB_PORT","POSTGRES_PORT","PGPORT", default="5432"),
+    "CONN_MAX_AGE": 600,
+    "OPTIONS": {"sslmode": env_first("DB_SSLMODE","PGSSLMODE", default="disable")},
+}
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            engine="django.contrib.gis.db.backends.postgis",
+            conn_max_age=600,
+        )
+    }
+else:
+    DATABASES = {"default": DEFAULT_DB}
+
+# Ajuste automático em container Docker (se não houver DATABASE_URL)
+if os.path.exists("/.dockerenv") and not DATABASE_URL:
+    DATABASES["default"]["HOST"] = "db"
+    DATABASES["default"]["PORT"] = "5432"
+
+
+# -----------------------------------------------------------------------------
+# Idioma / Fuso
+# -----------------------------------------------------------------------------
 LANGUAGE_CODE = "pt-br"
 TIME_ZONE = "America/Sao_Paulo"
 USE_I18N = True
 USE_TZ = True
 
-# === Static / Media ===
-# Estáticos
+# -----------------------------------------------------------------------------
+# Arquivos estáticos e mídia
+# -----------------------------------------------------------------------------
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [BASE_DIR / "core" / "static"]  # NÃO inclua STATIC_ROOT aqui
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = BASE_DIR / "staticfiles"             # destino do collectstatic
 
-# Auth
-LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "projetos:index"
-LOGOUT_REDIRECT_URL = "login"
+# Só mantenha diretórios GLOBAIS aqui (se existir).
+# NÃO coloque diretórios de apps (ex.: BASE_DIR / "core" / "static")!
+STATICFILES_DIRS = [
+    BASE_DIR / "core" / "static",   # opcional: só se você tiver web/static/
+]
+
+# Use os finders padrão (não duplique, não remova)
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+]
+
+# Armazenamento de estáticos
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 
 
-MEDIA_URL = "media/"
+MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# === S3 / MinIO ===
+# -----------------------------------------------------------------------------
+# Redirects de autenticação
+# -----------------------------------------------------------------------------
+LOGIN_URL = "core:login"
+LOGIN_REDIRECT_URL = "core:principal"
+LOGOUT_REDIRECT_URL = "core:login"
+
+# -----------------------------------------------------------------------------
+# S3 / MinIO (para uploads)
+# -----------------------------------------------------------------------------
 S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY", "multiview")
 S3_SECRET_KEY = os.getenv("S3_SECRET_KEY", "senha_123")
 S3_ENDPOINT_URL = os.getenv("S3_ENDPOINT_URL", "http://127.0.0.1:9000")
@@ -159,48 +254,14 @@ S3 = {
     "public_url": f"{S3_BROWSER_ENDPOINT}/{S3_BUCKET}",
 }
 
-# Aliases AWS (caso alguma lib espere esses nomes)
+# aliases esperados por alguns SDKs:
 AWS_S3_ENDPOINT_URL = S3_ENDPOINT_URL
 AWS_ACCESS_KEY_ID = S3_ACCESS_KEY
 AWS_SECRET_ACCESS_KEY = S3_SECRET_KEY
 AWS_STORAGE_BUCKET_NAME = S3_BUCKET
 AWS_S3_REGION_NAME = S3_REGION
 
+# -----------------------------------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ===================== GDAL/GEOS (Windows via OSGeo4W) =====================
-# O Django lê GDAL_LIBRARY_PATH/GEOS_LIBRARY_PATH a partir do settings.py.
-# Se você já exportou as variáveis no PowerShell, mantenha — mas este bloco
-# garante que o Django saiba os caminhos mesmo sem o shell.
-
-import os
-
-OSGEO_ROOT = os.environ.get("OSGEO4W_ROOT") or r"C:\OSGeo4W"
-
-# Caminhos das DLLs (ajuste se o seu OSGeo estiver em outro lugar ou versão)
-GDAL_LIBRARY_PATH = os.environ.get("GDAL_LIBRARY_PATH") or fr"{OSGEO_ROOT}\bin\gdal311.dll"
-GEOS_LIBRARY_PATH = os.environ.get("GEOS_LIBRARY_PATH") or fr"{OSGEO_ROOT}\bin\geos_c.dll"
-
-# Dados do PROJ/GDAL e PATH para dependências das DLLs
-os.environ.setdefault("PROJ_LIB", fr"{OSGEO_ROOT}\share\proj")
-os.environ.setdefault("GDAL_DATA", fr"{OSGEO_ROOT}\share\gdal")
-os.environ.setdefault("PATH", fr"{OSGEO_ROOT}\bin;" + os.environ.get("PATH", ""))
-# ========================================================================
-
-# ===================== DATABASES (PostGIS local) =====================
-import os
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": os.environ.get("PGDATABASE", "multiview"),
-        "USER": os.environ.get("PGUSER", "multiview"),
-        "PASSWORD": os.environ.get("PGPASSWORD", "multiview"),
-        # Se estava vindo "db" ou vazio, força 127.0.0.1:
-        "HOST": os.environ.get("PGHOST", "127.0.0.1"),
-        "PORT": os.environ.get("PGPORT", "5432"),
-        # Opcional: evita tentativa de SSL local
-        "OPTIONS": {"sslmode": "disable"},
-    }
-}
-# =====================================================================
+DEFAULT_CHARSET = "utf-8"

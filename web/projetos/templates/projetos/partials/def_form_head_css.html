@@ -1,0 +1,530 @@
+
+
+{% load static %}
+<style>
+
+:root{
+  /* Cores base */
+  --mv-green-900:#114722; --mv-green-700:#2b6b3f; --mv-green-600:#3f8b50;
+  --mv-green-500:#55a562; --mv-green-300:#80CB2E; --mv-green-200:#cfe9d3;
+  --mv-green-100:#eef5e6; --mv-bg:#7aa763; --mv-ink:#1c271c; --mv-ink-2:#415041;
+
+  --mv-gray-900:#111; --mv-gray-700:#545; --mv-gray-500:#8a908a;
+  --mv-gray-300:#dfe4df; --mv-gray-200:#edf1ed; --mv-white:#fff;
+
+  /* Feedback */
+  --mv-red:#cc3a3a; --mv-yellow:#e0a21c; --mv-blue:#2f6bd8;
+
+  /* Tipografia & espaçamento */
+  --mv-r:16px;           /* raio padrão */
+  --mv-pad:12px;         /* padding base */
+  --mv-gap:12px;         /* gap base */
+  --mv-shadow:0 12px 28px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.12);
+}
+
+/* Helpers rápidos */
+.flex{display:flex} .items-center{align-items:center} .gap-2{gap:8px} .gap-6{gap:16px}
+
+
+
+  /* Botão “chip” desativado (mesma cara dos botões inativos atuais) */
+  .mv-btn--chip{
+    background:#DCE7D4;          /* chip claro */
+    color:#A6A6A6;
+    border:1px solid rgba(0,0,0,.06);
+    box-shadow:none;
+    cursor:not-allowed;
+    pointer-events:none;
+  }
+  /* quando virarmos para primário (verde) o pointer volta ao normal: já vem do site.css */
+
+  /* === Sticky-footer neutro nesta página === */
+  body.layout-root{ min-height:100vh; display:flex; flex-direction:column; }
+  main.mv-main{ flex:1 0 auto; }
+  body.layout-root footer.mv-footer{
+    position: static !important;
+    inset: auto !important; top:auto !important; right:auto !important; bottom:auto !important; left:auto !important;
+    z-index: 0 !important; margin-top: 24px;
+  }
+  footer.mv-footer .mv-footer__band, footer.mv-footer .mv-footer__band--top{ display:none !important; height:0 !important; }
+
+  /* === Área útil === */
+  #mvwrap{ max-width:1220px; margin:0 auto; padding:12px 16px 24px; }
+
+  /* === Topbar (cartão à direita) === */
+  .mv-topbar{ display:flex; align-items:center; justify-content:flex-end; width:100%; box-sizing:border-box; padding:0; margin:4px 0 8px; }
+
+  /* === Título === */
+  .mv-page-title{ text-align:center; font-weight:800; font-size:1.25rem; margin:6px 0 14px; }
+
+  /* === Cards === */
+  .mvcard{
+    background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:14px;
+    padding:22px; margin-bottom:20px;
+    box-shadow: inset 0 0 8px rgba(0,0,0,.08), 0 6px 18px rgba(0,0,0,.08);
+  }
+  .mvcard h3{ margin:0 0 14px; }
+
+  /* === Grid 1→2→3 colunas === */
+  /* grades responsivas suaves */
+  .mvgrid { display: grid; gap: 12px; }
+  .mvgrid.mv-2 { grid-template-columns: 1fr; }
+  .mvgrid.mv-3 { grid-template-columns: 1fr; }
+
+  @media (min-width: 900px) {
+    .mvgrid.mv-2 { grid-template-columns: 1fr 1fr; }
+    .mvgrid.mv-3 { grid-template-columns: 1fr 1fr 1fr; }
+  }
+
+  /* helper para esconder apenas visualmente mas manter acessível se precisar */
+  .sr-only { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  .mvfield{ display:flex; flex-direction:column; gap:6px; }
+  .mvfield small{ opacity:.85; }
+  .mvfield input[type="text"],
+  .mvfield input[type="number"],
+  .mvfield input[type="date"],
+  .mvfield input[type="datetime-local"],
+  .mvfield select,
+  .mvfield textarea{
+    width:100%; border:1px solid #d9d9d9; border-radius:10px; padding:10px 12px; background:#fff;
+  }
+  .mvfield textarea{ min-height:120px; resize:vertical; }
+
+  .mv-check{ display:inline-flex; align-items:center; gap:8px; font-weight:600; }
+  .errorlist{ margin:4px 0 0; color:#b30000; font-weight:600; list-style:none; padding-left:0; }
+
+
+/* === Quadro 1 / Objetivo do Projeto (estilos leves) === */
+.mv-help { font-size: .92rem; opacity:.85 }
+.mv-row    { display:grid; gap:14px 18px; grid-template-columns:1fr }
+@media (min-width:720px){ .mv-row{ grid-template-columns:1fr 1fr } }
+@media (min-width:1024px){ .mv-row{ grid-template-columns:1fr 1fr 1fr } }
+
+.mv-chip { display:inline-block; padding:6px 10px; border-radius:999px;
+  background:#f3f5f4; border:1px solid rgba(0,0,0,.08); margin-right:8px; font-size:.9rem }
+
+.mv-credits { display:flex; gap:16px; align-items:center; margin-top:6px; flex-wrap:wrap }
+.mv-credits__box { background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:12px;
+  padding:10px 14px; box-shadow:0 4px 12px rgba(0,0,0,.06) }
+.mv-credits__neg { color:#b91c1c; font-weight:600 }
+.mv-credits__ok  { color:#166534; font-weight:600 }
+
+.mv-muted { color:#6b7280 }
+.hidden { display:none !important; }
+
+/* ======= Distribuição do Quadro 1 ======= */
+
+/* grid principal do Quadro 1 já é mv-3; criamos spans para campos maiores */
+.mv-span-2 { grid-column: span 2; }
+.mv-span-3 { grid-column: 1 / -1; }  /* ocupa as 3 colunas */
+
+/* grade interna só para os checkboxes de "Produtos desejados" */
+.mv-products-grid{
+  display: grid;
+  gap: 10px 16px;
+  grid-template-columns: 1fr;        /* mobile: 1 col */
+  align-items: start;
+}
+@media (min-width: 720px){
+  .mv-products-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }  /* tablet: 2 col */
+}
+@media (min-width: 1200px){
+  .mv-products-grid{ grid-template-columns: repeat(3, minmax(0,1fr)); }  /* desktop largo: 3 col */
+}
+.mv-products-grid label{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  line-height: 1.25;
+}
+
+/* painel de IV em 2 colunas no desktop, 1 no mobile */
+#iv-panel{
+  display: grid;
+  gap: 12px 18px;
+  grid-template-columns: 1fr;        /* mobile */
+}
+@media (min-width: 960px){
+  #iv-panel{ grid-template-columns: 1fr 1fr; }  /* desktop: 2 col */
+}
+/* a primeira "hint" ocupa toda a largura do painel */
+#iv-panel > .mvfield:first-child{ grid-column: 1 / -1; }
+
+
+/* === Quadro 2 e 3 – Ajustes leves === */
+.mvfield .twocol { display:grid; grid-template-columns:1fr 1fr; gap:14px 18px; }
+@media (max-width: 760px){ .mvfield .twocol{ grid-template-columns:1fr; } }
+
+.mvfield .mv-sm { font-size:12px; color:#666; }
+.mvfield input[type="file"] { padding:8px; background:#fff; border:1px solid #e5e7eb; border-radius:10px; }
+.mv-sep { height:1px; background:rgba(0,0,0,.06); margin:8px 0 4px; }
+
+.mv-colhelp { display:flex; gap:10px; align-items:center; color:#4a5568; }
+.mv-colhelp code { background:#f3f4f6; padding:2px 6px; border-radius:6px; }
+
+
+/* === Botões inferiores (usar apenas .mv-btn do site.css) === */
+.mv-actions{
+  display:flex; gap:18px; justify-content:flex-start; align-items:center;
+  margin:22px 0 6px;
+}
+
+/* Força tamanho/align iguais para todos os botões */
+.mv-actions .mv-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:12px;
+  height:56px;                /* mesma altura para todos */
+  min-width:170px;            /* mesmo comprimento visual */
+  padding:0 24px;             /* deixa a cápsula consistente */
+  border-radius:18px;         /* casa com o “Voltar” de Projetos */
+}
+
+/* Ícones alinhados e do mesmo tamanho */
+.mv-actions .mv-btn > img{
+  width:22px; height:22px; display:block;
+}
+/* Ícone ~20% menor só no Cancelar (vence a regra .mv-actions .mv-btn > img) */
+#btn-cancelar > img.mv-btn__icon--sm {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+
+/* === Quadro 1: Objetivo do Projeto === */
+.mvcard h3 .mv-badge{ font-size:12px; font-weight:600; margin-left:8px; padding:2px 8px; border-radius:999px; background:#eef5e6; color:#3e7e14; }
+
+.mvfield small.mv-hint{ color:#666; display:block; margin-top:4px; line-height:1.3; }
+.mvfield .mv-inline{ display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+.mvfield .mv-inline label{ display:flex; align-items:center; gap:8px; }
+
+
+.mv-tag{ display:inline-block; font-size:12px; line-height:1; padding:4px 8px; border-radius:999px; margin-left:8px;
+           background:#fde2e1; color:#7a1b1b; border:1px solid #f7b1ad; } /* label de obrigatório */
+
+.mv-iv-group { margin: 8px 0 0 0; padding: 8px 10px; border-left: 3px solid #e5e7eb; }
+.mv-iv-title { font-weight: 600; margin-bottom: 6px; }
+
+/* Painel de créditos (no topo do Quadro 1) */
+.mv-credits{
+  display:flex; flex-wrap:wrap; gap:12px 16px; align-items:center;
+  padding:10px 12px; border:1px dashed rgba(0,0,0,.12); border-radius:12px; background:#fafcff;
+  margin:8px 0 14px;
+}
+.mv-credits .mv-kv{ display:flex; gap:6px; align-items:center; }
+.mv-credits .mv-kv b{ font-weight:600; }
+.mv-credits .mv-alert{ background:#fff4e5; color:#8a4900; padding:4px 8px; border-radius:999px; font-size:12px; }
+.mv-credits .mv-ok{ background:#eef5e6; color:#3e7e14; padding:4px 8px; border-radius:999px; font-size:12px; }
+.mv-credits .mv-btn{ height:42px; min-width:160px; border-radius:14px; }
+
+/* Tags de exigência */
+.mv-tag{
+  display:inline-block; font-size:12px; line-height:1; padding:4px 8px; border-radius:999px; margin-left:8px;
+  border:1px solid transparent; vertical-align:middle;
+}
+.mv-tag--req { background:#fde2e1; color:#7a1b1b; border-color:#f7b1ad }       /* Obrigatório */
+.mv-tag--imp { background:#fff5d6; color:#7a5a00; border-color:#ffe4a3 }       /* Importante */
+.mv-tag--rec { background:#e8f5e9; color:#226c2c; border-color:#cfe9d3 }       /* Recomendado */
+.mv-tag--opt { background:#eef2f7; color:#4a5568; border-color:#d6dde8 }       /* Opcional */
+
+/* === Q3 Estatísticas e badges === */
+.mv-badge-ok{background:#e8f5e9;color:#226c2c;border:1px solid #cfe9d3;border-radius:999px;padding:2px 8px;font-size:12px}
+.mv-badge-warn{background:#fff5d6;color:#7a5a00;border:1px solid #ffe4a3;border-radius:999px;padding:2px 8px;font-size:12px}
+.mv-badge-err{background:#fde2e1;color:#7a1b1b;border:1px solid #f7b1ad;border-radius:999px;padding:2px 8px;font-size:12px}
+.mv-read{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:10px}
+
+/* === Q4 Básico/Avançado === */
+.mv-tabs{display:flex;gap:8px;margin:6px 0 12px}
+.mv-tab{padding:8px 12px;border:1px solid #e5e7eb;border-radius:10px;cursor:pointer}
+.mv-tab.active{background:#eef5e6;border-color:#cfe9d3}
+
+#q5-creditos strong{font-weight:600}
+#q5-creditos .ok{color:#226c2c}
+#q5-creditos .warn{color:#7a5a00}
+#q5-creditos .err{color:#7a1b1b}
+
+
+/* ===== Tipografia dos labels (opções x títulos) ===== */
+
+/* Por padrão, labels na página ficam com peso normal */
+.mvcard label { font-weight: 400 !important; }
+
+/* Títulos dos campos (o label DIRETO dentro do bloco) ficam em negrito */
+.mvfield > label { font-weight: 600 !important; }
+
+/* Opções (checkbox/radio) dentro dos containers inline ficam normais */
+.mvfield .mv-inline label { font-weight: 400 !important; }
+
+/* Seções de IV: títulos podem ficar um pouco mais fortes, opções normais */
+.mv-iv-title { font-weight: 600 !important; }
+#grp-iv-rgb label,
+#grp-iv-ms label,
+#grp-iv-thermal label { font-weight: 400 !important; }
+
+/* ===== Help / Tooltip & Popover ===== */
+.mv-help-wrap { display:inline-flex; align-items:center; margin-left:.35rem; position:relative; }
+.mv-help-btn {
+  display:inline-flex; align-items:center; gap:.4rem;
+  padding:.15rem .35rem; border:1px solid rgba(0,0,0,.12); border-radius:999px;
+  background:#fff; color:#2c3e2d; cursor:pointer; line-height:1; font-size:.85rem;
+}
+.mv-help-btn:hover { background:#f7f9f7; }
+
+.mv-help-short { margin-left:.4rem; opacity:.8; font-size:.82rem; display:none; }
+@media (min-width: 980px) { .mv-help-short { display:inline; } }
+
+.mv-popover[hidden] { display:none !important; }
+.mv-popover {
+  position:absolute; z-index:60; top:110%; left:0; width:min(720px, 92vw);
+  background:#fff; border:1px solid rgba(0,0,0,.12); border-radius:12px;
+  box-shadow:0 12px 32px rgba(0,0,0,.18); padding:0;
+}
+.mv-popover__content { padding:16px 18px; }
+.mv-popover .mv-list { margin:.25rem 0 .5rem 1.1rem; }
+.mv-popover code { background:#f4f6f4; padding:.05rem .25rem; border-radius:4px; }
+
+.mv-grid-epsg { display:grid; gap:12px 18px; grid-template-columns:1fr; }
+@media (min-width:700px){ .mv-grid-epsg { grid-template-columns:1fr 1fr; } }
+.mv-tagline { font-weight:600; margin:.25rem 0; }
+
+.mv-figure { margin:.5rem 0 0 0; }
+.mv-figure img { width:100%; height:auto; border:1px solid rgba(0,0,0,.08); border-radius:8px; }
+.mv-figure figcaption { font-size:.85rem; color:#555; margin-top:.25rem; }
+
+.mv-popover .mv-close{
+  margin-top:.75rem; padding:.4rem .75rem; border-radius:8px; border:1px solid rgba(0,0,0,.12);
+  background:#f7faf7; cursor:pointer;
+}
+.mv-popover .mv-close:hover{ background:#eef5ee; }
+
+/* ===== Modais <dialog> (helps) – padrão unificado ===== */
+.mv-dialog-help {
+  border: 0;
+  padding: 0;
+  width: min(880px, 92vw);
+  border-radius: 14px;
+  box-shadow: 0 18px 48px rgba(0,0,0,.22);
+}
+.mv-dialog-help::backdrop {
+  background: rgba(0,0,0,.35);
+}
+
+.mv-dialog-card { background:#fff; border-radius:14px; overflow:hidden; }
+.mv-dialog-hd   { display:flex; align-items:center; gap:8px; padding:16px 18px 10px; }
+.mv-dialog-hd h4{ margin:0; font-size:1.05rem; font-weight:700; }
+.mv-dialog-bd   { padding:0 18px 18px; line-height:1.5; }
+.mv-dialog-bd code{ background:#f4f6f4; padding:.05rem .25rem; border-radius:4px; }
+.mv-dialog-bd pre { background:#f7f9f7; border:1px solid rgba(0,0,0,.08); border-radius:8px; padding:10px 12px; overflow:auto; }
+
+.mv-dialog-close{
+  margin-left:auto; width:32px; height:32px; border:0; background:transparent;
+  font-size:22px; line-height:1; cursor:pointer; border-radius:8px;
+}
+.mv-dialog-close:hover{ background:#f2f5f2; }
+
+/* botão (?) compacto */
+.mv-helpbtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:28px; height:28px;
+  border:0; background:transparent; padding:0;
+  cursor:pointer;
+}
+.mv-helpbtn img{
+  display:block;
+  width:18px; height:18px;
+}
+.mv-helpbtn:hover{ background:#f6f8f7 }
+
+/* modal simples com <dialog> */
+.mv-modal{ border:none; padding:0; border-radius:14px; width:min(860px, 92vw); }
+.mv-modal::backdrop{ background:rgba(0,0,0,.35) }
+.mv-modal__content{ padding:18px 22px 20px; background:#fff; border-radius:14px; }
+.mv-modal__close{
+  position:absolute; right:10px; top:8px; width:32px; height:32px;
+  border:none; background:transparent; font-size:22px; cursor:pointer;
+}
+.mv-table{ width:100%; border-collapse:collapse; margin:8px 0 14px }
+.mv-table th, .mv-table td{ border:1px solid #e5e7eb; padding:6px 8px; text-align:left; }
+.mv-figure{ margin:10px 0 0 }
+.mv-figure img{ width:100%; height:auto; border:1px solid #e5e7eb; border-radius:10px; }
+.mv-figure figcaption{ font-size:.9rem; color:#6b7280; margin-top:6px }
+
+/* botão de ajuda com ícone */
+.mv-helpbtn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:22px; height:22px; margin-left:8px;
+  border-radius:999px; border:1px solid rgba(0,0,0,.18);
+  background:#fff; cursor:pointer; padding:0;
+}
+.mv-helpbtn:hover{ background:#f6f8f7 }
+.mv-helpico{ width:14px; height:14px; display:block }
+
+/* modal simples com <dialog> */
+.mv-modal{ border:none; padding:0; border-radius:14px; width:min(860px, 92vw); }
+.mv-modal::backdrop{ background:rgba(0,0,0,.35) }
+.mv-modal__content{ position:relative; padding:18px 22px 20px; background:#fff; border-radius:14px; }
+.mv-modal__close{
+  position:absolute; right:10px; top:8px; width:32px; height:32px;
+  border:none; background:transparent; font-size:22px; cursor:pointer;
+}
+.mv-table{ width:100%; border-collapse:collapse; margin:8px 0 14px }
+.mv-table th, .mv-table td{ border:1px solid #e5e7eb; padding:6px 8px; text-align:left; }
+.mv-figure{ margin:10px 0 0 }
+.mv-figure img{ width:100%; height:auto; border:1px solid #e5e7eb; border-radius:10px; }
+.mv-figure figcaption{ font-size:.9rem; color:#6b7280; margin-top:6px }
+
+.mv-inline-nowrap { flex-wrap: nowrap !important; }
+.muted { color:#888 !important; }
+.is-disabled { opacity:.6; pointer-events:none; }
+
+.note { display:inline-block; margin-left:6px; font-size:.85rem; color:#6b7280; }
+
+#grp-formatos label{ display:inline-flex; align-items:center; gap:8px; }
+#grp-formatos .note{ white-space:nowrap; }
+
+/* rótulo acessível, invisível na tela */
+.sr-only{
+  position:absolute !important;
+  width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
+
+/* Botões no padrão pedido */
+.btn-success{ background:#80CB2E; color:#fff; border:0; padding:.45rem .8rem; border-radius:8px; box-shadow:0 1px 0 rgba(0,0,0,.08); }
+.btn-success:hover{ filter:brightness(.95); }
+.btn-success-dark{ background:#114722; color:#fff; border:0; padding:.45rem .8rem; border-radius:8px; box-shadow:0 1px 0 rgba(0,0,0,.08); }
+.btn-success-dark:hover{ filter:brightness(1.05); }
+
+/* Fantasma/branco no padrão */
+.btn-ghost{ background:#fff; color:#2c3e2c; border:1px solid rgba(0,0,0,.15); padding:.45rem .8rem; border-radius:8px; }
+.btn-ghost:hover{ background:#f6f8f6; }
+
+</style>
+
+<style>
+  /* ===== Grid utilitário para formulários ===== */
+  .form-grid { display: grid; gap: 16px; align-items: start; }
+  .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+  /* Spans rápidos */
+  .span-2 { grid-column: span 2 / span 2; }
+  .span-3 { grid-column: 1 / -1; }
+
+  /* Responsivo:  ≥1024px = 3 col; 720–1023px = 2 col; <720px = 1 col */
+  @media (max-width: 1023.98px) {
+    .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 719.98px) {
+    .grid-3 { grid-template-columns: 1fr; }
+    .span-2, .span-3 { grid-column: 1 / -1; }
+  }
+
+  /* Mantém grupos (checkbox/radio) visualmente coesos dentro da célula */
+  .field-group { background: #fff; border: 1px solid #e6e6e6; border-radius: 8px; padding: 12px; }
+  .field-group .group-title { font-weight: 600; margin-bottom: 8px; }
+</style>
+
+<style>
+
+  /* Normaliza espaçamento interno de cada célula */
+  .mvfield { margin: 0; }
+  .mvfield > .mv-inline,
+  .mvfield > select,
+  .mvfield > input[type="text"],
+  .mvfield > .mv-products-grid,
+  .mvfield > .mv-radio-row { margin-top: 6px; }
+
+  /* Fieldset com visual igual aos outros blocos */
+  .mvfield fieldset,
+  fieldset.mvfield {
+    border: 1px solid #e6e6e6;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 0;
+    background: #fff;
+  }
+  fieldset.mvfield legend {
+    padding: 0 6px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  /* Cabeçalho label + botão de ajuda na mesma linha */
+  .mv-labelrow { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .mv-label { font-weight:600; }
+
+  /* Produtos térmicos (LST) desabilitado = aparência cinza */
+  .js-lst-wrap { opacity: .5; }
+  #prod_lst:enabled + .note, .js-lst-wrap:has(#prod_lst:enabled) { opacity: 1; }
+  #prod_lst:enabled { /* quando habilita, volta a opacidade normal */ }
+  .js-lst-wrap:has(#prod_lst:enabled) { opacity: 1; }
+
+
+  /* ==== BEGIN PATCH: aumentar fonte dos títulos ==== */
+  .mv-label,
+  .mv-labelrow label,
+  .mv-labelrow strong {
+  font-size:  1.3rem;  /* um passo acima do padrão */
+  font-weight: 500;    /* não deixa bold exagerado */
+  }
+  /* ==== END PATCH ==== */
+
+
+  /* ==== BEGIN PATCH: aproximar checkbox do texto do toggle ==== */
+  #grp-vetores-toggle label.mv-toggle,
+  #grp-vetores-toggle label.mv-check,
+  #grp-vetores-toggle .mv-label-inline{
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;         /* aproxime/ajuste aqui se quiser 4px */
+    white-space: nowrap !important;
+  }
+  #grp-vetores-toggle input[type="checkbox"]{
+    margin: 0 !important;
+    vertical-align: middle;
+  }
+  /* ==== END PATCH ==== */
+
+  /* Campo "Outro EPSG" ~ 33% menor que os inputs padrão */
+  .mv-epsg-input {
+    width: 66%;
+    min-width: 220px;
+    max-width: 480px;
+  }
+
+
+  /* 2) Input do EPSG ~1/3 da largura (reforço em CSS) */
+  #crs_cliente_epsg {
+    width: 33%;
+    max-width: 220px;
+    min-width: 120px;
+  }
+
+  /* 3) Help icon bem centralizado no anel */
+  .help-ring{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:24px; height:24px; border-radius:999px;
+    border:1px solid #cfe4c4; background:#f7fbf5; line-height:0;
+  }
+  .help-ring .help-icon{
+    display:block; width:16px; height:16px; margin:0; padding:0; border:0;
+  }
+
+  /* ========= (opcionais úteis; não atrapalham) ========= */
+
+  .mvfield { display:flex; flex-direction:column; gap:6px; }
+  .mvfield small.mv-hint{ color:#666; display:block; margin-top:4px; line-height:1.3; }
+
+  /* Rótulos */
+  .mvcard label { font-weight: 400 !important; }      /* opções */
+  .mvfield > label { font-weight: 600 !important; }   /* títulos */
+
+  /* Linha label + help */
+  .mv-labelrow { display:flex; align-items:center; gap:8px; }
+
+</style>
+
+
+

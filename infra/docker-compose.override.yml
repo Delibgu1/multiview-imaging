@@ -1,8 +1,28 @@
-﻿version: "3.9"
+﻿# infra/docker-compose.override.yml
 services:
-  minio:
+  db:
+    image: postgis/postgis:16-3.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-multiview}
+      POSTGRES_USER: ${POSTGRES_USER:-multiview}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-multiview}
+    ports:
+      - "5432:5432"
     volumes:
-      - minio_data:/data
+      - pgdata:/var/lib/postgresql/data
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
 volumes:
-  minio_data:
-    driver: local
+  pgdata:

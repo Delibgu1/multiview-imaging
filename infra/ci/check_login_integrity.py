@@ -38,7 +38,7 @@ required_footer_lines = [
 # Imagens obrigatórias (aceita variações de nome/case)
 img_dir = APP / "static" / "core" / "img"
 img_sets = {
-  "logo_mv": ["Logo-multiview.png", "logo-multiview.png", "logo_multiview.png", "logo_multiview_verde.png", "Logo_Multiview_verde.png"],
+  "logo_mv": ["logo-multiview.png", "logo-multiview.png", "logo_multiview.png", "logo_multiview_verde.png", "Logo_Multiview_verde.png"],
   "logo_sin": ["Logo-sinergica.png", "logo-sinergica.png", "logo_sinergica.png"],
   "slogan": ["slogan.png"],
 }

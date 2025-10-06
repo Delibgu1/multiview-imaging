@@ -3,7 +3,7 @@
 <html lang="pt-br">
   <head>
     <meta charset="utf-8" />
-    <title>MultiView • Upload</title>
+    <title>MultiView ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Upload</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <style>
       body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 2rem; }
@@ -24,8 +24,8 @@
   <body>
     <div class="wrap">
       <div class="card">
-        <h1>Upload para MinIO/S3 (pré-assinado)</h1>
-        <p class="muted">Este formulário pede uma URL pré-assinada ao backend e envia o arquivo direto ao bucket.</p>
+        <h1>Upload para MinIO/S3 (prÃƒÆ’Ã‚Â©-assinado)</h1>
+        <p class="muted">Este formulÃƒÆ’Ã‚Â¡rio pede uma URL prÃƒÆ’Ã‚Â©-assinada ao backend e envia o arquivo direto ao bucket.</p>
 
         <!-- >>> FORM CORRETO <<< -->
         <form id="presign-form">
@@ -44,7 +44,7 @@
           <div class="log mono" id="log"></div>
         </div>
       </div>
-      <p class="muted mt"><a href="/">← Voltar</a></p>
+      <p class="muted mt"><a href="/">ÃƒÂ¢Ã¢â‚¬Â Ã‚Â Voltar</a></p>
     </div>
 
     <script>
@@ -80,7 +80,7 @@
             const presResp = await fetch(`/api/uploads/presign?${qs.toString()}`);
             if (!presResp.ok) {
               const txt = await presResp.text();
-              throw new Error(`presign falhou: HTTP ${presResp.status} — ${txt}`);
+              throw new Error(`presign falhou: HTTP ${presResp.status} ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ${txt}`);
             }
             const presign = await presResp.json();
             log('', presign);
@@ -102,13 +102,13 @@
               const hint = presign.public_url_hint || '';
               log('> upload OK!');
               if (hint) log('arquivo em:', { url: hint });
-              alert('Upload concluído com sucesso!');
+              alert('Upload concluÃƒÆ’Ã‚Â­do com sucesso!');
               return;
             }
 
-            // se não ok, mostrar corpo da resposta
+            // se nÃƒÆ’Ã‚Â£o ok, mostrar corpo da resposta
             const errTxt = await uploadResp.text();
-            throw new Error(`Falha no upload: HTTP ${uploadResp.status} — ${errTxt}`);
+            throw new Error(`Falha no upload: HTTP ${uploadResp.status} ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ${errTxt}`);
 
           } catch (err) {
             log('ERRO:', { message: String(err) });

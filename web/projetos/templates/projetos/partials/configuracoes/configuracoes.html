@@ -1,0 +1,29 @@
+
+{% extends "core/base_app.html" %}
+{% load static %}
+
+{% block content %}
+
+  {% include "core/elementos/title_header.html"
+     with icon_url=static('core/img/icon/lista_projetos.svg') titulo="Configurações do Projeto" %}
+
+  <section class="mv-body">
+    {# Miolo do quadro Q4 — mantenha o conteúdo em um partial dedicado #}
+    {% include "projetos/partials/configuracoes/bloco_config.html" %}
+
+    {# Resumo & Créditos aparecem aqui e em Objetivo #}
+    {% include "projetos/partials/comuns/resumo_creditos.html" %}
+
+    {# Barra de ações específica de Configurações (com Uploads) #}
+    {% include "core/elementos/actions/actions_config.html" %}
+  </section>
+
+{% endblock %}
+
+{% block extra_js %}
+  <script type="module">
+    // Se esta página tiver helps, chame-os aqui (exemplos):
+    // window.mvBindHelp?.('js-help-crs-btn','help-crs');
+    // window.mvBindHelp?.('js-help-formatos-btn','help-formatos');
+  </script>
+{% endblock %}

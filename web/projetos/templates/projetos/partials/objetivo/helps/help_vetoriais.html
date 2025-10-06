@@ -1,0 +1,38 @@
+
+{% load static %}
+<dialog id="help-vetoriais" class="mv-modal" aria-labelledby="help-vetoriais-title" aria-modal="true">
+  <div class="mv-modal__content">
+    <button type="button" class="mv-modal__close js-close-help" aria-label="Fechar">×</button>
+
+    <h3 id="help-vetoriais-title">Arquivos vetoriais do cliente</h3>
+
+    <p>
+      Aqui você pode enviar arquivos vetoriais (limites de talhões, áreas de interesse, pontos de amostragem, estradas internas etc.)
+      que serão usados como referência no projeto.
+    </p>
+
+    <ul>
+      <li><strong>Objetivo:</strong> garantir que os resultados gerados (rasters e vetores) estejam alinhados com os limites e dados já utilizados na sua propriedade.</li>
+      <li><strong>Formatos aceitos:</strong> Shapefile (.shp), GeoPackage (.gpkg), GeoJSON (.geojson), DXF (.dxf), KML/KMZ (.kml/.kmz).</li>
+    </ul>
+
+    <h4>Sobre o CRS</h4>
+    <p>
+      No passo anterior você já definiu o <em>CRS padrão</em> do projeto, que é a base de alinhamento para todos os produtos.
+      Porém, alguns clientes ou órgãos podem exigir que os <strong>produtos vetoriais</strong> sejam entregues em um CRS específico
+      (por exemplo: zona UTM diferente, SIRGAS 2000 ou SAD69).
+      Nesses casos, é possível solicitar que <strong>apenas os vetores finais</strong> sejam exportados nesse CRS,
+      <strong>sem alterar</strong> o processamento central do projeto.
+    </p>
+
+    <p>
+      ✔ Isso garante que o processamento interno permaneça consistente, enquanto os vetores finais já saem prontos
+      para uso em outros sistemas, evitando conversões posteriores.
+    </p>
+
+    <p>
+      <strong>Importante:</strong> se você enviar arquivos vetoriais, certifique-se de que estejam no CRS escolhido para eles.
+      Caso contrário, podem ocorrer desalinhamentos.
+    </p>
+  </div>
+</dialog>

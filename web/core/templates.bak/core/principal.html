@@ -1,0 +1,76 @@
+{% extends "core/base_public.html" %}
+{% load static %}
+{% block title %}Menu  Multiview{% endblock %}
+{% block head_extra %}
+  <link rel="stylesheet" href="{% static 'core/css/menu.css' %}">
+{% endblock %}
+{% block content %}
+<div class="mv-page">
+  <div class="mv-topbar">
+    <div class="mv-userbox">
+      <div class="mv-usericon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" class="mv-icon"><circle cx="12" cy="8" r="4"/><path d="M4,20c0-4,4-6,8-6s8,2,8,6"/></svg>
+      </div>
+      <div class="mv-userinfo">
+        <div class="mv-username">{{ display_name|default:request.user.username }}</div>
+        <div class="mv-userplan">
+          {% if credits %}Créditos: {{ credits }}{% elif plan %}Plano: {{ plan }}{% else %}Plano: Básico{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mv-hero" role="img" aria-label="Drone capturando imagens sobre cultivo">
+    <svg viewBox="0 0 1200 360" class="mv-hero-svg" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stop-color="#8fd463"/><stop offset="100%" stop-color="#72A348"/>
+        </linearGradient>
+        <linearGradient id="ndvi" x1="0" x2="1">
+          <stop offset="0%" stop-color="#d73027"/><stop offset="50%" stop-color="#fee08b"/><stop offset="100%" stop-color="#1a9850"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="1200" height="360" fill="url(#sky)" />
+      <g transform="translate(220,90)">
+        <rect x="-60" y="-10" width="120" height="20" rx="10" fill="#00371C" opacity="0.9"/>
+        <rect x="-30" y="-6" width="60" height="12" rx="6" fill="#80CB2E"/>
+        <circle cx="-80" cy="-10" r="8" fill="#00371C"/>
+        <circle cx="-80" cy="-10" r="20" fill="none" stroke="#00371C" stroke-width="3" opacity="0.4"/>
+        <circle cx="80" cy="-10" r="8" fill="#00371C"/>
+        <circle cx="80" cy="-10" r="20" fill="none" stroke="#00371C" stroke-width="3" opacity="0.4"/>
+        <polygon points="0,10 80,220 -80,220" fill="url(#ndvi)" opacity="0.35"/>
+      </g>
+      <g transform="translate(420,180)">
+        <rect x="-40" y="20" width="760" height="120" fill="#5aa832" opacity="0.8"/>
+        <rect x="-120" y="-10" width="140" height="90" fill="rgba(255,0,0,0.25)" stroke="#b30000" stroke-width="2"/>
+        <rect x="40" y="-20" width="140" height="90" fill="rgba(0,255,0,0.25)" stroke="#008a00" stroke-width="2"/>
+        <rect x="200" y="-30" width="140" height="90" fill="rgba(0,0,255,0.25)" stroke="#0033cc" stroke-width="2"/>
+        <rect x="560" y="-30" width="140" height="90" fill="url(#ndvi)" stroke="#00371C" stroke-width="2" opacity="0.85"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="mv-grid">
+    <a class="mv-card" href="{% url 'projetos' %}">
+      <div class="mv-card-icon"><svg viewBox="0 0 24 24" class="mv-icon"><path d="M3 7h18v10H3z"/><path d="M7 7V5h10v2"/></svg></div>
+      <div class="mv-card-title">Projetos</div>
+      <div class="mv-card-desc">Gerencie uploads, processamentos e resultados.</div>
+    </a>
+    <a class="mv-card" href="{% url 'creditos' %}">
+      <div class="mv-card-icon"><svg viewBox="0 0 24 24" class="mv-icon"><circle cx="12" cy="12" r="10"/><text x="12" y="16" text-anchor="middle" font-size="12" fill="#00371C">R$</text></svg></div>
+      <div class="mv-card-title">Créditos</div>
+      <div class="mv-card-desc">Adicionar créditos, plano e extrato da conta.</div>
+    </a>
+    <a class="mv-card" href="{% url 'guias' %}">
+      <div class="mv-card-icon"><svg viewBox="0 0 24 24" class="mv-icon"><path d="M4 4h12v16H4z"/><path d="M8 4h12v16H8z"/></svg></div>
+      <div class="mv-card-title">Guias &amp; Boas Práticas</div>
+      <div class="mv-card-desc">Voo, GCPs, RTK/PPK, processamento, NDVI, relatórios.</div>
+    </a>
+    <a class="mv-card" href="{% url 'usuario' %}">
+      <div class="mv-card-icon"><svg viewBox="0 0 24 24" class="mv-icon"><circle cx="12" cy="8" r="4"/><path d="M4,20c0-4,4-6,8-6s8,2,8,6"/></svg></div>
+      <div class="mv-card-title">Usuário</div>
+      <div class="mv-card-desc">Empresas, membros e preferências.</div>
+    </a>
+  </div>
+</div>
+{% endblock %}

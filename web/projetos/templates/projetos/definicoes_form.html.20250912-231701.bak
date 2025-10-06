@@ -1,0 +1,164 @@
+
+{% extends "core/base_public.html" %}
+{% load static %}
+
+{% block title %}Configurações | Projetos{% endblock %}
+
+{% block body_class %}page-config{% endblock %}
+
+{% block head_extra %}
+{# Remova o CSS externo desta página para evitar conflitos, se quiser:
+<link rel="stylesheet" href="{% static 'core/css/configuracoes.css' %}">
+#}
+
+<style>
+/* ----- Escopo local desta página ----- */
+.mv-form {
+  max-width: 1120px;
+  margin: 0 auto;
+  /* respiro extra para o rodapé não cobrir nada */
+  padding: 0 16px 160px;
+}
+
+/* Card */
+.form-card{
+  background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:14px;
+  padding:18px; margin-bottom:18px;
+  box-shadow: 8px 8px 8px rgba(0,85,28,.65);
+}
+.form-card h3{ margin:0 0 12px; font-size:1.08rem }
+
+/* GRID: 1 → 2 → 3 colunas */
+.form-grid{ display:grid; grid-template-columns: 1fr; gap:14px 18px }
+@media (min-width: 720px){ .form-grid{ grid-template-columns: 1fr 1fr } }
+@media (min-width:1200px){
+  .form-grid{ grid-template-columns: 1fr 1fr 1fr !important; }
+}
+
+/* Campos */
+.form-row{ display:flex; flex-direction:column; gap:6px }
+.form-row label{ font-weight:600 }
+.form-row small{ opacity:.8 }
+
+input[type="text"], input[type="number"], input[type="datetime-local"], select, textarea{
+  width:100%; padding:10px 12px; border:1px solid #d9d9d9; border-radius:10px; background:#fff;
+}
+textarea{ min-height:88px; resize:vertical }
+
+/* Ações */
+.form-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:8px; }
+.btn{
+  background:#5aa832; color:#fff; border:none; padding:10px 16px; border-radius:12px; cursor:pointer;
+  box-shadow: 8px 8px 8px rgba(0,85,28,.65);
+}
+.btn.secondary{ background:#8a8a8a }
+.btn:disabled{ opacity:.6; cursor:not-allowed }
+
+/* Detalhes menores */
+.hr{ height:1px; background:rgba(0,0,0,.06); margin:8px 0 4px; border-radius:1px }
+.switch{ display:flex; align-items:center; gap:8px }
+.switch input{ transform:scale(1.15) }
+
+/* Opcional de segurança: impede rodapé fixed só nesta página */
+footer { position: static !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mv-page mv-form">
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- Projeto -->
+    <section class="form-card">
+      <h3>Projeto</h3>
+      <div class="form-grid">
+        <div class="form-row">
+          <label for="nome">Nome do Projeto</label>
+          <input id="nome" name="nome" type="text" placeholder="Ex.: Fazenda Santa Luzia – Safra 24/25" required>
+        </div>
+        <div class="form-row">
+          <label for="cliente">Cliente</label>
+          <input id="cliente" name="cliente" type="text" placeholder="Ex.: Sinérgica Agro">
+        </div>
+        <div class="form-row">
+          <label for="srid">SRID / EPSG</label>
+          <input id="srid" name="srid" type="text" placeholder="Ex.: EPSG:31982">
+          <small>Ex.: SIRGAS 2000 / UTM 22S → EPSG:31982</small>
+        </div>
+        <div class="form-row" style="grid-column:1/-1">
+          <label for="descricao">Descrição</label>
+          <textarea id="descricao" name="descricao" placeholder="Notas do projeto..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Voo -->
+    <section class="form-card">
+      <h3>Voo</h3>
+      <div class="form-grid">
+        <div class="form-row">
+          <label for="drone">Drone</label>
+          <input id="drone" name="drone" type="text" placeholder="Ex.: DJI Phantom 4 RTK">
+        </div>
+        <div class="form-row">
+          <label for="camera">Câmera / Sensor</label>
+          <input id="camera" name="camera" type="text" placeholder="Ex.: RGB, Multiespectral, Lidar...">
+        </div>
+        <div class="form-row">
+          <label for="altitude">Altitude (m)</label>
+          <input id="altitude" name="altitude" type="number" step="0.01" min="0" placeholder="Ex.: 120">
+        </div>
+        <div class="form-row">
+          <label for="gsd">GSD (cm/pixel)</label>
+          <input id="gsd" name="gsd" type="number" step="0.01" min="0" placeholder="Ex.: 2.5">
+        </div>
+        <div class="form-row">
+          <label for="overlap_frontal">Sobreposição longitudinal (%)</label>
+          <input id="overlap_frontal" name="overlap_frontal" type="number" step="1" min="0" max="100" placeholder="Ex.: 75">
+        </div>
+        <div class="form-row">
+          <label for="overlap_lateral">Sobreposição lateral (%)</label>
+          <input id="overlap_lateral" name="overlap_lateral" type="number" step="1" min="0" max="100" placeholder="Ex.: 65">
+        </div>
+        <div class="form-row">
+          <label class="switch">
+            <input id="rtk_ppk" name="rtk_ppk" type="checkbox"> RTK/PPK habilitado
+          </label>
+          <small>Se desmarcado, planeje GCPs.</small>
+        </div>
+        <div class="form-row">
+          <label for="gcps">Nº estimado de GCPs</label>
+          <input id="gcps" name="gcps" type="number" step="1" min="0" placeholder="Ex.: 8">
+        </div>
+      </div>
+    </section>
+
+    <!-- Processamento -->
+    <section class="form-card">
+      <h3>Processamento</h3>
+      <div class="form-grid">
+        <div class="form-row">
+          <label for="produtos">Produtos</label>
+          <select id="produtos" name="produtos" multiple>
+            <option>DTM</option>
+            <option>NDVI</option>
+            <option>Curvas de nível</option>
+            <option>Ortomosaico</option>
+            <option>DSM</option>
+            <option>Nuvem de pontos</option>
+          </select>
+          <small>Use CTRL/SHIFT para múltiplos.</small>
+        </div>
+        <div class="form-row">
+          <label for="resolucao_saida">Resolução de saída (cm)</label>
+          <input id="resolucao_saida" name="resolucao_saida" type="number" step="0.1" min="0" placeholder="Ex.: 3.0">
+        </div>
+        <div class="form-row">
+          <label class="switch">
+            <input id="relatorio_pdf" name="relatorio_pdf" type="checkbox"> Gerar relatório com métricas
+          </label>
+          <small>Resumo de qualidade, RMS, cobertura e miniaturas.</small>
+        </div>
+        <div class="form-row" style="grid-column:1/-1">
+          <label

@@ -1,30 +1,294 @@
-:root{
-  --mv-bg-multiview:#72A348; /* fundo de tela */
-  --mv-footer-top:#00371C;   /* faixa superior 5px */
-  --mv-footer-mid:#72A348;   /* faixa intermediária 7px */
-  --mv-footer-bg:#80CB2E;    /* fundo do rodapé */
-  --mv-text:#222;
+/* =========================================================
+   Utilitário de acessibilidade
+   ========================================================= */
+.sr-only{
+  position:absolute!important;
+  width:1px!important; height:1px!important;
+  padding:0!important; margin:-1px!important;
+  overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important;
+  border:0!important;
 }
-/* Layout sem scroll: footer sempre no fim */
-html, body { height:100%; }
-body.layout-root{ display:flex; flex-direction:column; min-height:100vh; margin:0; }
-.mv-main{ flex:1 0 auto; display:flex; align-items:center; justify-content:center; padding:24px; }
-body.mv-bg--multiview{ background:var(--mv-bg-multiview); color:var(--mv-text); font:400 15px/1.45 system-ui,Segoe UI,Roboto,sans-serif }
 
-/* Rodapé em 3 faixas + conteúdo (3 colunas) */
-.mv-footer__band--top{height:5px;background:var(--mv-footer-top)}
-.mv-footer__band--mid{height:7px;background:var(--mv-footer-mid)}
-.mv-footer__content{
-  background:var(--mv-footer-bg);
-  color:#fff;
-  display:grid;
-  grid-template-columns:1fr 2fr 1fr;
-  align-items:center;
-  padding:10px 20px;
+/* =========================================================
+   Variáveis de tema
+   ========================================================= */
+:root{
+  --mv-bg-multiview: #72A348; /* fundo de tela */
+  --mv-footer-top:   #00371C; /* faixa superior 5px */
+  --mv-footer-mid:   #72A348; /* faixa intermediária 7px */
+  --mv-footer-bg:    #80CB2E; /* fundo do rodapé */
+  --mv-text:         #222;    /* cor de texto padrão */
+
+  /* UI base */
+  --mv-white: #fff;
+  --mv-border: rgba(0,0,0,.06);
+  --mv-shadow: 0 8px 26px rgba(0,0,0,.07);
+  --mv-green-700:#1f3d1f;
+  --mv-green-600:#285d28;
+  --mv-green-500:#5ea34d;
+  --mv-green-500-b:#4c8a3e;
 }
-.mv-footer__slot--center{text-align:center;font-family:Roboto,system-ui,sans-serif}
-.mv-footer__line{line-height:1.25}
-.mv-footer__line--strong{font-weight:700}
-.mv-footer__slot--right{display:flex;justify-content:flex-end}
-.mv-footer__logo{height:80px;padding-left:30px}
-.mv-footer__slogan{height:60px;padding-right:30px}
+
+/* =========================================================
+   Reset/normalização mínima
+   ========================================================= */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body{
+  height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+body.mv-bg--multiview{
+  background: var(--mv-bg-multiview);
+  color: var(--mv-text);
+  font: 400 15px/1.45 system-ui, Segoe UI, Roboto, sans-serif;
+}
+
+/* =========================================================
+   Shell de layout: 2 linhas (main = 1fr, footer = auto)
+   ========================================================= */
+body.layout-root{
+  display: grid;
+  grid-template-rows: 1fr auto;  /* conteúdo ocupa o espaço, rodapé vai ao fim */
+  min-height: 100svh;            /* viewport real em mobile */
+}
+
+/* =========================================================
+   Área principal
+   ========================================================= */
+.mv-main{
+  min-height: 0;
+  padding: 16px;
+}
+.mv-main--centered{
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+}
+.mv-main > :first-child { margin-top: 0; }
+.mv-main > :last-child  { margin-bottom: 0; }
+
+/* =========================================================
+   Hero / SVG
+   ========================================================= */
+.mv-hero,
+.mv-hero-svg{
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
+/* =========================================================
+   Rodapé (3 faixas + conteúdo)
+   ========================================================= */
+.mv-footer{ }
+
+.mv-footer__band--top{
+  height: 5px;
+  background: var(--mv-footer-top);
+  margin: 0;
+  line-height: 0;
+}
+.mv-footer__band--mid{
+  height: 7px;
+  background: var(--mv-footer-mid);
+  margin: 0;
+  line-height: 0;
+}
+.mv-footer__content{
+  background: var(--mv-footer-bg);
+  color: #fff;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+  gap: 0;
+  padding: 10px 20px;
+  margin: 0;
+  line-height: 1;
+}
+.mv-footer__slot--left,
+.mv-footer__slot--center,
+.mv-footer__slot--right{
+  margin: 0; padding: 0;
+}
+.mv-footer__slot--center{
+  text-align: center;
+  font-family: Roboto, system-ui, sans-serif;
+}
+.mv-footer__slot--right{
+  display: flex;
+  justify-content: flex-end;
+}
+.mv-footer__line{ margin: 0; line-height: 1.25; }
+.mv-footer__line--strong{ font-weight: 700; }
+.mv-footer__content img,
+.mv-footer__content svg{
+  display: block;
+}
+.mv-footer__logo  { height: 80px; padding-left: 30px; }
+.mv-footer__slogan{ height: 60px; padding-right: 30px; }
+
+/* =========================================================
+   Componentes base (cards, botões, containers)
+   ========================================================= */
+.container-narrow { max-width: 1080px; margin: 0 auto; padding: 1.25rem; }
+
+.page-header { margin-bottom: 1rem; }
+.page-title  { margin: 0; color: var(--mv-green-700); }
+.page-subtitle { margin: .25rem 0 0; color: #446; font-size: .95rem; opacity:.85; }
+
+.card{
+  background: var(--mv-white);
+  border-radius: 14px;
+  box-shadow: var(--mv-shadow);
+  overflow: hidden;
+  border: 1px solid var(--mv-border);
+}
+.card-header{ padding: .9rem 1.1rem; border-bottom: 1px solid var(--mv-border); background: #f8faf8; }
+.card-title { margin: 0; font-size: 1.05rem; }
+.card-body  { padding: 1.1rem; }
+
+.btn{
+  display:inline-flex; gap:.5rem; align-items:center; justify-content:center; cursor:pointer;
+  border-radius: 10px; padding:.5rem .8rem; text-decoration:none; border:1px solid transparent; font-weight:600;
+}
+.btn-primary{ background: var(--mv-green-500); color:#fff; border-color: var(--mv-green-500-b); }
+.btn-primary:hover{ filter: brightness(.96); }
+.btn-ghost{ background:#fff; color:var(--mv-green-700); border-color:#cbd5c0; }
+.btn-ghost:hover{ background:#f7fbf7; }
+.btn-block{ width: 100%; }
+
+.sep { border:none; border-top:1px solid var(--mv-border); margin: 1rem 0; }
+.tip { font-size:.92rem; color:#3b523b; }
+
+/* =========================================================
+   Grid da página Projetos
+   ========================================================= */
+.grid-2-col{
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.25rem;
+}
+@media (max-width: 960px) {
+  .grid-2-col { grid-template-columns: 1fr; }
+  .sticky { position: static; top: auto; }
+}
+.sticky{ position: sticky; top: 1rem; }
+
+/* Lista de projetos */
+.project-list { display: grid; gap: .6rem; }
+
+.project-item{
+  border: 1px solid var(--mv-border);
+  border-radius: 12px;
+  padding: .75rem .9rem;
+  background: var(--mv-white);
+}
+
+.project-row{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: .75rem;
+  align-items: center;
+}
+
+.project-name{
+  font-weight: 650;
+  text-decoration: none;
+  color: var(--mv-green-700);
+}
+.project-name:hover{ text-decoration: underline; }
+
+.project-meta{
+  margin-top: .25rem;
+  font-size: .9rem;
+  color: #4b5;
+  display: flex; gap: .6rem; align-items: center;
+}
+
+/* Tags de status */
+.tag{
+  display: inline-block; padding: .16rem .5rem; border-radius: 999px;
+  background: #eaf6ea; color: var(--mv-green-600); font-size: .8rem; border: 1px solid #cfe8cf;
+}
+.tag-processando       { background:#fff5da; color:#7a5b00; border-color:#f1e1a6; }
+.tag-finalizado        { background:#e8f3ff; color:#1e4e8c; border-color:#cfe3fb; }
+.tag-aguardando_upload { background:#f5eefc; color:#5a3a92; border-color:#e4d9f7; }
+
+.project-actions{ display: flex; gap: .4rem; }
+
+/* Estado vazio */
+.empty-state{ text-align:center; padding: 1.5rem .75rem; }
+.empty-title{ font-weight:700; margin:0 0 .25rem; color: var(--mv-green-700); }
+.empty-subtitle{ margin:0 0 .9rem; opacity:.85; }
+
+/* Paginação */
+.pagination{
+  margin-top: .9rem;
+  display: flex; align-items:center; gap:.6rem; justify-content:center;
+}
+.page-link{
+  padding:.35rem .65rem; border:1px solid var(--mv-border);
+  border-radius: 8px; text-decoration:none; color:var(--mv-green-700); background:#fff;
+}
+.page-link:hover{ background:#f7fbf7; }
+.page-current{ font-weight:600; color:var(--mv-green-700); }
+
+/* ===== Page Title (não-botão) ===== */
+.mv-pagetitle {
+  display:flex; justify-content:center;
+  margin: 20px 0 14px;           /* 20px do topo */
+}
+
+.mv-pagetitle__inner{
+  display:inline-flex; align-items:center; gap:10px;
+  padding: 10px 18px;
+  color:#354224;
+  font-size:1.22rem;             /* maior que o texto normal */
+  font-weight:600;               /* menos “pesado” que botões */
+  letter-spacing:.2px;
+  border-radius:14px;
+  background: rgba(128,203,46,.16);       /* NÃO é sólido como botão */
+  border:1px solid rgba(0,0,0,.06);
+  box-shadow:
+    0 10px 22px rgba(0,85,28,.15),
+    6px 8px 0 rgba(0,0,0,.05);            /* sombra difusa padrão sinérgica */
+}
+
+.mv-pagetitle__ico { width:20px; height:20px; display:block; opacity:.95; }
+
+/* ===== Buttons – garantir que o primário fique verde ===== */
+.mv-btn{
+  display:inline-flex; align-items:center; gap:10px;
+  padding:10px 16px; border-radius:14px;
+  border:1px solid rgba(0,0,0,.06);
+  font-weight:600; text-decoration:none; cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+  user-select:none;
+}
+.mv-btn img, .mv-btn svg{ width:20px; height:20px; display:block; }
+
+/* Se houver regras antigas de .btn/.button que deixam branco, esta
+   especificidade dupla assegura o verde. */
+.mv-btn.mv-btn--primary{
+  background:#80CB2E !important; color:#1f2e1f !important;
+  box-shadow: 0 10px 24px rgba(0,85,28,.18), 6px 8px 0 rgba(0,0,0,.06);
+}
+.mv-btn.mv-btn--primary:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(0,85,28,.22), 10px 12px 0 rgba(0,0,0,.06);
+}
+
+.mv-btn.mv-btn--secondary{
+  background:#fff; color:#1f2e1f;
+  box-shadow: 0 8px 18px rgba(0,0,0,.10), 6px 8px 0 rgba(0,0,0,.05);
+}
+.mv-btn.mv-btn--secondary:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(0,0,0,.12), 10px 12px 0 rgba(0,0,0,.06);
+}

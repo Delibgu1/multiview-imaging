@@ -1,0 +1,62 @@
+
+
+<dialog id="help-aoi" class="mv-dialog-help">
+  <div class="mv-dialog-card">
+    <div class="mv-dialog-hd">
+      <h4>AOI — Área de Interesse</h4>
+      <button type="button" class="js-close-help mv-dialog-close" aria-label="Fechar">×</button>
+    </div>
+
+    <div class="mv-dialog-bd">
+      <p><strong>O que é:</strong> a AOI define o polígono que representa a área do seu projeto. Com base nela o sistema
+        calcula a área (ha), cruza com a <em>área declarada</em> e orienta as próximas etapas.</p>
+
+      <h5>Métodos de entrada</h5>
+      <ol>
+        <li><strong>Upload de polígono (GeoJSON)</strong>
+          <ul>
+            <li>Arquivos aceitos: <code>.geojson</code> ou <code>.json</code>.</li>
+            <li>Geometrias aceitas: <code>Polygon</code> ou <code>MultiPolygon</code>.</li>
+          </ul>
+          <p><em>Exemplo mínimo (Polygon):</em></p>
+<pre><code>{
+  "type": "Polygon",
+  "coordinates": [[
+    [-55.8502, -12.3301],
+    [-55.8420, -12.3400],
+    [-55.8305, -12.3312],
+    [-55.8502, -12.3301]
+  ]]
+}
+</code></pre>
+          <p><em>Observação:</em> GeoJSON usa <strong>[longitude, latitude]</strong> (graus decimais) e o primeiro/
+          último vértice devem ser iguais para fechar o polígono.</p>
+        </li>
+
+        <li><strong>Digitar coordenadas dos vértices</strong>
+          <ul>
+            <li>Formato: <strong>graus decimais</strong> no <strong>CRS padrão do projeto: WGS84 (EPSG:4326)</strong>.</li>
+            <li>Campos: <code>Lat</code> (ex.: <code>-12.330100</code>) e <code>Lon</code> (ex.: <code>-55.850200</code>).</li>
+            <li>Informe ao menos 3 vértices; o sistema fecha o polígono automaticamente repetindo o primeiro ponto.</li>
+          </ul>
+        </li>
+
+        <li><strong>Sem AOI agora</strong>
+          <ul><li>Você pode salvar o projeto sem AOI e preencher depois.</li></ul>
+        </li>
+      </ol>
+
+      <h5>Resultados e usos</h5>
+      <ul>
+        <li><strong>Área calculada (ha):</strong> derivada da AOI (somente leitura).</li>
+        <li><strong>Comparação:</strong> área declarada × calculada com Δ (diferença).</li>
+        <li><strong>Finalidade = oficial:</strong> após informar a AOI será possível visualizar um
+          <em>croqui</em> (mapa) com os segmentos <code>a, b, c, ...</code> e registrar
+          <strong>confrontantes</strong> (nome/documento) para memorial descritivo.</li>
+      </ul>
+
+      <p><small>Dica: se você trabalha em outro sistema de referência, converta para WGS84 (EPSG:4326) antes do upload.
+      O cálculo de área é feito em projeção de área equivalente internamente.</small></p>
+    </div>
+  </div>
+</dialog>

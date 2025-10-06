@@ -1,130 +1,107 @@
-/* core/static/core/css/menu.css */
-:root{
-  --mv-white:#fff;
-  --mv-card:#ffffff;
-  --mv-border:rgba(0,0,0,.06);
-  --mv-shadow:0 10px 30px rgba(16,24,40,.06);
-  --mv-primary:#72A348;
-  --mv-primary-600:#5C9431;
-  --mv-danger:#A32F2F;
-  --mv-deep:#00371C;
-  --mv-foot:#80CB2E;
-}
+/* =========================
+   Principal (menu.css)
+   ========================= */
 
-/* Fundo igual ao login, só nesta página (este CSS é carregado apenas aqui) */
-body{ background: var(--mv-primary) !important; }
 
-/* ====== Layout principal ====== */
-.mv-page{
-  min-height: calc(100vh - 120px); /* espaço pro rodapé já existente */
-  display:flex;
-  flex-direction:column;
-  gap:16px;
-  padding: 6px 12px 16px;
-}
-
-/* ====== Topbar: ícone + nome + créditos/plano ====== */
+/* -------------------------
+   Topbar: chip de usuário
+   ------------------------- */
 .mv-topbar{
   display:flex;
   justify-content:flex-end;
-  align-items:center;
-  margin: 4px auto 0;
-  width:min(1200px, 100%);
+  padding: 0 24px;
 }
-
 .mv-userbox{
-  display:flex; align-items:center; gap:10px;
-  background: rgba(255,255,255,.25);
-  border: 1px solid rgba(0,0,0,.05);
-  backdrop-filter: blur(2px);
-  padding:8px 12px; border-radius:12px;
-  color: var(--mv-deep);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  min-width:280px;
+  max-width:360px;
+  border-radius:14px;
+  background:#EFF8E5;            /* cor solicitada */
+  border:1px solid rgba(0,0,0,.05);
+  color:#1f2e1f;
+  box-shadow: 8px 8px 8px rgba(0,85,28,.65);
 }
-.mv-usericon .mv-icon{ width:28px; height:28px; fill: var(--mv-deep); }
-.mv-userinfo{ line-height:1.1; }
-.mv-username{ font-weight:800; }
-.mv-userplan{ font-size:.92rem; opacity:.95; }
+.mv-usericon .mv-icon{ width:22px; height:22px; fill:#2f6930; }
+.mv-username{ font-weight:700 }
+.mv-userplan{ font-size:.9rem; opacity:.85 }
 
-/* ====== Hero (drone + NDVI) ====== */
+/* -------------------------
+   HERO (foto do drone)
+   ------------------------- */
 .mv-hero{
-  width:min(1200px, 100%);
-  margin: 0 auto;
-  border-radius:16px;
-  overflow:hidden;
-  box-shadow: var(--mv-shadow);
-  border:1px solid var(--mv-border);
-  background:#8fd463;
+  width:100%;
+  margin:12px auto 40px;        /* espaço para a sombra do hero */
+  display:flex;
+  justify-content:center;
+  position: relative;
+  z-index: 2;
 }
-.mv-hero-svg{
-  width:100%; height:260px; display:block;
+.mv-hero__img{
+  display:block;
+  width: min(50vw, 720px);
+  height:auto;
+  border-radius:18px;
+  /* MESMA SOMBRA dos cards/chip */
+  box-shadow: 8px 8px 8px rgba(0,85,28,.65);
+  /* sem filter/drop-shadow */
 }
 
-/* ====== GRID com 4 cartões ====== */
+/* -------------------------
+   GRID de cards (2 x 2)
+   ------------------------- */
 .mv-grid{
-  width:min(1200px, 100%);
-  margin: 0 auto;
   display:grid;
-  gap:16px;
-  grid-template-columns: repeat(2, minmax(260px,1fr));
+  grid-template-columns: repeat(2, min(460px, 44vw));
+  column-gap:26px;
+  row-gap:32px;
+  margin-top:8px;
+  position: relative;
+  z-index: 1;
 }
-@media (max-width:900px){
+
+@media (max-width: 780px){
   .mv-grid{ grid-template-columns: 1fr; }
 }
 
-/* ====== Cartões (compatível com seu BEM e com a nova marcação) ====== */
+/* Card */
 .mv-card{
-  display:block;
-  background:var(--mv-card);
-  border:1px solid var(--mv-border);
-  border-radius:16px;
-  padding:16px;
+  display:flex;
+  padding: 16px 18px;
+  align-items:flex-start;
+  gap:15px;
+  border-radius:14px;
+  background:#fff;
+  border:1px solid rgba(0,0,0,.06);
+  color:#1f2e1f;
   text-decoration:none;
-  color:#0f172a;
-  box-shadow:var(--mv-shadow);
-  transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  box-shadow: 8px 8px 8px rgba(0,85,28,.65);
+  transition: transform .12s ease, box-shadow .12s ease;
 }
 .mv-card:hover{
   transform: translateY(-2px);
-  box-shadow:0 12px 36px rgba(16,24,40,.10);
-  border-color:#d0d7de;
+  box-shadow:
+    0 6px 12px rgba(0,0,0,.10),
+    0 18px 36px rgba(0,0,0,.12),
+    12px 14px 0 rgba(0,0,0,.06);
 }
-.mv-card:focus-visible{
-  outline: 3px solid #0ea5e9;
-  outline-offset: 2px;
-  border-radius:16px;
+.mv-card:link,
+.mv-card:visited{ color:inherit; text-decoration:none; }
+
+/* Ícones 25% maiores */
+.mv-card-icon img{ width:45px; height:45px; display:block; }
+.mv-card-title{ font-weight:700; margin-bottom:4px; }
+.mv-card-desc{ color:#445; font-size:.92rem; }
+
+/* Títulos/descrições */
+.mv-card-title{
+  font-weight:700;
+  margin-bottom:4px;
 }
-
-/* Ícone do cartão: aceita .mv-card__icon (seu HTML antigo) e .mv-card-icon (novo) */
-.mv-card__icon,
-.mv-card-icon{
-  width:44px; height:44px; border-radius:12px;
-  display:grid; place-items:center;
-  background:#eef6ea; margin-bottom:10px;
-}
-.mv-card__icon svg,
-.mv-card-icon svg{
-  width:24px; height:24px; fill:var(--mv-primary);
-}
-
-/* Título/descrição: aceita os dois padrões de classe */
-.mv-card__title,
-.mv-card-title{ font-weight:800; margin-bottom:4px; color: var(--mv-deep); }
-
-.mv-card__desc,
-.mv-card-desc{ font-size:14px; color:#475569 }
-
-/* Variação "danger" (logout, etc.) — mantém seu padrão */
-.mv-card--danger .mv-card__icon,
-.mv-card--danger .mv-card-icon{ background:#fdecec }
-.mv-card--danger .mv-card__icon svg,
-.mv-card--danger .mv-card-icon svg{ fill:var(--mv-danger) }
-
-/* ====== Seções BEM antigas (mantidas p/ retrocompatibilidade) ====== */
-.mv-menu{ width:min(1100px, 100%); margin-inline:auto }
-.mv-menu__header{ color:#00371C; text-align:center; margin-bottom:12px }
-.mv-menu__header h1{ margin:0 0 4px 0 }
-.mv-menu__grid{
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-  gap:14px;
+.mv-card-desc{
+  font-size:.93rem;
+  color:#344;
+  line-height:1.35;
 }

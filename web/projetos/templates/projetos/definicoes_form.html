@@ -1,98 +1,1701 @@
 
 {% extends "core/base_public.html" %}
-{% block title %}Novo Projeto · Multiview{% endblock %}
-{% block content %}
-<section class="card">
-  <h1 class="page-title">Configurações / Definições do Projeto</h1>
+{% load static %}
+<meta id="municipios-json" data-url="{% static 'core/data/municipios_br.json' %}">
 
-  {# mensagens flash #}
-  {% if messages %}
-    <ul class="mv-messages">
-      {% for message in messages %}
-        <li class="mv-message {{ message.tags }}">{{ message }}</li>
-      {% endfor %}
-    </ul>
+{% block title %}Definições do Projeto{% endblock %}
+
+{% block content %}
+
+{% block extra_head %}
+    {% include "projetos/partials/def_form_head_css.html" %}
+{% endblock %}
+
+<section id="mvwrap">
+  <!-- Cartão -->
+  <div class="mv-topbar">
+    {% include "projetos/_user_card.html" %}
+  </div>
+
+{% include "projetos/partials/def_form_header.html" %}
+{% include "projetos/partials/q1_objetivo.html" %}
+{% include "projetos/partials/q2_projeto.html" %}
+{% include "projetos/partials/def_form_js_core.html" %}
+
+<!-- === QUADRO 3 — DADOS DO VOO =========================================== -->
+<section class="mvcard" id="q3-voo">
+  <h3>Dados do Voo <span class="mv-tag mv-tag--imp">Importante</span></h3>
+
+  <div class="mvgrid mv-3">
+
+    <!-- Aeronave e piloto -->
+    <div class="mvfield">
+      <label>Modelo do drone <span class="mv-tag mv-tag--rec">Recomendado</span></label>
+      <input type="text" name="voo_drone_modelo" placeholder="Ex.: DJI Mavic 3E">
+      <small class="mv-hint">Ajuda a estimar performance e GSD.</small>
+    </div>
+
+    <div class="mvfield">
+      <label>Nº de registro ANAC <span class="mv-tag mv-tag--opt">Opcional</span></label>
+      <input type="text" name="voo_drone_anac" placeholder="Ex.: PR-XXXX">
+    </div>
+
+    <div class="mvfield">
+      <label>Software de planejamento <span class="mv-tag mv-tag--opt">Opcional</span></label>
+      <input type="text" name="voo_software" placeholder="Ex.: DJI Pilot, Litchi, UGCS">
+    </div>
+
+    <div class="mvfield">
+      <label>Responsável pelo voo <span class="mv-tag mv-tag--rec">Recomendado</span></label>
+      <input type="text" name="voo_piloto" placeholder="Nome do piloto">
+    </div>
+
+    <div class="mvfield">
+      <label>Credenciais do piloto (ANAC) <span class="mv-tag mv-tag--opt">Opcional</span></label>
+      <input type="text" name="voo_piloto_cred" placeholder="Ex.: CANAC/CAV">
+    </div>
+
+    <!-- Sensor -->
+    <div class="mvfield">
+      <label>Modelo da câmera/sensor <span class="mv-tag mv-tag--rec">Recomendado</span></label>
+      <input type="text" name="voo_sensor_modelo" placeholder="Ex.: M3E RGB, RedEdge-MX, Altum, H20T">
+    </div>
+
+    <div class="mvfield">
+      <label>Tam. de pixel (µm) <span class="mv-tag mv-tag--opt">Opcional</span></label>
+      <input type="number" step="0.01" name="voo_sensor_px" placeholder="Ex.: 3.3">
+    </div>
+
+    <div class="mvfield">
+      <label>Distância focal (mm) <span class="mv-tag mv-tag--opt">Opcional</span></label>
+      <input type="number" step="0.1" name="voo_sensor_focal" placeholder="Ex.: 24">
+      <small class="mv-hint">Com pixel e focal, é possível <b>estimar GSD</b> automaticamente.</small>
+    </div>
+
+    <!-- Perfil do voo -->
+    <div class="mvfield">
+      <label>Data do voo <span class="mv-tag mv-tag--rec">Recomendado</span></label>
+      <input type="date" name="voo_data">
+    </div>
+
+    <div class="mvfield">
+      <label>Altitude AGL (m) <span class="mv-tag mv-tag--req">Obrigatório</span></label>
+      <input type="number" step="0.1" name="voo_altitude" required placeholder="Ex.: 120">
+    </div>
+
+    <div class="mvfield">
+      <label>GSD (cm/pixel) <span class="mv-tag mv-tag--imp">Importante</span></label>
+      <div class="mv-inline">
+        <input type="number" step="0.01" name="voo_gsd" placeholder="Ex.: 2.5">
+        <button type="button" id="btn_estimar_gsd" class="mv-btn">Estimar GSD</button>
+      </div>
+      <small class="mv-hint">Você pode estimar via Altitude + sensor.</small>
+    </div>
+
+    <div class="mvfield">
+      <label>Overlap frontal (%) <span class="mv-tag mv-tag--req">Obrigatório</span></label>
+      <input type="number" min="0" max="100" name="voo_overlap_frontal" required placeholder="Ex.: 75">
+    </div>
+
+    <div class="mvfield">
+      <label>Overlap lateral (%) <span class="mv-tag mv-tag--req">Obrigatório</span></label>
+      <input type="number" min="0" max="100" name="voo_overlap_lateral" required placeholder="Ex.: 70">
+    </div>
+
+    <div class="mvfield">
+      <label>Velocidade (m/s) <span class="mv-tag mv-tag--opt">Opcional</span></label>
+      <input type="number" step="0.1" name="voo_velocidade" placeholder="Ex.: 8.0">
+    </div>
+
+    <!-- Georreferenciamento e controle -->
+    <div class="mvfield" style="grid-column:1/-1">
+      <label>GNSS / Controle de terreno <span class="mv-tag mv-tag--imp">Importante</span></label>
+      <div class="mv-inline" id="grp-gnss">
+        <label><input type="radio" name="voo_gnss" value="none" checked> Sem controle</label>
+        <label><input type="radio" name="voo_gnss" value="rtk"> RTK</label>
+        <label><input type="radio" name="voo_gnss" value="ppk"> PPK</label>
+        <label><input type="radio" name="voo_gnss" value="gcp"> GCPs</label>
+        <label><input type="radio" name="voo_gnss" value="rtk_gcp"> RTK/PPK + GCPs</label>
+      </div>
+      <small class="mv-hint" id="hint-gnss">Para usos <b>Oficiais</b>, prefira RTK/PPK e/ou GCPs.</small>
+    </div>
+
+    <!-- GCPs -->
+    <div class="mvfield mv-hide" id="grp-gcps" style="grid-column:1/-1">
+      <label>Pontos de Controle (GCPs)
+        <span class="mv-tag mv-tag--req js-ofc-tag">Obrigatório (se GCPs em Oficial)</span>
+        <span class="mv-tag mv-tag--rec js-gestao-tag">Recomendado</span>
+      </label>
+      <div class="mv-colhelp">
+        <input type="file" name="voo_gcps_file" id="voo_gcps_file" accept=".csv,.txt">
+        <a href="#" id="link_modelo_gcp">Baixar modelo</a>
+        <span class="mv-sm">Esperado: <code>id, x, y, z, epsg</code></span>
+      </div>
+    </div>
+
+    <!-- Condições (opcional) -->
+    <div class="mvfield">
+      <label>Vento (m/s) <span class="mv-tag mv-tag--opt">Opcional</span></label>
+      <input type="number" step="0.1" name="voo_vento">
+    </div>
+    <div class="mvfield">
+      <label>Nebulosidade (%) <span class="mv-tag mv-tag--opt">Opcional</span></label>
+      <input type="number" min="0" max="100" name="voo_nuvens">
+    </div>
+    <div class="mvfield">
+      <label>Iluminação <span class="mv-tag mv-tag--opt">Opcional</span></label>
+      <select name="voo_iluminacao">
+        <option value="">Selecione…</option>
+        <option>Ensolarado</option>
+        <option>Nublado</option>
+        <option>Variável</option>
+      </select>
+    </div>
+
+  </div>
+  <!-- F) Estatísticas (auto) -->
+  <div class="mvfield" style="grid-column:1/-1">
+    <label>Estatísticas (automático) <span class="mv-tag mv-tag--rec">Recomendado</span></label>
+    <div class="mvgrid" style="grid-template-columns:1fr 1fr 1fr;gap:14px 18px;">
+    <div class="mvfield">
+    <label for="q3_imgs_decl">Número de imagens (informado)</label>
+    <input id="q3_imgs_decl" name="qtd_imagens" type="number" min="0" step="1" placeholder="Ex.: 500" id="mv-num-imagens">
+    <small class="mv-hint">
+      Este número serve para estimativa de créditos. O valor oficial será verificado após os uploads.
+    </small>
+  </div>
+      <div class="mvfield">
+        <div class="mv-sm">Cobertura estimada (ha)</div>
+        <div id="stat_area_ha" class="mv-read">—</div>
+      </div>
+      <div class="mvfield">
+        <div class="mv-sm">EXIF / consistência temporal</div>
+        <div id="stat_exif" class="mv-read"><span class="mv-badge-warn">A verificar</span></div>
+      </div>
+    </div>
+    <small class="mv-hint">Estes valores são preenchidos assim que as imagens/AOI forem conhecidas. (Integração de backend fará a leitura real do EXIF e contagem de imagens.)</small>
+  </div>
+
+
+
+</section>
+<!-- === /QUADRO 3 ========================================================== -->
+
+<!-- === QUADRO 4 — CONFIGURAÇÕES ========================================= -->
+<section class="mvcard" id="q4-config">
+  <h3>Configurações <span class="mv-tag mv-tag--imp">Importante</span></h3>
+
+  <!-- Tabs Básico / Avançado -->
+  <div class="mv-tabs" id="cfg-tabs">
+    <div class="mv-tab active" data-tab="basic">Básico</div>
+    <div class="mv-tab" data-tab="adv">Avançado</div>
+  </div>
+
+  <!-- Básico -->
+  <div id="cfg-basic">
+    <div class="mvgrid mv-3">
+      <div class="mvfield">
+        <label>Ortomosaico — resolução (cm/pixel) <span class="mv-tag mv-tag--req">Obrigatório</span></label>
+        <input type="number" step="0.01" name="cfg_ortho_cm" placeholder="≈ GSD do voo">
+        <small class="mv-hint">Por padrão, use o GSD (Quadro 3). Ajustes maiores geram arquivos menores, porém menos nítidos.</small>
+      </div>
+
+      <div class="mvfield">
+        <label>DEM (DSM/DTM) — resolução (cm) <span class="mv-tag mv-tag--rec">Recomendado</span></label>
+        <input type="number" step="0.01" name="cfg_dem_cm" placeholder="4× ortho (auto)">
+        <small class="mv-hint">Se vazio, usaremos 4× o valor do ortho. Pode sobrescrever.</small>
+      </div>
+
+      <div class="mvfield">
+        <label>Fast Orthophoto <span class="mv-tag mv-tag--opt">Opcional</span></label>
+        <select name="cfg_fast_ortho">
+          <option value="off" selected>Desligado</option>
+          <option value="on">Ligado (recomendado em terreno plano)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Calibração radiométrica aparece se sensor MS/térmico -->
+    <div class="mvfield mv-hide" id="cfg-radiometry" style="margin-top:8px">
+      <label>Calibração radiométrica <span class="mv-tag mv-tag--imp">Importante</span></label>
+      <select name="cfg_radiometry">
+        <option value="none" selected>Nenhuma</option>
+        <option value="camera">Câmera</option>
+        <option value="camera_sun">Câmera + sensor solar</option>
+      </select>
+      <small class="mv-hint">Para índices multiespectrais/térmicos consistentes, prefira “Câmera” ou “Câmera + sensor solar”.</small>
+    </div>
+  </div>
+
+  <!-- Avançado -->
+  <div id="cfg-adv" class="mv-hide">
+    <div class="mvgrid mv-3">
+      <div class="mvfield">
+        <label>pc-quality <span class="mv-tag mv-tag--opt">Opcional</span></label>
+        <select name="cfg_pc_quality">
+          <option value="medium" selected>medium</option>
+          <option value="high">high</option>
+          <option value="ultra">ultra</option>
+          <option value="low">low</option>
+        </select>
+      </div>
+
+      <div class="mvfield">
+        <label>feature-quality <span class="mv-tag mv-tag--opt">Opcional</span></label>
+        <select name="cfg_feature_quality">
+          <option value="medium" selected>medium</option>
+          <option value="high">high</option>
+          <option value="low">low</option>
+        </select>
+      </div>
+
+      <div class="mvfield">
+        <label>min-num-features <span class="mv-tag mv-tag--opt">Opcional</span></label>
+        <input type="number" step="1" name="cfg_min_features" placeholder="auto">
+      </div>
+
+      <div class="mvfield">
+        <label>resize (px) <span class="mv-tag mv-tag--opt">Opcional</span></label>
+        <input type="number" step="1" name="cfg_resize" placeholder="sem redimensionar">
+        <small class="mv-hint">Reduz tempo/custo em datasets grandes, com perda de detalhe.</small>
+      </div>
+
+      <div class="mvfield">
+        <label>optimize-disk-space <span class="mv-tag mv-tag--opt">Opcional</span></label>
+        <select name="cfg_opt_disk">
+          <option value="off" selected>off</option>
+          <option value="on">on</option>
+        </select>
+        <small class="mv-hint">Remove intermediários para economizar espaço.</small>
+      </div>
+
+      <div class="mvfield" style="grid-column:1/-1">
+        <label>cameras.json (reusar calibração) <span class="mv-tag mv-tag--opt">Opcional</span></label>
+        <input type="file" name="cfg_cameras_json" accept=".json">
+      </div>
+
+      <!-- Parâmetros 3D/Curvas podem ser expandidos no futuro -->
+      <div class="mvfield">
+        <label>Curvas — intervalo (m) <span class="mv-tag mv-tag--opt">Opcional</span></label>
+        <input type="number" step="0.1" name="cfg_contours_interval" placeholder="ex.: 1.0">
+      </div>
+    </div>
+  </div>
+</section>
+<!-- === /QUADRO 4 ========================================================== -->
+
+
+    <!-- === RESUMO & CRÉDITOS (quadro final) ================================ -->
+    <section class="mvcard" id="qf-resumo-creditos">
+      <h3>Resumo & Créditos</h3>
+
+      <div class="mv-rc">
+        <!-- Coluna esquerda: totais e ações -->
+        <div>
+          <div class="mv-credits" id="mv-credits">
+            <div class="mv-kv"><b>Necessário:</b> <span id="mv-cred-needed">—</span> créditos</div>
+            <div class="mv-kv"><b>Você tem:</b> <span id="mv-cred-have" data-user-credits="{{ user_credits|default:0 }}">{{ user_credits|default:0 }}</span> créditos</div>
+            <div class="mv-kv"><b>Saldo após:</b> <span id="mv-cred-after">—</span></div>
+            <a id="mv-buy-credits" class="mv-btn mv-btn--primary mv-hide" href="{% url 'projetos:comprar_creditos' %}">Comprar créditos</a>
+            <span id="mv-cred-flag" class="mv-hide mv-alert">saldo insuficiente</span>
+          </div>
+          <small class="mv-hint">O projeto configurado requer a quantidade acima. Se estiver de acordo, clique em <b>Salvar</b>.</small>
+        </div>
+
+        <!-- Coluna direita: composição/estimativa -->
+        <aside class="mv-credits-box" aria-label="Composição da estimativa">
+          <h4 class="mv-rc-title">Como chegamos a este valor</h4>
+          <ul id="mv-cred-breakdown" class="mv-rc-list">
+            <li>Preencha nº de imagens e selecione os produtos para ver a composição.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+
+
+<!-- ==================================================================== -->
+
+
+
+    <!-- ===== BOTÕES INFERIORES ===== -->
+    {% comment %}
+      Flags vindos da view:
+      - project_saved: bool (existe pk)
+      - has_uploads: bool (já tem uploads no projeto?)
+    {% endcomment %}
+
+<!-- ===== BOTÕES INFERIORES ===== -->
+<div class="mv-actions">
+
+  {# 1) Voltar — sempre ativo, padrão Projetos #}
+  <a class="mv-btn mv-btn--primary" href="{% url 'projetos:index' %}">
+    <img src="{% static 'core/img/icon/botao_anterior.svg' %}" alt="">
+    <span>Voltar</span>
+  </a>
+
+  {# 2) Cancelar — começa desativado, ativa quando o form ficar “sujo” #}
+  <a id="btn-cancelar"
+      class="mv-btn mv-btn--chip"
+      href="#"
+      aria-disabled="true"
+      title="Limpa os campos preenchidos (fica ativo quando houver alterações)">
+    <img class="mv-btn__icon--sm" src="{% static 'core/img/icon/cancelar.svg' %}" alt="">
+    <span>Cancelar</span>
+  </a>
+
+  {# 3) Editar — ativo apenas se salvo e sem uploads #}
+  {% if project_saved and not has_uploads %}
+    <a class="mv-btn mv-btn--primary" href="{% url 'projetos:editar' object.pk %}" title="Editar este projeto">
+      <img src="{% static 'core/img/icon/editar.svg' %}" alt="">
+      <span>Editar</span>
+    </a>
+  {% else %}
+    <a class="mv-btn mv-btn--chip" href="#" aria-disabled="true"
+       title="não existe projeto salvo para ser editado">
+      <img src="{% static 'core/img/icon/editar.svg' %}" alt="">
+      <span>Editar</span>
+    </a>
   {% endif %}
 
-  <form method="post" enctype="multipart/form-data" novalidate>
-    {% csrf_token %}
-    {{ form.non_field_errors }}  {# <- útil para validações gerais #}
+  {# 4) Salvar — desativado até cumprir obrigatórios (nome + EPSG) #}
+  {% if required_min_ok %}
+    <button id="btn-salvar" type="submit" class="mv-btn mv-btn--primary" title="Salvar definições">
+      <img src="{% static 'core/img/icon/salvar.svg' %}" alt="">
+      <span>Salvar</span>
+    </button>
+  {% else %}
+    <button id="btn-salvar" type="submit" class="mv-btn mv-btn--chip" aria-disabled="true" disabled
+            title="faltam dados obrigatórios do projeto para ele ser salvo">
+      <img src="{% static 'core/img/icon/salvar.svg' %}" alt="">
+      <span>Salvar</span>
+    </button>
+  {% endif %}
 
-    <div class="grid">
-      <div>
-        <label for="{{ form.nome.id_for_label }}">Nome</label>
-        {{ form.nome }} {{ form.nome.errors }}
+  {# 5) Uploads — ícone 30% maior e regra: ativo se salvo e sem uploads #}
+  {% if project_saved and not has_uploads %}
+    <a id="btn-uploads" class="mv-btn mv-btn--primary" href="{% url 'projetos:uploads' object.pk %}" title="Enviar imagens">
+      <img style="width:28px;height:28px" src="{% static 'core/img/icon/upload_imagem.svg' %}" alt="">
+      <span>Uploads</span>
+    </a>
+  {% else %}
+    <a id="btn-uploads" class="mv-btn mv-btn--chip" href="#" aria-disabled="true"
+       title="{% if not project_saved %}projeto não salvo{% else %}este projeto já tem uploads, se quiser carregar outras imagens tente clonar o projeto e incluir todas as imagens novamente{% endif %}">
+      <img style="width:28px;height:28px" src="{% static 'core/img/icon/upload_imagem.svg' %}" alt="">
+      <span>Uploads</span>
+    </a>
+  {% endif %}
 
-        <label for="{{ form.descricao.id_for_label }}">Descrição</label>
-        {{ form.descricao }} {{ form.descricao.errors }}
+</div>
 
-        <label for="{{ form.data_voo.id_for_label }}">Data do voo</label>
-        {{ form.data_voo }} {{ form.data_voo.errors }}
+<script>
 
-        <label for="{{ form.plataforma.id_for_label }}">Plataforma</label>
-        {{ form.plataforma }} {{ form.plataforma.errors }}
+  /* Resumo & Créditos: layout em 2 colunas */
+.mv-rc{
+  display:grid; gap:16px 20px; grid-template-columns:1fr;
+}
+@media (min-width: 960px){
+  .mv-rc{ grid-template-columns: 2fr 1fr; align-items:start; }
+}
+.mv-credits-box{
+  background:#fff; border:1px solid rgba(0,0,0,.08);
+  border-radius:12px; padding:14px 16px;
+  box-shadow:0 4px 12px rgba(0,0,0,.06);
+}
+.mv-rc-title{ margin:0 0 8px; font-size:.95rem; font-weight:700; }
+.mv-rc-list{ margin:0; padding-left:18px; }
+.mv-rc-list li{ margin:4px 0; }
+</script>
 
-        <label for="{{ form.camera_modelo.id_for_label }}">Modelo da câmera</label>
-        {{ form.camera_modelo }} {{ form.camera_modelo.errors }}
+<script>
+(function(){
+  // 1) Certifique-se de que os rádios de finalidade têm value="oficial" e value="privado".
+  //    Se ainda não têm, ajuste no HTML dos rádios:
+  //    <input type="radio" name="finalidade" value="oficial"> Oficial
+  //    <input type="radio" name="finalidade" value="privado"> Gestão / Privado
+  const radiosFinalidade = document.querySelectorAll('input[name="finalidade"]');
+  const grpCultura = document.getElementById('grp-cultura');
+  const selCrop = document.getElementById('crop');
+  const inpOutro = document.getElementById('crop_outro');
 
-        <label for="{{ form.camera_tipo.id_for_label }}">Tipo de câmera</label>
-        {{ form.camera_tipo }} {{ form.camera_tipo.errors }}
-      </div>
+  function refreshCultura(){
+    const fin = Array.from(radiosFinalidade).find(r=>r.checked)?.value || '';
+    // mostra "Cultura" somente quando Gestão/Privado
+    grpCultura?.classList.toggle('mv-hide', fin !== 'privado');
+  }
 
-      <div>
-        <label for="{{ form.georef.id_for_label }}">Georreferenciamento</label>
-        {{ form.georef }} {{ form.georef.errors }}
+  function refreshCropOutro(){
+    const outra = selCrop?.value === 'outro';
+    inpOutro?.classList.toggle('mv-hide', !outra);
+    if (!outra && inpOutro) inpOutro.value = '';
+  }
 
-        <label for="{{ form.epsg.id_for_label }}">EPSG</label>
-        {{ form.epsg }} <small>Ex.: EPSG:31983</small> {{ form.epsg.errors }}
+  radiosFinalidade.forEach(r=> r.addEventListener('change', refreshCultura));
+  selCrop?.addEventListener('change', refreshCropOutro);
 
-        <label for="{{ form.altura_voo_m.id_for_label }}">Altura de voo (m)</label>
-        {{ form.altura_voo_m }} {{ form.altura_voo_m.errors }}
+  // estado inicial
+  refreshCultura();
+  refreshCropOutro();
+})();
+</script>
 
-        <label for="{{ form.gsd_cm.id_for_label }}">GSD (cm/pixel)</label>
-        {{ form.gsd_cm }} {{ form.gsd_cm.errors }}
+<script>
+/**
+ * Cultura + Finalidade (Q1) e Obrigatórios (Q2)
+ * - Cultura sempre visível; "Outra…" abre input de texto
+ * - Cultura só é OBRIGATÓRIA em Gestão/Privado
+ * - Campos do Q2 (RT/PEC) ficam required apenas em Oficial
+ * - Blocos #blk-oficial-2/3/4 aparecem só em Oficial
+ */
+(function () {
+  const FINALIDADE_NAME = "objetivo_finalidade"; // radios do Q1: "gestao" | "oficial"
 
-        <label for="{{ form.overlap_frontal.id_for_label }}">Overlap frontal (%)</label>
-        {{ form.overlap_frontal }} {{ form.overlap_frontal.errors }}
+  // Helpers
+  const $  = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-        <label for="{{ form.overlap_lateral.id_for_label }}">Overlap lateral (%)</label>
-        {{ form.overlap_lateral }} {{ form.overlap_lateral.errors }}
-      </div>
-    </div>
+  // Cultura (Q1)
+  const cropSel   = $("#crop");
+  const cropOutro = $("#crop_outro");
+  const cropReq   = document.querySelector('#grp-cultura .js-crop-req'); // tagzinha "Obrigatório" no label (opcional)
 
-    <hr>
+  // Campos que viram required apenas em Oficial (no Q2)
+  const oficialRequired = ["rt_nome", "rt_conselho", "rt_art", "pos_metodo", "pec_meta"];
 
-    <div>
-      <label>{{ form.usa_gcp }} Usar GCP</label>
-      <label for="{{ form.gcp_csv.id_for_label }}">Arquivo GCP (CSV/TXT)</label>
-      {{ form.gcp_csv }} {{ form.gcp_csv.errors }}
-      <small>Precisa de um exemplo? <a href="{% url 'projetos:gcp_modelo_csv' %}">Baixar CSV modelo</a></small>
-    </div>
+  function getFinalidade() {
+    const r = document.querySelector(`input[name="${FINALIDADE_NAME}"]:checked`);
+    return r ? r.value : "";
+  }
 
-    <hr>
+  function toggleCropOutro() {
+    if (!cropSel || !cropOutro) return;
+    const outra = (cropSel.value === "outro");
+    cropOutro.classList.toggle("mv-hide", !outra);
+    if (!outra) cropOutro.value = "";
+  }
 
-    <div>
-      <label>Produtos</label><br>
-      <label>{{ form.prod_ortomosaico }} Ortomosaico</label>
-      <label>{{ form.prod_dsm }} DSM</label>
-      <label>{{ form.prod_dtm }} DTM</label>
-      <label>{{ form.prod_nuvem_pts }} Nuvem de pontos</label>
-      <label>{{ form.prod_contornos }} Curvas de nível</label>
-    </div>
+  function applyFinalidade() {
+    const fin = getFinalidade();
+    const isOficial = (fin === "oficial");
+    const isGestao  = (fin === "gestao");
 
-    <div style="margin-top:14px">
-      <button class="btn" type="submit">Salvar e ir para Upload</button>
-    </div>
+    // Cultura obrigatória só em Gestão/Privado
+    if (cropSel) cropSel.required = !!isGestao;
+    if (cropReq) cropReq.classList.toggle("mv-hide", !isGestao);
+
+    // Mostra/oculta os blocos do Q2 específicos de Oficial
+    ["blk-oficial-2", "blk-oficial-3", "blk-oficial-4"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle("mv-hide", !isOficial);
+    });
+
+    // Required apenas em Oficial
+    oficialRequired.forEach(name => {
+      const el = document.querySelector(`[name="${name}"]`);
+      if (!el) return;
+      if (isOficial) el.setAttribute("required", "required");
+      else el.removeAttribute("required");
+    });
+
+    // Dica sobre Oficial (se existir)
+    const posHint = $("#pos_hint");
+    if (posHint) {
+      posHint.textContent = isOficial
+        ? "Para usos oficiais, recomenda-se controle de terreno (GCP/RTK/PPK) e declarar a classe PEC/escala no relatório."
+        : "";
+    }
+  }
+
+  // Listeners
+  if (cropSel) cropSel.addEventListener("change", toggleCropOutro);
+  $$(`input[name="${FINALIDADE_NAME}"]`).forEach(r => r.addEventListener("change", applyFinalidade));
+
+  // Estado inicial
+  document.addEventListener("DOMContentLoaded", () => {
+    toggleCropOutro();
+    applyFinalidade();
+  });
+  // fallback se o script estiver já no fim do body
+  toggleCropOutro();
+  applyFinalidade();
+})();
+</script>
+
+
+
+<script>
+(function(){
+  // Utilidades
+  const $  = (s,ctx=document)=>ctx.querySelector(s);
+  const $$ = (s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
+  const num = v => isNaN(v) ? 0 : Number(v);
+
+  // Elementos do painel
+  const elNeed   = $('#mv-cred-needed');
+  const elHave   = $('#mv-cred-have');
+  const elAfter  = $('#mv-cred-after');
+  const elBuy    = $('#mv-buy-credits');
+  const elFlag   = $('#mv-cred-flag');
+  const elBreak  = $('#mv-cred-breakdown');
+
+  // Mapa dos checkboxes de produtos (ajuste os seletores se necessário)
+  const getProdChecks = () => ([
+    ['Ortomosaico',   $('#prod_ortho')],
+    ['DSM',           $('#prod_dsm')],
+    ['DTM',           $('#prod_dtm')],
+    ['Curvas de nível',$('#prod_curvas')],
+    ['Nuvem de pontos',$('#prod_nuvem')],
+    ['Relatório',     $('#prod_relatorio')],
+  ]);
+
+  // Estado e API pública
+  const credits = {
+    inputs: { images:0, productsMult:1.00, configAdj:0.00, storage:0 },
+    setImages(v){ this.inputs.images = Math.max(0, num(v)||0); this.render(); },
+    setProdutos(mult){ this.inputs.productsMult = Math.max(0, num(mult)||1.00); this.render(); },
+    setAjustes(adj){ this.inputs.configAdj = num(adj)||0; this.render(); },
+    setStorage(s){ this.inputs.storage = Math.max(0, num(s)||0); this.render(); },
+
+    // regra simples p/ exemplo: total = imagens * (1 + extras) + storage
+    total(){
+      const p = this.inputs;
+      return Math.ceil(Math.max(0, p.images * (1 + (p.productsMult-1) + p.configAdj) + p.storage));
+    },
+
+    breakdown(){
+      const it = [];
+      it.push(`Imagens informadas: <b>${(this.inputs.images||0).toLocaleString('pt-BR')}</b> × 1 crédito`);
+      // Produtos
+      const prods = getProdChecks().filter(([_,el])=>el && el.checked).map(([lbl])=>lbl);
+      const extra = Math.max(0,(this.inputs.productsMult-1));
+      it.push(`Produtos: ${prods.length ? prods.join(', ') : '—'} ${extra ? `(+${(extra*100).toFixed(0)}%)` : '(+0%)'}`);
+      // Ajustes
+      if (this.inputs.configAdj)
+        it.push(`Ajustes de configuração: ${(this.inputs.configAdj*100).toFixed(0)}%`);
+      if (this.inputs.storage)
+        it.push(`Armazenamento: +${this.inputs.storage.toLocaleString('pt-BR')} créditos`);
+      return it;
+    },
+
+    render(){
+      if (!elNeed) return;
+      const need = this.total();
+      const have = num(elHave?.dataset.userCredits || elHave?.textContent || 0);
+      const after = have - need;
+
+      elNeed.textContent  = need ? need.toLocaleString('pt-BR') : '—';
+      elAfter.textContent = need ? after.toLocaleString('pt-BR') : '—';
+
+      const insuf = need && after < 0;
+      elBuy?.classList.toggle('mv-hide', !insuf);
+      elFlag?.classList.toggle('mv-hide', !insuf);
+      if (elFlag) elFlag.textContent = insuf ? 'saldo insuficiente' : '';
+
+      // Atualiza composição (coluna direita)
+      if (elBreak){
+        const parts = this.breakdown();
+        elBreak.innerHTML = parts.length
+          ? parts.map(s=>`<li>${s}</li>`).join('')
+          : '<li>Preencha nº de imagens e selecione os produtos.</li>';
+      }
+    }
+  };
+  window.mvCredits = credits; // expõe p/ outros scripts
+
+  // Ligações dos campos
+
+  // (a) nº de imagens (Q3)
+  const fImgs = document.querySelector('[name="qtd_imagens"]') ||
+                document.querySelector('#q3_imgs_decl');
+  if (fImgs){
+    const push = ()=> credits.setImages(fImgs.value);
+    fImgs.addEventListener('input', push);
+    fImgs.addEventListener('change', push);
+    push();
+  }
+
+  // (b) produtos
+  const prods = getProdChecks().map(([_,el])=>el).filter(Boolean);
+  function recomputeProducts(){
+    // exemplo: cada produto além do ortho +10%
+    let mult = 1.00;
+    const checked = getProdChecks().filter(([_,el])=>el && el.checked).map(([lbl])=>lbl);
+    if (checked.includes('DSM'))         mult += .10;
+    if (checked.includes('DTM'))         mult += .10;
+    if (checked.includes('Curvas de nível')) mult += .05;
+    if (checked.includes('Nuvem de pontos')) mult += .05;
+    // relatório não altera
+    credits.setProdutos(mult);
+  }
+  prods.forEach(el=>el.addEventListener('change', recomputeProducts));
+  recomputeProducts();
+
+  // (c) ajustes simples (ex.: qualidade pc/high/ultra, fast-ortho, etc.)
+  const selPc = document.querySelector('[name="cfg_pc_quality"]') ||
+                document.querySelector('[name="pc_quality"]');
+  const selFast = document.querySelector('[name="cfg_fast_ortho"]');
+  function recomputeAdj(){
+    let adj = 0;
+    const q = selPc && selPc.value;
+    if (q === 'high')  adj += 0.08;
+    if (q === 'ultra') adj += 0.15;
+    if (selFast && selFast.value === 'on') adj -= 0.05;
+    credits.setAjustes(adj);
+  }
+  selPc   && selPc.addEventListener('change', recomputeAdj);
+  selFast && selFast.addEventListener('change', recomputeAdj);
+  recomputeAdj();
+
+  // Render inicial
+  credits.render();
+})();
+</script>
+
+
+<script>
+
+(function(){
+  const $$ = (s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
+
+  function getProductsMultiplier(){
+    // Sempre inclui o ortho (se desmarcar, fica só o que estiver marcado)
+    const cbs = $$('#grp-produtos input[type="checkbox"]:checked');
+    let mult = 0;
+    cbs.forEach(cb=>{
+      const extra = parseFloat(cb.dataset.creditMult || '0') || 0;
+      mult += extra;
+    });
+    // Obs.: se você quiser que o ortho seja sempre 1.00 mesmo desmarcado, force:
+    // if (!document.getElementById('prod_ortho').checked) mult += 1.00;
+    return mult; // ex.: 1.00 (só ortho) ou 1.26 (ortho + DSM + curvas…)
+  }
+
+  // Exponha para o módulo de créditos, se você já tem um:
+  window.mvCredits = window.mvCredits || {};
+  window.mvCredits.getProductsMult = getProductsMultiplier;
+
+  // recompute quando marcar/desmarcar produtos
+  const prodBox = document.getElementById('grp-produtos');
+  prodBox?.addEventListener('change', ()=>{
+    if (window.mvCredits && typeof window.mvCredits.recompute === 'function'){
+      window.mvCredits.recompute();
+    }
+  });
+})();
+
+  function toggleIvPanel(){
+    ivPanel?.classList.toggle('mv-hide', !on);
+    if (!on) return;
+
+    const {hasRGB,hasMS,hasTher} = sensorSet();
+    ivRGB?.classList.toggle('mv-hide', !hasRGB);
+    ivMS?.classList.toggle('mv-hide', !hasMS);
+    ivTherm?.classList.toggle('mv-hide', !hasTher);
+  }
+
+  $$('input[name="sensores"]').forEach(chk => chk.addEventListener('change', toggleIvPanel));
+
+  document.addEventListener('DOMContentLoaded', toggleIvPanel);
+})();
+</script>
+
+
+
+
+
   </form>
+
+
+<script>
+(function () {
+  const $ = (s) => document.querySelector(s);
+
+  // Safe checks para não quebrar caso window.MV não exista
+  const projectSaved = !!(window.MV && window.MV.projectId);          // true se já tem id
+  const hasUploads   = !!(window.MV && window.MV.projectHasUploads);  // true se já existem arquivos
+  const btnUploads   = $('#btn-uploads');                             // id do botão "Uploads"
+
+  const setDisabled = (el, on, title) => {
+    if (!el) return;
+    el.classList.toggle('is-disabled', !!on);
+    el.setAttribute('aria-disabled', on ? 'true' : 'false');
+    el.tabIndex = on ? -1 : 0;
+    if (title) el.setAttribute('title', title);
+    else el.removeAttribute('title');
+  };
+
+  function reevaluateUploads() {
+    if (!btnUploads) return;
+
+    // 1) precisa estar salvo
+    if (!projectSaved) {
+      setDisabled(btnUploads, true, 'Salve o projeto para fazer upload.');
+      return;
+    }
+
+    // 2) já tem uploads?
+    if (hasUploads) {
+      setDisabled(btnUploads, true, 'Este projeto já tem uploads. Para novas imagens, clone o projeto e suba todas novamente.');
+      return;
+    }
+
+    // 3) precisa ter nº de imagens informado
+    const imgs   = document.querySelector('[name="qtd_imagens"]');
+    const nImgs  = +((imgs && imgs.value) || 0);
+    if (!nImgs) {
+      setDisabled(btnUploads, true, 'Informe o nº de imagens.');
+    } else {
+      setDisabled(btnUploads, false);
+    }
+
+    // Liga o campo "qtd_imagens" à estimativa de créditos (se existir o widget)
+    if (imgs) {
+      const push = () => {
+        try {
+          if (window.mvCredits && typeof window.mvCredits.setImages === 'function') {
+            window.mvCredits.setImages(imgs.value);
+          }
+        } catch (e) { /* ignora */ }
+      };
+      imgs.addEventListener('input',  push);
+      imgs.addEventListener('change', push);
+      push(); // inicializa quando a página carrega
+    }
+
+    // 4) (Opcional) ler total exibido — protegido em try/catch
+    try {
+      const txt = (document.querySelector('#mv-credits-total')?.textContent) || '';
+      const num = +txt.replace(/\./g, '').replace(',', '.');
+      // use "num" se precisar tomar decisão adicional
+    } catch (e) { /* ignora */ }
+  }
+
+  document.addEventListener('DOMContentLoaded', reevaluateUploads);
+})();
+</script>
+
+
+<script>
+(function(){
+  const form        = document.getElementById('mv-form') || document.querySelector('form');
+  const btnCancelar = document.getElementById('btn-cancelar');
+  if (!form || !btnCancelar) return;
+
+  // 1) Evita submit acidental com Enter (exceto em TEXTAREA)
+  form.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target && e.target.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+    }
+  });
+
+  // 2) Campos observados (ignora hidden/disabled)
+  const fields = Array.from(form.querySelectorAll('input, select, textarea'))
+    .filter(el => !el.disabled && el.type !== 'hidden');
+
+  // 3) Snapshot inicial
+  const initial = new Map();
+  fields.forEach(el => {
+    let v;
+    if (el.type === 'checkbox' || el.type === 'radio') v = el.checked;
+    else if (el.tagName === 'SELECT') v = el.selectedIndex;
+    else v = (el.value || '');
+    initial.set(el, v);
+  });
+
+  function isDirty(){
+    return fields.some(el => {
+      let cur;
+      if (el.type === 'checkbox' || el.type === 'radio') cur = el.checked;
+      else if (el.tagName === 'SELECT') cur = el.selectedIndex;
+      else cur = (el.value || '');
+      return cur !== initial.get(el);
+    });
+  }
+
+  function setCancelEnabled(enable){
+    if (enable){
+      btnCancelar.classList.remove('mv-btn--chip');
+      btnCancelar.classList.add('mv-btn--primary'); // mesmo visual do Voltar
+      btnCancelar.removeAttribute('aria-disabled');
+      btnCancelar.removeAttribute('disabled');
+      btnCancelar.style.pointerEvents = 'auto';
+      btnCancelar.title = 'Cancelar e limpar o formulário';
+    } else {
+      btnCancelar.classList.add('mv-btn--chip');
+      btnCancelar.classList.remove('mv-btn--primary');
+      btnCancelar.setAttribute('aria-disabled','true');
+      btnCancelar.setAttribute('disabled','disabled');
+      btnCancelar.style.pointerEvents = 'none';
+      btnCancelar.title = 'Fica ativo quando houver alterações';
+    }
+  }
+
+  function recompute(){
+    setCancelEnabled(isDirty());
+    // (opcional) se existir, re-renderiza o resumo de créditos
+    try { window.mvCredits?.render(); } catch(_) {}
+  }
+
+  // 4) Observadores: qualquer mudança reavalia
+  form.addEventListener('input',  recompute, true);
+  form.addEventListener('change', recompute, true);
+  fields.forEach(el => el.addEventListener('keyup', recompute));
+
+  // 5) Clique em Cancelar = restaurar snapshot
+  btnCancelar.addEventListener('click', (e)=>{
+    if (btnCancelar.getAttribute('aria-disabled') === 'true'){ e.preventDefault(); return; }
+    e.preventDefault();
+    fields.forEach(el=>{
+      const v0 = initial.get(el);
+      if (el.type === 'checkbox' || el.type === 'radio'){ el.checked = v0; return; }
+      if (el.tagName === 'SELECT'){ el.selectedIndex = v0; return; }
+      el.value = v0;
+    });
+    // dispara eventos p/ widgets dependentes e reavalia
+    form.dispatchEvent(new Event('change', {bubbles:true}));
+    form.dispatchEvent(new Event('input',  {bubbles:true}));
+    recompute();
+  });
+
+  // 6) Estado inicial
+  document.addEventListener('DOMContentLoaded', recompute);
+  recompute();
+})();
+</script>
+
+
 </section>
 
-<style>
-/* Só se sua base não tiver .grid ainda; caso já tenha, pode remover este bloco */
-.grid { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-@media (max-width: 720px){ .grid { grid-template-columns: 1fr; } }
+<script>
+// Habilita "Salvar" quando os obrigatórios estiverem OK
+(function(){
+  const form = document.getElementById('mv-form');
+  const btn  = document.getElementById('btn-salvar');
+  const lbl  = document.getElementById('lbl-salvar');
 
-/* mensagens simples; ficam discretas se já houver estilo global */
-.mv-messages { list-style:none; margin:0 0 10px 0; padding:0; }
-.mv-message { background:#f6fff1; border:1px solid #dcefd3; padding:10px; border-radius:8px; }
-</style>
+  if (!form || !btn) return;
+
+  // Campos realmente existentes na sua página
+  const requiredFields = [
+    form.querySelector('[name="proj_nome"]'),     // Nome do projeto (Q2)
+    form.querySelector('[name="crs_saida"]')      // CRS padrão para saídas (Q1)
+    // se houver mais obrigatórios, adicione aqui
+  ].filter(Boolean);
+
+  function setSaveEnabled(on){
+    if (on){
+      btn.removeAttribute('disabled');
+      btn.setAttribute('aria-disabled','false');
+      if (lbl) lbl.classList.remove('disabled');
+      btn.title = 'Salvar definições';
+    }else{
+      btn.setAttribute('disabled','disabled');
+      btn.setAttribute('aria-disabled','true');
+      if (lbl) lbl.classList.add('disabled');
+      btn.title = 'faltam dados obrigatórios do projeto para ele ser salvo';
+    }
+  }
+
+  function check(){
+    const ok = requiredFields.every(el => {
+      if (!el) return false;
+      if (el.tagName === 'SELECT') return el.value && el.value !== '';
+      if (el.type === 'radio' || el.type === 'checkbox') return !!form.querySelector(`[name="${el.name}"]:checked`);
+      return el.value && el.value.trim().length > 0;
+    });
+    setSaveEnabled(ok);
+  }
+
+  form.addEventListener('input',  check, true);
+  form.addEventListener('change', check, true);
+  document.addEventListener('DOMContentLoaded', check);
+  check();
+})();
+</script>
+
+
+<script>
+/* === Bindings dos campos relevantes para a estimativa ===== */
+(function(){
+  // garanta que a API existe
+  if (!window.mvCredits) return;
+
+  // (a) Nº de imagens informado
+  const fImgs = document.querySelector('[name="q3_imgs_decl"], [name="num_imagens"], [data-field="num_imagens"]');
+  if (fImgs) {
+    const onImgs = () => window.mvCredits.setImages(fImgs.value);
+    fImgs.addEventListener('input', onImgs);
+    fImgs.addEventListener('change', onImgs);
+  }
+
+  // (b) Produtos marcados (conte quantos estão ativos → múltiplo)
+  const prodChecks = Array.from(document.querySelectorAll(
+    '[name="prod_ortomosaico"],[name="prod_dsm"],[name="prod_dtm"],[name="prod_nuvem_pts"],[name="prod_contornos"]'
+  ));
+  function recomputeProducts(){
+    const count = prodChecks.reduce((acc, el)=> acc + (el.checked ? 1 : 0), 0);
+    // 1 produto = 1.00; 2 = 1.10; 3 = 1.20; 4 = 1.30; 5 = 1.40 (exemplo)
+    const mult = count ? 1 + Math.max(0, count - 1) * 0.10 : 0;
+    window.mvCredits.setProdutos(mult || 0);
+  }
+  prodChecks.forEach(el => el.addEventListener('change', recomputeProducts));
+
+  // (c) Ajustes de configuração (resolução/GSD etc.) – opcional:
+  // use um fator simples só para dar feedback visual
+  const ortho = document.querySelector('[name="cfg_ortho_cm"]');
+  const gsd   = document.querySelector('[name="gsd_cm"], [name="gsd"]');
+  function recomputeAdj(){
+    let adj = 0;
+    const o = parseFloat(ortho && ortho.value || '');
+    const g = parseFloat(gsd   && gsd.value   || '');
+    if (!isNaN(o)) adj += Math.max(0, (3.0 - o)) * 0.04;  // resolução menor → um “pouco” mais caro
+    if (!isNaN(g)) adj += Math.max(0, (2.5 - g)) * 0.03;  // GSD menor → idem
+    window.mvCredits.setAjustes(adj || 0);
+  }
+  ortho && ortho.addEventListener('input',  recomputeAdj);
+  ortho && ortho.addEventListener('change', recomputeAdj);
+  gsd   && gsd.addEventListener('input',  recomputeAdj);
+  gsd   && gsd.addEventListener('change', recomputeAdj);
+
+  // dispara um cálculo inicial (se houver valores preenchidos)
+  window.mvCredits.recompute && window.mvCredits.recompute();
+})();
+</script>
+
+<script>
+/* === Cancelar: habilita quando o formulário fica “sujo” e restaura === */
+(function(){
+  const form = document.getElementById('mv-form') || document.querySelector('form');
+  const btnCancelar = document.getElementById('btn-cancelar');
+  if (!form || !btnCancelar) return;
+
+  // considera campos “editáveis” (ignora hidden/disabled)
+  const fields = Array.from(form.querySelectorAll('input, select, textarea'))
+    .filter(el => !el.disabled && el.type !== 'hidden');
+
+  // snapshot inicial
+  const initial = new Map();
+  fields.forEach(el=>{
+    let v;
+    if (el.type === 'checkbox' || el.type === 'radio') v = el.checked;
+    else if (el.tagName === 'SELECT') v = el.selectedIndex;
+    else v = el.value || '';
+    initial.set(el, v);
+  });
+
+  const setCancelEnabled = (on) => {
+    const cls = btnCancelar.classList;
+    if (on){
+      cls.remove('mv-btn--chip');
+      cls.add('mv-btn--primary');     // mesmo look do “Voltar”
+      btnCancelar.removeAttribute('aria-disabled');
+      btnCancelar.removeAttribute('disabled');
+      btnCancelar.style.pointerEvents = 'auto';
+      btnCancelar.title = 'Cancelar e limpar o formulário';
+    } else {
+      cls.add('mv-btn--chip');
+      cls.remove('mv-btn--primary');
+      btnCancelar.setAttribute('aria-disabled','true');
+      btnCancelar.setAttribute('disabled','disabled');
+      btnCancelar.style.pointerEvents = 'none';
+      btnCancelar.title = 'Fica ativo quando houver alterações';
+    }
+  };
+
+  const isDirty = () => fields.some(el=>{
+    let cur;
+    if (el.type === 'checkbox' || el.type === 'radio') cur = el.checked;
+    else if (el.tagName === 'SELECT') cur = el.selectedIndex;
+    else cur = el.value || '';
+    return cur !== initial.get(el);
+  });
+
+  const recompute = () => setCancelEnabled(isDirty());
+
+  // escuta mudanças
+  form.addEventListener('input',  recompute, true);
+  form.addEventListener('change', recompute, true);
+
+  // ação do cancelar = restaurar snapshot + disparar eventos
+  btnCancelar.addEventListener('click', (e)=>{
+    if (btnCancelar.getAttribute('aria-disabled') === 'true'){ e.preventDefault(); return; }
+    e.preventDefault();
+    fields.forEach(el=>{
+      const v0 = initial.get(el);
+      if (el.type === 'checkbox' || el.type === 'radio'){ el.checked = v0; return; }
+      if (el.tagName === 'SELECT'){ el.selectedIndex = v0; return; }
+      el.value = v0 || '';
+    });
+    form.dispatchEvent(new Event('change', {bubbles:true}));
+    form.dispatchEvent(new Event('input',  {bubbles:true}));
+    recompute();
+  });
+
+  // estado inicial
+  document.addEventListener('DOMContentLoaded', recompute);
+  recompute();
+})();
+</script>
+
+
+
+
+<script>
+    // obrigatórios em Oficial
+    ['rt_nome','rt_conselho','rt_art','pos_metodo','pec_meta'].forEach(name=>{
+      const el = $(`[name="${name}"]`);
+      if (el) { isOficial ? el.setAttribute('required','required') : el.removeAttribute('required'); }
+    });
+    const posHint = $('#pos_hint');
+    if (posHint){
+      posHint.innerHTML = isOficial
+        ? 'Para usos oficiais, recomenda-se controle de terreno (GCP/RTK/PPK) e declarar a classe PEC/escala no relatório.'
+        : '';
+    }
+  }
+  finalidadeGrp.addEventListener('change', applyFinalidade);
+
+  // --- CRS / UTM
+  const crsSel = $('#crs_saida');
+  const grpUtm = $('#grp-utm');
+  const crsHint = $('#crs_hint');
+  function applyCRS(){
+    const v = crsSel.value;
+    const utm = (v === 'SIRGAS_UTM' || v === 'WGS84_UTM');
+    toggle(grpUtm, utm);
+    if (crsHint){
+      crsHint.innerHTML =
+        (v && v.startsWith('EPSG:4674') || v === 'SIRGAS_UTM')
+        ? 'Usos oficiais: SIRGAS 2000 é a referência recomendada.'
+        : 'Integrações com máquinas e GPS: WGS84 costuma ser exigido.';
+    }
+  }
+  crsSel.addEventListener('change', applyCRS);
+
+  // --- CRS vetores do cliente
+  const crsRadio = $$('input[name="crs_cliente"]');
+  const crsOther = $('#crs_cliente_epsg');
+  function applyCrsCliente(){
+    const val = $$('input[name="crs_cliente"]:checked').map(i=>i.value)[0];
+    if (val === 'other'){ crsOther.classList.remove('mv-hide'); crsOther.setAttribute('required','required'); }
+    else { crsOther.classList.add('mv-hide'); crsOther.removeAttribute('required'); crsOther.value=''; }
+  }
+  crsRadio.forEach(r=>r.addEventListener('change', applyCrsCliente));
+
+  // --- Oficial: "Outro" processo
+  const ofcChecks = $$('input[name="ofc_processo"]');
+  const ofcOutro  = $('#ofc_outro');
+  function applyOfcOutro(){
+    const hasOutro = ofcChecks.some(c=>c.checked && c.value==='outro');
+    if (hasOutro){ ofcOutro.classList.remove('mv-hide'); ofcOutro.setAttribute('required','required'); }
+    else { ofcOutro.classList.add('mv-hide'); ofcOutro.removeAttribute('required'); ofcOutro.value=''; }
+  }
+  ofcChecks.forEach(c=>c.addEventListener('change', applyOfcOutro));
+
+  // --- Painel de créditos (API simples para Q3/Q4 plugarem depois)
+  const credHaveEl = $('#mv-cred-have');
+  const credNeededEl = $('#mv-cred-needed');
+  const credAfterEl  = $('#mv-cred-after');
+  const buyBtn       = $('#mv-buy-credits');
+  const flagEl       = $('#mv-cred-flag');
+
+  const mvCredits = {
+    inputs: { images: 0, productsMult: 1.00, configAdj: 0.00, storage: 0 },
+    calc(){
+      // fórmula: imagens * (1.00 + extras) + storage
+      const base = this.inputs.images * (1.00 + (this.inputs.productsMult - 1.00) + this.inputs.configAdj);
+      const total = Math.ceil(Math.max(0, base) + Math.max(0, this.inputs.storage));
+      return total;
+    },
+    render(){
+      const have = parseInt(credHaveEl?.dataset.userCredits || '0', 10) || 0;
+      const need = this.calc();
+      credNeededEl.textContent = (need > 0 ? need : '—');
+      if (need > 0){
+        const after = have - need;
+        credAfterEl.textContent = after;
+        const insuf = after < 0;
+        buyBtn.classList.toggle('mv-hide', !insuf);
+        flagEl.classList.toggle('mv-hide', !insuf);
+        flagEl.textContent = insuf ? 'saldo insuficiente' : '';
+      } else {
+        credAfterEl.textContent = '—';
+        buyBtn.classList.add('mv-hide');
+        flagEl.classList.add('mv-hide');
+      }
+    },
+    // Permite outros quadros atualizarem a estimativa
+    setInputs(partial){
+      this.inputs = Object.assign({}, this.inputs, partial || {});
+      this.render();
+    }
+  };
+  window.mvCredits = mvCredits;
+  // Ligar o campo "qtd_imagens" à estimativa:
+(function(){
+  const imgs = document.querySelector('[name="qtd_imagens"]');
+  if (imgs) {
+    const push = () => window.mvCredits?.setImages(imgs.value);
+    imgs.addEventListener('input', push);
+    imgs.addEventListener('change', push);
+    push(); // inicializa quando a página carrega
+  }
+  const linkProds = () => mvCredits.setProdutos({
+  ortho:   cb('#prod_ortho')?.checked,
+  dsm:     cb('#prod_dsm')?.checked,
+  dtm:     cb('#prod_dtm')?.checked,
+  curvas:  cb('#prod_curvas')?.checked,
+  nuvem:   cb('#prod_nuvem')?.checked,
+});
+(function(){
+  if (!window.mvCredits) return;
+
+  // acessos diretos a elementos já esperados pelo seu render()
+  const needEl  = document.getElementById('mv-cred-needed');
+  const haveEl  = document.getElementById('mv-cred-have');
+  const afterEl = document.getElementById('mv-cred-after');
+  const barEl   = document.getElementById('mv-cred-bar');
+
+  function recomputeLocal(inputs){
+    // aplica entradas novas mantendo as antigas
+    window.mvCredits.setInputs(inputs || {});
+    window.mvCredits.render({ needEl, haveEl, afterEl, barEl });
+  }
+
+  // wrappers que você estava chamando mas não existiam:
+  window.mvCredits.setImages   = (n)  => recomputeLocal({ images: Number(n) || 0 });
+  window.mvCredits.setProdutos = (k)  => recomputeLocal({ productsMult: Number(k) || 1 });
+  window.mvCredits.setAjustes  = (aj) => recomputeLocal({ configAdj: Number(aj) || 0 });
+  window.mvCredits.setStorage  = (d)  => recomputeLocal({ storageMonths: Number(d) || 0 });
+
+  // expõe recompute caso precise forçar um refresh
+  window.mvCredits.recompute = () => recomputeLocal({});
+})();
+
+['#prod_ortho','#prod_dsm','#prod_dtm','#prod_curvas','#prod_nuvem']
+  .forEach(sel => cb(sel)?.addEventListener('change', linkProds));
+linkProds(); // estado inicial
+
+  // Se você tiver o saldo do usuário no contexto (ex.: {{ user_credits }}):
+  // window.mvCredits?.setUserCredits({{ user_credits|default:0 }});
+})();
+
+
+  // Estado inicial
+  applyFinalidade();
+  applyCRS();
+  applyCrsCliente();
+  applyOfcOutro();
+  mvCredits.render();
+
+})();
+
+// Mostrar/ocultar "CRS dos vetores do cliente"
+const chkEnviaVet = document.querySelector('#chk_envia_vetores');
+const grpCrsCliente = document.querySelector('#grp-crs-cliente');
+
+function toggleCrsCliente(){
+  if (!chkEnviaVet || !grpCrsCliente) return;
+  const show = chkEnviaVet.checked;
+  grpCrsCliente.classList.toggle('mv-hide', !show);
+  if (!show){
+    const same = document.querySelector('input[name="crs_cliente"][value="same"]');
+    const epsg = document.querySelector('#crs_cliente_epsg');
+    if (same) same.checked = true;
+    if (epsg){ epsg.classList.add('mv-hide'); epsg.removeAttribute('required'); epsg.value=''; }
+  }
+}
+if (chkEnviaVet){
+  chkEnviaVet.addEventListener('change', toggleCrsCliente);
+  toggleCrsCliente(); // estado inicial
+}
+
+</script>
+
+<script>
+(function(){
+  // garante a API
+  if (!window.mvCredits) return;
+
+  // nº imagens
+  const inputImgs = document.querySelector('[name="qtd_imagens"]');
+  function pushImgs(){ window.mvCredits.setInputs({ images: Number(inputImgs.value||0) }); }
+  inputImgs?.addEventListener('input',  pushImgs);
+  inputImgs?.addEventListener('change', pushImgs);
+  pushImgs();
+
+  // produtos → multiplicador
+  const has = sel => !!document.querySelector(sel)?.checked;
+  function productsMult(){
+    let m = 1.00;
+    if (has('#prod_dsm'))       m += 0.10;
+    if (has('#prod_dtm'))       m += 0.10;
+    if (has('#prod_curvas'))    m += 0.05;
+    if (has('#prod_nuvem'))     m += 0.05;
+    if (has('#prod_relatorio')) m += 0.00;
+    return m;
+  }
+  function pushProds(){ window.mvCredits.setInputs({ productsMult: productsMult() }); }
+  ['#prod_ortho','#prod_dsm','#prod_dtm','#prod_curvas','#prod_nuvem','#prod_relatorio']
+    .forEach(id => document.querySelector(id)?.addEventListener('change', pushProds));
+  pushProds();
+
+  // ajustes simples por configuração
+  const selPcQuality = document.querySelector('[name="cfg_pc_quality"]');
+  const selFast      = document.querySelector('[name="cfg_fast_ortho"]');
+  function configAdj(){
+    let adj = 0;
+    const q = selPcQuality?.value;
+    if (q === 'high')  adj += 0.08;
+    if (q === 'ultra') adj += 0.15;
+    if (selFast?.value === 'on') adj -= 0.05;
+    return adj;
+  }
+  function pushCfg(){ window.mvCredits.setInputs({ configAdj: configAdj() }); }
+  selPcQuality?.addEventListener('change', pushCfg);
+  selFast?.addEventListener('change',      pushCfg);
+  pushCfg();
+
+  window.mvCredits.render(); // primeira pintura
+})();
+</script>
+
+
+<script>
+
+  // --- 4.1 Obrigações de "Oficial" também para Quadro 2 e 3
+  function applyObrigatoriosQ2Q3(){
+    // Oficial?
+    const finalidade = $$('input[name="objetivo_finalidade"]:checked').map(i=>i.value)[0];
+    const isOficial = finalidade === 'oficial';
+
+    // Quadro 2 – responsável técnico
+    const rtReq = ['rt_nome','rt_conselho','rt_art'];
+    rtReq.forEach(name => {
+        const el = document.querySelector(`[name="${name}"]`);
+        if (!el) return;
+        if (isOficial) el.setAttribute('required', 'required');
+        else el.removeAttribute('required');
+  });
+
+    $$('.js-ofc-tag').forEach(t=>t.style.display = isOficial ? '' : 'none');
+    $$('.js-gestao-tag').forEach(t=>t.style.display = isOficial ? 'none' : '');
+
+    // Quadro 3 – GNSS/GCPs: se Oficial e escolha "gcp" ou "rtk_gcp", arquivo passa a ser obrigatório
+    const gnssVal = $$('input[name="voo_gnss"]:checked').map(i=>i.value)[0];
+    const needsGcp = (gnssVal === 'gcp' || gnssVal === 'rtk_gcp');
+    const grpGcps = $('#grp-gcps');
+    show(grpGcps, needsGcp);
+    const gcpFile = $('#voo_gcps_file');
+    if (gcpFile){
+      if (isOficial && needsGcp) gcpFile.setAttribute('required','required');
+      else gcpFile.removeAttribute('required');
+    }
+
+    // Hint GNSS
+    const hint = $('#hint-gnss');
+    if (hint){
+      hint.innerHTML = isOficial
+        ? 'Para usos <b>Oficiais</b>, prefira RTK/PPK e/ou GCPs. Caso escolha GCPs, anexe o arquivo.'
+        : 'Para Gestão, GCPs/RTK são recomendados quando se exige alta acurácia absoluta.';
+    }
+  }
+
+  // Listeners para Oficial/GNSS
+  const finGrp = $('#fld-finalidade');
+  if (finGrp) finGrp.addEventListener('change', applyObrigatoriosQ2Q3);
+  $$('#grp-gnss input[type="radio"]').forEach(r=>r.addEventListener('change', applyObrigatoriosQ2Q3));
+
+  // --- 4.2 Estimar GSD (aproximação simples)
+  const btnGsd = $('#btn_estimar_gsd');
+  if (btnGsd){
+    btnGsd.addEventListener('click', ()=>{
+      const alt = parseFloat($('[name="voo_altitude"]')?.value || '0');    // metros AGL
+      const px  = parseFloat($('[name="voo_sensor_px"]')?.value || '0');  // micrometro
+      const f   = parseFloat($('[name="voo_sensor_focal"]')?.value || '0'); // mm
+      if (alt>0 && px>0 && f>0){
+        // GSD ≈ (Altura * PixelSize / Focal)   [m/pixel]; converter p/ cm/pixel
+        const gsd_cm = (alt * (px*1e-6) / (f*1e-3)) * 100; // cm/px
+        const out = $('[name="voo_gsd"]');
+        if (out){ out.value = (gsd_cm).toFixed(2); out.dispatchEvent(new Event('input')); }
+      } else {
+        alert('Informe Altitude, Tamanho de pixel e Distância focal para estimar o GSD.');
+      }
+    });
+  }
+
+  // --- 4.3 Baixar modelo de GCP (placeholder)
+  const linkModelo = $('#link_modelo_gcp');
+  if (linkModelo){
+    linkModelo.addEventListener('click', (e)=>{
+      e.preventDefault();
+      // Trocar por URL real quando disponível
+      alert('Modelo de GCP: id,x,y,z,epsg (CSV). Em breve disponibilizaremos o download direto.');
+    });
+  }
+
+  // Estado inicial
+  applyObrigatoriosQ2Q3();
+})();
+
+  // ============== Q3 Estatísticas – API simples ======================
+(function(){
+  const $ = (s,ctx=document)=>ctx.querySelector(s);
+  function badge(status){
+    if (status==='ok')   return '<span class="mv-badge-ok">OK</span>';
+    if (status==='warn') return '<span class="mv-badge-warn">A verificar</span>';
+    if (status==='err')  return '<span class="mv-badge-err">Problema</span>';
+    return '<span class="mv-badge-warn">A verificar</span>';
+  }
+  window.mvStats = {
+    set({images, areaHa, exifStatus}={}){
+      const n = $('#stat_num_imgs'), a = $('#stat_area_ha'), e = $('#stat_exif');
+      if (n && typeof images==='number') n.textContent = images.toLocaleString('pt-BR');
+      if (a && (typeof areaHa==='number')) a.textContent = areaHa.toLocaleString('pt-BR', {maximumFractionDigits: 2});
+      if (e && exifStatus) e.innerHTML = badge(exifStatus);
+    }
+  };
+})();
+</script>
+
+
+<script>
+// ============== Q4 Tabs Básico/Avançado, dependências e defaults ==========
+
+
+  // ELEMENTOS DO RESUMO & CRÉDITOS (já existem no seu HTML)
+  const elNeed   = $('#mv-cred-needed');     // Necessário: —
+  const elHave   = $('#mv-cred-have');       // Você tem: data-user-credits="{{ user_credits }}"
+  const elAfter  = $('#mv-cred-after');      // Saldo após: —
+  const elFlag   = $('#mv-cred-flag');       // badge "saldo insuficiente"
+  const btnBuy   = $('#mv-buy-credits');     // link "Comprar créditos" (fica oculto até faltar saldo)
+
+  // BOTÕES
+  const btnCancelar = $('#btn-cancelar');
+  const btnSalvar   = $('#btn-salvar');
+
+  // CAMPOS RELEVANTES
+  const form        = $('#mv-form') || document.querySelector('form');
+  const fImgs       = $('[name="qtd_imagens"]') || $('#q3_imgs_decl');
+  // Produtos (marque aqueles que você já tem na página; estes nomes seguem seu HTML atual)
+  const prodSel = [
+    '[name="prod_ortho"]',
+    '[name="prod_dsm"]',
+    '[name="prod_dtm"]',
+    '[name="prod_curvas"]',
+    '[name="prod_relatorio"]'
+  ].map(s => $(s)).filter(Boolean);
+
+  // Obrigatórios mínimos para liberar "Salvar"
+  const reqFields = [
+    $('[name="proj_nome"]'),   // Q2 – Nome do projeto
+    $('[name="crs_saida"]')    // Q1 – CRS padrão
+  ].filter(Boolean);
+
+  // Snapshot para "Cancelar"
+  const observed = Array.from(form.querySelectorAll('input,select,textarea'))
+    .filter(el => !el.disabled && el.type !== 'hidden');
+  const initial = new Map();
+  observed.forEach(el => {
+    let v;
+    if (el.type === 'checkbox' || el.type === 'radio') v = el.checked;
+    else if (el.tagName === 'SELECT') v = el.selectedIndex;
+    else v = el.value || '';
+    initial.set(el, v);
+  });
+
+  function isDirty() {
+    return observed.some(el => {
+      let cur;
+      if (el.type === 'checkbox' || el.type === 'radio') cur = el.checked;
+      else if (el.tagName === 'SELECT') cur = el.selectedIndex;
+      else cur = el.value || '';
+      return cur !== initial.get(el);
+    });
+  }
+
+  function setCancel(on) {
+    if (!btnCancelar) return;
+    const cls = btnCancelar.classList;
+    if (on) {
+      cls.remove('mv-btn--chip'); cls.add('mv-btn--primary');
+      btnCancelar.removeAttribute('aria-disabled');
+      btnCancelar.removeAttribute('disabled');
+      btnCancelar.style.pointerEvents = 'auto';
+      btnCancelar.title = 'Cancelar e limpar o formulário';
+    } else {
+      cls.add('mv-btn--chip'); cls.remove('mv-btn--primary');
+      btnCancelar.setAttribute('aria-disabled', 'true');
+      btnCancelar.setAttribute('disabled', 'disabled');
+      btnCancelar.style.pointerEvents = 'none';
+      btnCancelar.title = 'Fica ativo quando houver alterações';
+    }
+  }
+
+  function setSave(on) {
+    if (!btnSalvar) return;
+    if (on) {
+      btnSalvar.removeAttribute('disabled');
+      btnSalvar.setAttribute('aria-disabled', 'false');
+      btnSalvar.title = 'Salvar definições';
+      btnSalvar.classList.remove('mv-btn--chip');
+      btnSalvar.classList.add('mv-btn--primary');
+    } else {
+      btnSalvar.setAttribute('disabled', 'disabled');
+      btnSalvar.setAttribute('aria-disabled', 'true');
+      btnSalvar.title = 'faltam dados obrigatórios do projeto para ele ser salvo';
+      btnSalvar.classList.add('mv-btn--chip');
+      btnSalvar.classList.remove('mv-btn--primary');
+    }
+  }
+
+  function requiredOK() {
+    return reqFields.every(el => {
+      if (!el) return false;
+      if (el.tagName === 'SELECT') return !!el.value;
+      if (el.type === 'radio' || el.type === 'checkbox') {
+        return !!form.querySelector(`[name="${el.name}"]:checked`);
+      }
+      return !!el.value.trim();
+    });
+  }
+
+  // ==== CÁLCULO DE CRÉDITOS (estimativa simples) ===========================
+  // Regra base: 1 imagem = 1 crédito; produtos adicionam um multiplicador.
+  // Ajuste os multiplicadores conforme seu modelo de negócio.
+  const MULT_PROD = { base:1.00, dsm:1.10, dtm:1.10, curvas:1.05, rel:1.00 };
+
+  function productsMultiplier() {
+    // Começa em 1.00 (ortho+relatório básico), e aplica multiplicadores extras se marcados
+    let m = MULT_PROD.base;
+    const byName = (n) => form.querySelector(`[name="${n}"]`);
+    if (byName('prod_dsm')?.checked)    m *= MULT_PROD.dsm;
+    if (byName('prod_dtm')?.checked)    m *= MULT_PROD.dtm;
+    if (byName('prod_curvas')?.checked) m *= MULT_PROD.curvas;
+    // relatorio é padrão (já incluso), mas se você tiver um checkbox específico:
+    // if (byName('prod_relatorio')?.checked) m *= MULT_PROD.rel;
+    return m;
+  }
+
+  function recomputeCredits() {
+    const have = num(elHave?.dataset.userCredits || elHave?.textContent || 0);
+    const images = num(fImgs?.value || 0);
+
+    if (!images) {
+      if (elNeed)  elNeed.textContent = '—';
+      if (elAfter) elAfter.textContent = '—';
+      if (elFlag)  elFlag.classList.add('mv-hide');
+      if (btnBuy)  btnBuy.classList.add('mv-hide');
+      return;
+    }
+
+    const total = Math.ceil(images * productsMultiplier());
+    if (elNeed) elNeed.textContent = fmt(total);
+
+    if (elAfter) {
+      const after = have - total;
+      elAfter.textContent = fmt(after);
+    }
+
+    const insuf = have < total;
+    if (elFlag) {
+      elFlag.classList.toggle('mv-hide', !insuf);
+      elFlag.textContent = 'saldo insuficiente';
+    }
+    if (btnBuy) btnBuy.classList.toggle('mv-hide', !insuf);
+  }
+
+  // ==== LIGAÇÕES / EVENTOS ==================================================
+  // 0) Enter não submete (apenas por segurança)
+  form.addEventListener('keydown', (e) => {
+    const tag = e.target?.tagName;
+    if ((tag === 'INPUT' || tag === 'TEXTAREA') && e.key === 'Enter') e.preventDefault();
+  });
+
+  // 1) Cancelar → restaura snapshot
+  if (btnCancelar) {
+    btnCancelar.addEventListener('click', (e) => {
+      if (btnCancelar.getAttribute('aria-disabled') === 'true') { e.preventDefault(); return; }
+      e.preventDefault();
+      observed.forEach(el => {
+        const v0 = initial.get(el);
+        if (el.type === 'checkbox' || el.type === 'radio') el.checked = v0;
+        else if (el.tagName === 'SELECT') el.selectedIndex = v0;
+        else el.value = v0 || '';
+      });
+      form.dispatchEvent(new Event('input', { bubbles:true }));
+      form.dispatchEvent(new Event('change', { bubbles:true }));
+    });
+  }
+
+  // 2) Escutar mudanças p/ sujar/limpar e p/ recalcular
+  const onAnyChange = () => {
+    setCancel(isDirty());
+    setSave(requiredOK());
+    recomputeCredits();
+  };
+  form.addEventListener('input',  onAnyChange, true);
+  form.addEventListener('change', onAnyChange, true);
+
+  // 3) Campos diretamente ligados ao cálculo
+  fImgs && fImgs.addEventListener('input',  recomputeCredits);
+  prodSel.forEach(el => el.addEventListener('change', recomputeCredits));
+
+  // 4) Estado inicial
+  setCancel(false);
+  setSave(requiredOK());
+  recomputeCredits();
+})();
+</script>
+
+<script>
+
+
+    // === Abas de Configurações (Básico + Avançado)
+  const grpBasic = document.getElementById('cfg-basic');      // container do básico
+  const grpAdv   = document.getElementById('cfg-advanced');   // container do avançado
+  const radios   = $$('input[name="cfg_mode"]');               // seus rádios "basico"/"avancado"
+
+  function applyCfgMode() {
+    const mode = ($$('input[name="cfg_mode"]:checked')[0] || {}).value || 'basico';
+    // Básico SEMPRE visível:
+    show(grpBasic, true);
+    // Avançado aparece apenas quando escolhido:
+    show(grpAdv, mode === 'avancado');
+  }
+
+  radios.forEach(r => r.addEventListener('change', applyCfgMode));
+  // garante estado inicial
+  document.addEventListener('DOMContentLoaded', applyCfgMode);
+
+  // Tabs
+  const tabs = $$('#cfg-tabs .mv-tab');
+  const basic = $('#cfg-basic'), adv = $('#cfg-adv');
+  tabs.forEach(t=>{
+    t.addEventListener('click', ()=>{
+      tabs.forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      const isAdv = t.dataset.tab==='adv';
+      show(adv, isAdv);
+      show(basic, true);;
+    });
+  });
+
+  // DEM = 4x Ortho por padrão
+  const ortho = $('[name="cfg_ortho_cm"]');
+  const dem   = $('[name="cfg_dem_cm"]');
+  if (ortho && dem){
+    ortho.addEventListener('input', ()=>{
+      if (!dem.value) {
+        const v = parseFloat(ortho.value||'0');
+        if (v>0) dem.placeholder = (v*4).toFixed(2)+' (auto)';
+      }
+    });
+  }
+
+  // Mostrar calibração radiométrica se sensores incluem MS/Térmica (do Q1)
+  const radBlk = $('#cfg-radiometry');
+  function sensorHasMSOrThermal(){
+    const sel = Array.from(document.querySelectorAll('input[name="sensores"]:checked')).map(i=>i.value);
+    return sel.includes('ms') || sel.includes('thermal') || sel.includes('rgb_ms');
+  }
+  function applyRadiometry(){
+    show(radBlk, sensorHasMSOrThermal());
+  }
+  // Listeners nos checkboxes do Q1
+  Array.from(document.querySelectorAll('input[name="sensores"]')).forEach(cb=>{
+    cb.addEventListener('change', applyRadiometry);
+  });
+  applyRadiometry();
+
+  // Sugerir ortho ≈ GSD do Q3, se existir
+  const gsd = $('[name="voo_gsd"]');
+  if (gsd && ortho && !ortho.value){
+    gsd.addEventListener('input', ()=>{
+      const v = parseFloat(gsd.value||'0');
+      if (v>0 && !ortho.value) ortho.placeholder = v.toFixed(2)+' (≈ GSD)';
+    });
+  }
+})();
+</script>
+
+<script>
+(function cfgTabs(){
+  const tabs   = document.querySelectorAll('#cfg-tabs .mv-tab');
+  const basic  = document.getElementById('cfg-basic');
+  const adv    = document.getElementById('cfg-adv');
+  if (!tabs.length || !basic || !adv) return;
+
+  function show(mode){
+    basic.classList.toggle('mv-hide', mode !== 'basic');
+    adv.classList.toggle('mv-hide',   mode !== 'adv');
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === mode));
+  }
+  tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.tab)));
+  show('basic'); // estado inicial
+})();
+</script>
+
+
+<script>
+    const balanceTxt = document.querySelector('#mv-credits-balance')?.textContent || '';
+    const matchSaldo = balanceTxt.match(/Saldo:\s*([\d\.\,]+)/i);
+    const saldo = matchSaldo ? +matchSaldo[1].replace(/\./g,'').replace(',','.') : (window.MV?.userCredits||0);
+
+    if (!need || need <= 0) {
+      setDisabled(btnUploads, true, 'Estime os créditos (preencha nº de imagens e configurações).');
+      return;
+    }
+    if (saldo < need) {
+      setDisabled(btnUploads, true, 'Saldo insuficiente para o número de imagens declarado.');
+      return;
+    }
+
+    // OK, habilitado
+    setDisabled(btnUploads, false);
+  }
+
+  // Reagir a mudanças
+  ['input','change'].forEach(ev=>{
+    document.addEventListener(ev, e=>{
+      if (e.target && (e.target.matches('[name="qtd_imagens"]') ||
+                       e.target.matches('[name^="prod_"]') ||
+                       e.target.matches('[name^="cfg_"]') ||
+                       e.target.matches('[name="storage_months"]'))) {
+        setTimeout(reevaluateUploads, 0);
+      }
+    });
+  });
+</script>
+
+<script>
+  // Evita submit acidental do formulário ao pressionar ENTER
+  (function () {
+    const form = document.getElementById('mv-form');
+    if (!form) return;
+
+    form.addEventListener('keydown', function (e) {
+      // Permite Enter em botões e textareas; bloqueia em inputs/selects
+      const tag = e.target.tagName.toLowerCase();
+      const isTextArea = tag === 'textarea';
+      const isButton   = tag === 'button' || e.target.type === 'submit';
+      if (e.key === 'Enter' && !isTextArea && !isButton) {
+        e.preventDefault();
+      }
+    });
+  })();
+
+  form.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.target && e.target.tagName !== 'TEXTAREA') {
+    e.preventDefault(); // impede submit acidental via Enter
+  }
+});
+</script>
+  </form>
+
+{% include "projetos/partials/def_form_js_core.html" %}
+
+
+
 {% endblock %}
+

@@ -1,0 +1,20 @@
+
+
+{% load static %}
+
+<div class="mv-user-chip" role="region" aria-label="Informações do usuário e créditos">
+  <div class="mv-user-chip__left">
+    <img class="mv-user-chip__avatar" src="{% static 'core/img/icon/user_circle.svg' %}" alt="">
+    <div class="mv-user-chip__text">
+      <strong class="mv-user-chip__name">{{ user_label|default:request.user.username }}</strong>
+      <span class="mv-user-chip__meta">
+        Plano: {{ plano_nome|default:"Básico" }} · Créditos: {{ saldo_creditos|default:"—" }}
+      </span>
+    </div>
+  </div>
+
+  <a class="mv-user-chip__buy"
+     href="{{ comprar_creditos_url|default:'#' }}">
+    Comprar créditos
+  </a>
+</div>

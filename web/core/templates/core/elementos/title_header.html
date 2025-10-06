@@ -1,0 +1,29 @@
+
+
+{% load static %}
+{% if variant == 'hero' %}
+  {# stack: 'inline' => ícone ao lado do texto; default = empilhado #}
+  <div class="mv-hero-title {% if stack == 'inline' %}mv-hero-title--inline{% endif %}">
+    {% if icon_relpath %}
+      <img class="mv-hero-title__icon {% if icon_size == 'sm' %}mv-hero-title__icon--sm{% endif %}"
+           src="{% static icon_relpath %}" alt="">
+    {% endif %}
+    <h1 class="mv-hero-title__title">{{ titulo }}</h1>
+    {% if subtitulo %}
+      <p class="mv-hero-title__subtitle">{{ subtitulo }}</p>
+    {% endif %}
+  </div>
+{% else %}
+  <div class="mv-title-card {% if align == 'center' %}mv-title-card--center{% endif %}">
+    {% if icon_relpath %}
+      <img class="mv-title-card__icon {% if icon_size == 'sm' %}mv-title-card__icon--sm{% endif %}"
+           src="{% static icon_relpath %}" alt="">
+    {% endif %}
+    <div class="mv-title-card__text">
+      <h1 class="mv-title-card__title">{{ titulo }}</h1>
+      {% if subtitulo %}
+        <p class="mv-title-card__subtitle">{{ subtitulo }}</p>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}

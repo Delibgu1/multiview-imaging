@@ -1,101 +1,209 @@
 
+{% extends "core/base_public.html" %}
 {% load static %}
-<!doctype html>
-<html lang="pt-br">
-<head>
-  <meta charset="utf-8" />
-  <title>Projetos</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
-    h1 { margin: 0 0 16px }
-    .toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
-    .btn { display:inline-block; padding:10px 14px; border-radius:8px; border:1px solid #0a7; background:#0a7; color:#fff; text-decoration:none; font-weight:600 }
-    .btn-outline { background:#fff; color:#0a7 }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 10px 8px; border-bottom: 1px solid #e5e7eb; text-align: left; }
-    th { background:#f8fafc; font-weight: 600; }
-    .muted { color: #6b7280; }
-    .actions a { margin-right: 8px; text-decoration: none; color: #0a7; }
-    nav.pager { display:flex; gap:8px; align-items:center; margin-top:16px; }
-    nav.pager a, nav.pager span { padding:6px 10px; border:1px solid #e5e7eb; border-radius:6px; text-decoration:none; color:#111; }
-    nav.pager .current { background:#0a7; color:#fff; border-color:#0a7; }
-    .empty { padding:24px; border:1px dashed #e5e7eb; border-radius:12px; background:#fafafa; }
-  </style>
-</head>
-<body>
 
-  <h1>Projetos</h1>
+{% block title %}Projetos{% endblock %}
 
-  <div class="toolbar">
-    <a class="btn" href="{% url 'projetos:new' %}">+ Novo projeto</a>
-    <a class="btn btn-outline" href="{% url 'projetos:index' %}">Atualizar lista</a>
+{% block head_extra %}
+  <link rel="stylesheet" href="{% static 'core/css/projetos_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+
+  <!-- Chip usuário (mesmo look da principal) -->
+  <div class="mv-topbar">
+    <div class="mv-userbox">
+      <div class="mv-usericon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" class="mv-icon">
+          <circle cx="12" cy="8" r="4"></circle>
+          <path d="M4,20c0-4,4-6,8-6s8,2,8,6"></path>
+        </svg>
+      </div>
+      <div class="mv-userinfo">
+        <div class="mv-username">{{ request.user.get_full_name|default:request.user.username }}</div>
+        <div class="mv-userplan">Plano: Básico</div>
+      </div>
+    </div>
   </div>
 
-  {% if messages %}
-    <ul>
-      {% for message in messages %}
-        <li>{{ message }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-
-  {% if projetos %}
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nome</th>
-          <th>Câmera</th>
-          <th>GeoRef</th>
-          <th>EPSG</th>
-          <th>Status</th>
-          <th>Criado</th>
-          <th class="actions">Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for p in projetos %}
-          <tr>
-            <td>#{{ p.id }}</td>
-            <td>{{ p.nome }}</td>
-            <td class="muted">{{ p.get_camera_tipo_display }}</td>
-            <td class="muted">{{ p.get_georef_display }}</td>
-            <td class="muted">{{ p.epsg|default:"—" }}</td>
-            <td>{{ p.get_status_display }}</td>
-            <td class="muted">{{ p.criado_em|date:"d/m/Y H:i" }}</td>
-            <td class="actions">
-              <a href="{% url 'projetos:detail' p.pk %}">Abrir</a>
-              <a href="{% url 'projetos:upload' p.pk %}">Upload</a>
-              <a href="{% url 'projetos:new' %}?base={{ p.pk }}">Duplicar</a>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
-    {% if is_paginated %}
-      <nav class="pager" aria-label="Paginação">
-        {% if page_obj.has_previous %}
-          <a href="?page={{ page_obj.previous_page_number }}">&larr; Anterior</a>
-        {% else %}
-          <span class="muted">&larr; Anterior</span>
-        {% endif %}
-
-        <span class="current">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-
-        {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}">Próxima &rarr;</a>
-        {% else %}
-          <span class="muted">Próxima &rarr;</span>
-        {% endif %}
-      </nav>
-    {% endif %}
-  {% else %}
-    <div class="empty">
-      Nenhum projeto ainda. Clique em <strong>“+ Novo projeto”</strong> para começar.
+  <!-- Título da página -->
+  <div class="mv-titlewrap">
+    <div class="mv-title mv-title--banner">
+      <img src="{% static 'core/img/icon/mapa_sf.svg' %}" class="mv-title-ico" alt="">
+      <span class="mv-title-text">Projetos</span>
     </div>
-  {% endif %}
+  </div>
 
-</body>
-</html>
+
+
+  <!-- Card/link Criar novo -->
+  <a class="novo-card" href="{% url 'projetos:objetivo' %}">
+    <img class="novo-ico" src="{% static 'core/img/icon/novo_projeto.svg' %}" alt="">
+    <span class="novo-texto">Criar um Novo Projeto</span>
+  </a>
+
+  <!-- Lista de projetos -->
+  <section class="lista-card">
+    <header class="lista-header">
+      <div class="lista-header-title">
+        <img src="{% static 'core/img/icon/lista_projetos.svg' %}" alt="" class="lista-ico">
+        <span>Lista de Projetos Salvos</span>
+      </div>
+    </header>
+
+    <div class="lista-tabela-wrap">
+      <table class="lista-tabela">
+        <thead>
+          <tr>
+            <th>Nome do Projeto</th>
+            <th>Data</th>
+            <th>Upload</th>
+            <th>Ortomozaico</th>
+            <th>Processamento</th>
+            <th>Downloads</th>
+            <th>Clonar/Editar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if projetos %}
+            {% for p in projetos %}
+              <tr>
+                <td class="nome">
+                  <a href="{% url 'projetos:detail' p.id %}" class="nome-link">{{ p.nome }}</a>
+                </td>
+                <td>{{ p.atualizado_em|date:"d/m/Y H:i" }}</td>
+
+                <td class="ico">
+                  {% with ok=p.tem_upload %}
+                    <img src="{% static 'core/img/icon/flag_vd.svg' %}" alt="" {% if not ok %}style="display:none"{% endif %}>
+                    <img src="{% static 'core/img/icon/flag_cz.svg' %}" alt="" {% if ok %}style="display:none"{% endif %}>
+                  {% endwith %}
+                </td>
+
+                <td class="ico">
+                  {% with ok=p.tem_ortomozaico %}
+                    <img src="{% static 'core/img/icon/flag_vd.svg' %}" alt="" {% if not ok %}style="display:none"{% endif %}>
+                    <img src="{% static 'core/img/icon/flag_cz.svg' %}" alt="" {% if ok %}style="display:none"{% endif %}>
+                  {% endwith %}
+                </td>
+
+                <td class="ico">
+                  {% with ok=p.processado %}
+                    <img src="{% static 'core/img/icon/processo_vd.svg' %}" alt="" {% if not ok %}style="display:none"{% endif %}>
+                    <img src="{% static 'core/img/icon/processo_cz.svg' %}" alt="" {% if ok %}style="display:none"{% endif %}>
+                  {% endwith %}
+                </td>
+
+                <td class="ico">
+                  {% if p.disponivel_download %}
+                    <a href="{% url 'projetos:detail' p.id %}#downloads" class="btn-ico" title="Baixar arquivos">
+                      <img src="{% static 'core/img/icon/baixar_vd.svg' %}" alt="">
+                    </a>
+                  {% else %}
+                    <img src="{% static 'core/img/icon/baixar_cz.svg' %}" alt="" title="Indisponível">
+                  {% endif %}
+                </td>
+
+                <!-- Único ícone (verde) abrindo o modal; JS decide editar x clonar -->
+                <td class="ico">
+                  <a href="#"
+                     class="btn-ico js-cloneedit"
+                     title="Clonar ou editar"
+                     data-processed="{{ p.processado|yesno:'true,false' }}"
+                     data-edit-url="{% url 'projetos:edit' p.id %}"
+                     data-clone-url="{% url 'projetos:new' %}?clone={{ p.id }}">
+                    <img src="{% static 'core/img/icon/clone_vd.svg' %}" alt="">
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr class="vazio">
+              <td colspan="7">
+                <div class="vazio-box">
+                  <span class="vazio-msg">Você ainda não tem projetos.</span>
+                  <a class="btn-ghost" href="{% url 'projetos:objetivo' %}">
+                    + Criar o primeiro projeto
+                  </a>
+                </div>
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Botão Voltar (alinhado ao chip de usuário, acima do rodapé) -->
+  <a class="mv-btn mv-btn--ok mv-btn--back" href="{% url 'core:principal' %}">
+    <img class="mv-btn-ico" src="{% static 'core/img/icon/botao_anterior.svg' %}" alt="">
+    <span>Voltar</span>
+  </a>
+
+
+</div>
+
+<!-- Modal Editar x Clonar -->
+<div id="mv-confirm-modal" class="mv-modal" aria-hidden="true">
+  <div class="mv-modal__backdrop" data-close="1"></div>
+
+  <div class="mv-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="mv-modal-title">
+    <header class="mv-modal__header">
+      <h3 id="mv-modal-title">Confirmação</h3>
+      <button class="mv-modal__x" type="button" aria-label="Fechar" data-close="1">×</button>
+    </header>
+
+    <div class="mv-modal__body">
+      <p id="mv-modal-text"><!-- definido via JS --></p>
+    </div>
+
+    <footer class="mv-modal__footer">
+      <button class="mv-btn mv-btn--ghost" type="button" data-close="1">Não</button>
+      <a id="mv-modal-yes" class="mv-btn mv-btn--ok" href="#">Sim</a>
+    </footer>
+  </div>
+</div>
+
+<!-- JS do modal e dos botões -->
+<script>
+(function(){
+  const modal = document.getElementById('mv-confirm-modal');
+  const text  = document.getElementById('mv-modal-text');
+  const yes   = document.getElementById('mv-modal-yes');
+
+  function openModal(msg, href){
+    text.textContent = msg;
+    yes.setAttribute('href', href);
+    modal.classList.add('is-open');
+    yes.focus();
+  }
+  function closeModal(){ modal.classList.remove('is-open'); }
+
+  modal.addEventListener('click', (e)=>{ if (e.target.dataset.close) closeModal(); });
+  window.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal(); });
+
+  document.querySelectorAll('.js-cloneedit').forEach(el=>{
+    el.addEventListener('click', (ev)=>{
+      ev.preventDefault();
+      const processed = (el.dataset.processed === 'true');
+      const editUrl   = el.dataset.editUrl;
+      const cloneUrl  = el.dataset.cloneUrl;
+
+      if (processed){
+        openModal(
+          'Só é possível a clonagem do projeto, pois ele já foi processado. ' +
+          'Você poderá solicitar novos serviços sobre o mesmo ortomosaico. Deseja continuar?',
+          cloneUrl
+        );
+      } else {
+        openModal(
+          'Só é possível a edição do projeto, pois ele ainda não foi processado. Deseja continuar?',
+          editUrl
+        );
+      }
+    });
+  });
+})();
+</script>
+{% endblock %}

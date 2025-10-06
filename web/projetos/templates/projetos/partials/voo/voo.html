@@ -1,0 +1,23 @@
+
+{% extends "core/base_app.html" %}
+{% load static %}
+
+{% block content %}
+
+
+  <section class="mv-body">
+    {# Miolo do quadro Q3 — mantenha o conteúdo em um partial dedicado #}
+    {% include "projetos/partials/voo/bloco_voo.html" %}
+
+    {# Barra de ações padrão do wizard (Voltar/Cancelar/Editar/Salvar/Avançar) #}
+    {% include "core/elementos/actions/actions_wizard.html" %}
+  </section>
+
+{% endblock %}
+
+{% block extra_js %}
+  <script type="module">
+    // Se esta página tiver helps, chame-os aqui (exemplos):
+    // window.mvBindHelp?.('js-help-voo-btn','help-voo');
+  </script>
+{% endblock %}

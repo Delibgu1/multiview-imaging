@@ -14,7 +14,7 @@ class FrozenLoginUITest(TestCase):
         # Logo (caminho pode ser o branco ou o fallback)
         self.assertTrue(
             ("Logo-multiview-branco.png" in resp.content.decode("utf-8"))
-            or ("Logo-multiview.png" in resp.content.decode("utf-8"))
+            or ("logo-multiview.png" in resp.content.decode("utf-8"))
         )
 
 class FrozenProjetosListUITest(TestCase):

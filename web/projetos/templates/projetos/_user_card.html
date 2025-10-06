@@ -1,0 +1,43 @@
+
+{# Cartão do usuário #}
+<style>
+  .mv-usercard{
+    display:flex; align-items:center; gap:14px;
+    background:#fff7e6; border:1px solid #ead7aa; border-radius:14px;
+    padding:10px 14px; box-shadow:0 6px 18px rgba(0,0,0,.08);
+  }
+  .mv-usercard .avatar{
+    width:36px; height:36px; border-radius:9999px;
+    display:grid; place-items:center; background:#e9f5e9; color:#2e7d32;
+  }
+  .mv-usercard .info{ line-height:1.15 }
+  .mv-usercard .info .name{ font-weight:700 }
+  .mv-usercard .info .sub{ font-size:.9rem; opacity:.85 }
+  .mv-usercard .cta{
+    margin-left:auto; text-decoration:none;
+    background:#fff; border:2px solid #c58b00; color:#6b4a00;
+    padding:8px 14px; border-radius:20px; font-weight:800;
+    box-shadow:0 3px 10px rgba(0,0,0,.06);
+  }
+  .mv-usercard svg{ width:20px; height:20px; display:block }
+</style>
+
+<div class="mv-usercard">
+  <div class="avatar" aria-hidden="true">
+    <!-- Ícone de usuário (inline SVG) -->
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21a8 8 0 0 0-16 0"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+  </div>
+
+  <div class="info">
+    <div class="name">{{ request.user.get_full_name|default:request.user.username }}</div>
+    <div class="sub">
+      Plano: {{ user_plan_label|default:"Básico" }} · Créditos: {{ user_credits|default:"—" }}
+    </div>
+  </div>
+
+  <a class="cta" href="{{ buy_credits_url|default:'/billing/comprar/' }}">Comprar créditos</a>
+</div>

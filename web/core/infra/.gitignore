@@ -1,0 +1,9 @@
+# Do not commit secrets or runtime data
+.env
+*.env
+minio-data/
+*-data/
+*.log
+*.pid
+*.sock
+tmp/

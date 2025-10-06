@@ -1,0 +1,352 @@
+
+{% extends "core/base_app.html" %}
+{% load static %}
+
+{% block title %}Objetivo do Projeto{% endblock %}
+
+{% block head_extra %}
+<style>
+  /* Escopo desta página */
+  body.pg-objetivo .mv-page,
+  body.pg-objetivo .mv-container,
+  body.pg-objetivo .mv-cards-vert,
+  body.pg-objetivo .mv-card { overflow: visible !important; }
+
+  body.pg-objetivo .mv-container { width: min(1200px, 95vw); }
+
+  /* — Topo do card: Atenção + Passo 1 de 5 — */
+  .mv-card__toprow{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:12px}
+  .mv-attn{display:flex;align-items:center;gap:10px}
+  .mv-attn__icon{width:28px;height:28px;flex:0 0 28px;opacity:.9}
+  .mv-attn__text{font-size:15px;font-weight:600}
+  .mv-steps{display:inline-grid;width:max-content;line-height:1.15}
+  .mv-steps__label{white-space:nowrap;font-weight:600;font-size:14px;margin-bottom:4px}
+  .mv-steps__bar{height:6px;border-radius:999px;background:#eaf3db;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);width:100%}
+  .mv-steps__bar-fill{height:100%;border-radius:inherit;background:#2f6b1c;width:var(--pct,20%)}
+  @media (max-width:720px){.mv-card__toprow{flex-direction:column;align-items:flex-start}.mv-steps{text-align:left}}
+
+
+  /* === Linha 1 (Finalidade + Objetivo específico) === */
+  .q1-row1 { display: contents; } /* mantém 3 colunas do grid */
+  .mvfield--nobox { background: transparent; border: 0; padding: 0; }
+  .inline-radios { display:flex; gap:20px; align-items:center; flex-wrap:nowrap; }
+  .inline-radios label { display:flex; align-items:center; gap:8px; white-space:nowrap; }
+  #objetivo_especifico:disabled { background:#f3f3f3; color:#888; cursor:not-allowed; }
+  @media (max-width: 560px){ .inline-radios { flex-wrap:wrap; } } /* opcional p/ telas muito estreitas */
+
+
+  /* === Ajustes finos Linha 1 === */
+  .inline-radios label { font-weight: 400; }           /* sem negrito nas opções */
+  #grp-finalidade .mv-hint {                            /* texto explicativo menor */
+    font-size: 12.5px;
+    color: #666;
+  }
+
+  /* estado visual do select quando habilita */
+  #objetivo_especifico:not(:disabled) {
+    background: #fff;
+    color: #222;
+    cursor: default;
+  }
+
+
+/* ==== BEGIN PATCH: sensores inline, sem quadro ==== */
+.mvfield--nobox { border:0; background:transparent; padding:0; margin:0; }
+
+/* linha de sensores ocupando toda a largura */
+.sensor-row{
+  display:flex;
+  align-items:center;
+  gap: 18px 32px;        /* espaço entre opções */
+  flex-wrap:wrap;        /* quebra em telas pequenas */
+}
+
+/* em telas largas, forçar tudo numa linha só */
+@media (min-width: 980px){
+  .sensor-row{ flex-wrap:nowrap; }
+}
+
+/* cada opção compacta e sem quebra no texto */
+.sensor-row label{
+  display:flex; align-items:center; gap:8px;
+  white-space:nowrap;
+}
+/* ==== END PATCH ==== */
+
+/* ==== BEGIN PATCH: help icons (duvida.svg) ==== */
+.help-icon {
+  width: 18px;       /* largura */
+  height: 18px;      /* altura */
+  vertical-align: middle;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+  margin-left: 6px;  /* afastar do texto */
+}
+
+.help-icon:hover {
+  opacity: 1;
+}
+/* ==== END PATCH ==== */
+
+/* ==== BEGIN PATCH (SUBSTITUIR O BLOCO DO HELP) ==== */
+
+/* linha de título + help na mesma linha (já estava OK) */
+.mv-labelrow{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:nowrap;
+}
+
+/* “anel” do help — maior e com centragem perfeita */
+.help-ring{
+  display:inline-flex;               /* centra conteúdo */
+  align-items:center;
+  justify-content:center;
+  width:24px;                        /* diâmetro do círculo */
+  height:24px;
+  border-radius:999px;
+  border:1px solid #cfe4c4;
+  background:#f7fbf5;
+  flex:0 0 24px;
+  line-height:0;                     /* remove baseline de img inline */
+  box-sizing:content-box;            /* evita “apertar” o svg */
+}
+
+/* ícone dentro do círculo — maior e sem “sobra” */
+.help-ring img.help-icon{
+  width:16px;                        /* tamanho do SVG dentro do anel */
+  height:16px;
+  display:block;                     /* remove espaço inline */
+  margin:0; padding:0; border:0;
+  opacity:.9;
+  transition:opacity .2s ease;
+  object-fit:contain;                /* garante encaixe ao viewBox do SVG */
+}
+
+/* hover */
+.help-ring:hover img.help-icon{ opacity:1; }
+
+/* ==== END PATCH ==== */
+
+/* Toggle vetoriais: garantir a mesma tipografia dos títulos, sem bold pesado */
+#grp-vetores-toggle label.mv-labelrow { font-weight: 500; font-size: 1.06rem; }
+#grp-vetores-toggle label.mv-labelrow span { font-weight: 500; }
+
+/* ==== BEGIN PATCH: toggle "vou enviar vetoriais" alinhado ==== */
+label.mv-toggle,
+.mv-toggle-row{
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0px !important;           /* espaço real desejado */
+  white-space: nowrap !important;
+}
+label.mv-toggle input[type="checkbox"]{
+  display: inline-block;
+  vertical-align: middle;
+  margin: 8px !important;  /* encosta mais no texto */
+}
+label.mv-toggle span{
+  font-weight: 500;              /* mesma “força” dos títulos, sem bold pesado */
+}
+/* ==== END PATCH ==== */
+
+/* ==== BEGIN PATCH: reduzir gap do toggle (vence cascata) ==== */
+#grp-vetores-toggle label.mv-toggle{
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;           /* aproxima checkbox do texto */
+  white-space: nowrap !important;
+}
+#grp-vetores-toggle label.mv-toggle input[type="checkbox"]{
+  margin:0 4px 0 0 !important;
+  vertical-align:middle;
+}
+#grp-vetores-toggle > label.mv-toggle > span{
+  margin:0 !important; padding:0 !important;
+}
+/* ==== END PATCH ==== */
+
+
+/* ====== Só no grupo "CRS dos arquivos vetoriais" ====== */
+
+
+/* ==== CRS vetoriais — layout em 4 linhas ==== */
+#grp-vetores-crs { display: block; }
+#grp-vetores-crs .mv-line{
+  display:flex; align-items:center; gap:8px; margin:6px 0;
+}
+#grp-vetores-crs .mv-line:first-child{ margin-top: 0; }
+#grp-vetores-crs .mv-radio{
+  display:inline-flex; align-items:center; gap:6px;
+}
+#grp-vetores-crs .help-ring{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:22px; height:22px; border-radius:999px; border:1px solid #cfe4c4; background:#f7fbf5; line-height:1; box-sizing:border-box; padding:0; margin:0; flex:0 0 24px;
+}
+#grp-vetores-crs .help-icon{ width:14px; height:14px; display:block; }
+#crs_cliente_epsg_wrap input{ width:100%; }
+
+/* ===== CRS vetoriais (4 linhas) ===== */
+
+#grp-vetores-crs.mv-hide {
+  display: none !important;
+}
+
+/* por segurança, garanta a utilitária também */
+.mv-hide {
+  display: none !important;
+}
+
+/* Linhas horizontais (título e rádios) */
+#grp-vetores-crs .mv-line{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:6px 0;
+  flex-wrap:nowrap;
+}
+
+/* Linha em coluna (input + hint) */
+#grp-vetores-crs .mv-line-col{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin:6px 0;
+}
+
+/* Radios alinhados e com distância controlada */
+#grp-vetores-crs .mv-radio{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;           /* ajuste fino da distância bolinha–texto */
+}
+#grp-vetores-crs .mv-radio input[type="radio"]{ margin:0; }
+
+/* Input ocupa a largura disponível e o hint quebra de linha */
+#grp-vetores-crs input[type="text"]{ width:100%; }
+#grp-vetores-crs .mv-hint{ display:block; }
+
+#grp-vetores-crs .help-icon{
+  width:16px;
+  height:16px;
+  display:block;
+}
+
+</style>
+
+<style id="hotfix-vetores-crs">
+  /* --- bloco: CRS dos arquivos vetoriais --- */
+  #grp-vetores-crs .mv-line{
+    display:flex !important;
+    align-items:center !important;
+    gap:10px !important;
+    flex-wrap:nowrap !important;
+  }
+  #grp-vetores-crs .mv-line-col{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:8px !important;
+  }
+
+  /* radios alinhados e perto do texto */
+  #grp-vetores-crs .mv-radio{
+    display:inline-flex !important;
+    align-items:center !important;
+    gap:8px !important;                 /* distância radio ↔ texto */
+    width:max-content !important;
+    font-weight:400 !important;
+  }
+  #grp-vetores-crs .mv-radio > input[type="radio"]{
+    margin:0 !important;                /* remove margens globais */
+    vertical-align:middle !important;
+  }
+  #grp-vetores-crs .mv-radio > span{
+    margin:0 !important;
+    white-space:nowrap !important;      /* evita quebra “Mesmo das saídas” */
+  }
+
+  /* título + help: círculo perfeitamente redondo e centrado */
+  #grp-vetores-crs .help-ring{
+    display:inline-flex !important;
+    width:24px !important; height:24px !important;
+    border-radius:999px !important;
+    align-items:center !important; justify-content:center !important;
+    border:1px solid #cfe4c4 !important; background:#f7fbf5 !important;
+    padding:0 !important;
+  }
+  #grp-vetores-crs .help-ring .help-icon{
+    width:16px !important; height:16px !important; display:block !important;
+  }
+
+  /* input EPSG em coluna, com a dica logo abaixo */
+  #grp-vetores-crs #crs_cliente_epsg_wrap{
+    display:flex !important; flex-direction:column !important; gap:6px !important;
+  }
+</style>
+
+
+{% endblock head_extra %}
+
+{% block content %}
+
+{# TOP RIGHT: chip do usuário/créditos #}
+<div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
+  {% include "core/elementos/user_chip.html" with user_label=request.user.username plano_nome=plano_nome saldo_creditos=saldo_creditos comprar_creditos_url=comprar_creditos_url %}
+</div>
+
+<script>document.addEventListener('DOMContentLoaded',()=>document.body.classList.add('pg-objetivo'));</script>
+
+<section class="mv-container mv-cards-vert">
+  <!-- HERO/Título -->
+  <div class="mv-hero-title mv-hero-title--inline">
+    <img class="mv-hero-title__icon mv-hero-title__icon--sm"
+         src="{% static 'core/img/icon/lista_projetos.svg' %}" alt="">
+    <div class="mv-hero-title__stack">
+      <h1 class="mv-hero-title__title">Objetivo do Projeto</h1>
+    </div>
+  </div>
+</section>
+
+<section class="mv-container mv-cards-vert">
+  <div class="mv-card">
+    <!-- Topo do card -->
+    <div class="mv-card__toprow">
+      <div class="mv-attn">
+        <img class="mv-attn__icon" src="{% static 'core/img/icon/atencao.svg' %}" alt="">
+        <span class="mv-attn__text">Atenção: Objetivos do Projeto são guia das páginas seguintes</span>
+      </div>
+
+      <div class="mv-steps" id="mv-steps" data-step="{{ current_step|default:1 }}" data-total="{{ total_steps|default:5 }}">
+        <span class="mv-steps__label">Passo <strong>{{ current_step|default:1 }}</strong> de <strong>{{ total_steps|default:5 }}</strong></span>
+        <div class="mv-steps__bar"><div class="mv-steps__bar-fill"></div></div>
+      </div>
+    </div>
+
+    {# Quadro 1 #}
+    {% include "projetos/partials/objetivo/bloco_objetivo.html" %}
+  </div>
+
+  {% include "core/elementos/actions/actions_wizard.html" %}
+</section>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+  // barra com largura igual ao texto “Passo X de Y” + preenchimento proporcional
+  document.addEventListener('DOMContentLoaded',()=>{
+    const wrap=document.getElementById('mv-steps'); if(!wrap) return;
+    const label=wrap.querySelector('.mv-steps__label'), bar=wrap.querySelector('.mv-steps__bar');
+    const sync=()=>{ bar.style.width = Math.ceil(label.getBoundingClientRect().width) + 'px'; };
+    new ResizeObserver(sync).observe(label); sync(); addEventListener('resize',sync);
+
+    const s=+wrap.dataset.step||1, t=Math.max(1,+wrap.dataset.total||5);
+    wrap.style.setProperty('--pct', Math.max(0, Math.min(100, (s/t)*100)) + '%');
+  });
+</script>
+
+
+
+
+{% endblock extra_js %}

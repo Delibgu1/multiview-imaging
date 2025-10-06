@@ -1,0 +1,69 @@
+
+
+{% load static %}
+<script>
+(function () {
+  'use strict';
+
+  const $  = (sel, ctx=document) => ctx.querySelector(sel);
+  const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+
+  /** Tamanho/constraints do input EPSG (reforço JS) */
+  function sizeEPSG() {
+    const inp = $('#crs_cliente_epsg');
+    if (!inp) return;
+    inp.style.width    = '33%';
+    inp.style.maxWidth = '220px';
+    inp.style.minWidth = '120px';
+    inp.setAttribute('inputmode', 'numeric');
+    inp.setAttribute('pattern', '\\d{4,6}');
+    inp.size = 10;
+  }
+
+  /** Mostra/oculta o campo EPSG conforme rádio OUTRO/MESMO */
+  function syncCampoEPSG() {
+    const wrap   = $('#crs_cliente_epsg_wrap');             // começa hidden no HTML
+    const input  = $('#crs_cliente_epsg');
+    const rOutro = $('#crs_cli_outro') || $('input[name="crs_cliente_choice"][value="OUTRO"]');
+    if (!wrap || !input || !rOutro) return;
+
+    const mostrar = !!rOutro.checked;
+    wrap.hidden    = !mostrar;
+    input.disabled = !mostrar;
+    if (!mostrar) input.value = '';
+  }
+
+  /** Mostra/oculta o grupo inteiro conforme o checkbox mestre (se existir) */
+  function syncGrupoCRS() {
+    const grp = $('#grp-vetores-crs');                      // tem mv-hide no HTML
+    const chk = $('#chk_envia_vetores')                    // “Vou querer gerar arquivos vetoriais”
+             || $('#grp-vetores-toggle input[type="checkbox"]');
+    if (!grp || !chk) return;
+
+    grp.classList.toggle('mv-hide', !chk.checked);
+
+    if (!chk.checked) {
+      // ao esconder o grupo, padroniza para "MESMO" e esconde/limpa EPSG
+      const rMesmo = $('#crs_cli_mesmo') || $('input[name="crs_cliente_choice"][value="MESMO"]');
+      if (rMesmo) rMesmo.checked = true;
+      syncCampoEPSG();
+    }
+  }
+
+  function bind() {
+    const chk = $('#chk_envia_vetores') || $('#grp-vetores-toggle input[type="checkbox"]');
+    if (chk) chk.addEventListener('change', () => { syncGrupoCRS(); });
+
+    $$('input[name="crs_cliente_choice"]').forEach(r => {
+      r.addEventListener('change', syncCampoEPSG);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    sizeEPSG();
+    syncGrupoCRS();   // esconde/mostra o grupo conforme o estado atual do checkbox
+    syncCampoEPSG();  // respeita o rádio atual (campo EPSG inicia hidden no HTML)
+    bind();
+  });
+})();
+</script>

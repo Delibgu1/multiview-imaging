@@ -115,30 +115,137 @@ class Projeto(models.Model):
     def get_upload_url(self):
         return reverse("projetos:upload", kwargs={"pk": self.pk})
 
+    # helpers/constantes Quadro 1
+    FORMATOS_VALIDOS = {"GPKG", "SHP", "GEOJSON", "GEOTIFF", "COG"}
+
+    @staticmethod
+    def _norm_epsg(value: str) -> str:
+        if not value:
+            return ""
+        v = (value or "").strip().upper()
+        if v.startswith("EPSG:"):
+            return v
+        if v.isdigit():
+            return f"EPSG:{v}"
+        if ":" in v:
+            left, right = v.split(":", 1)
+            if right.strip().isdigit():
+                return f"EPSG:{right.strip()}"
+        return v  # clean() valida
+    # END
+
+
     def clean(self):
-        # se marcou que usa GCP, garanta arquivo
+        from django.core.exceptions import ValidationError
+
+        errors = {}
+        # (1) sua regra de GCP (mantida)
         if self.usa_gcp and not self.gcp_csv:
-            from django.core.exceptions import ValidationError
-            raise ValidationError({"gcp_csv": "Informe o arquivo CSV/TXT com os pontos de controle (GCP)."})
+            errors["gcp_csv"] = "Informe o arquivo CSV/TXT com os pontos de controle (GCP)."
+
+        # (2) Quadro 1 SEMPRE avaliado (fora do if acima)
+        q1 = (self.config or {}).get("q1") or {}
+
+        # 2.1) CRS padrão
+        crs_padrao = q1.get("crs_padrao") or self.epsg or ""
+        crs_padrao = self._norm_epsg(crs_padrao)
+        if crs_padrao and not crs_padrao.upper().startswith("EPSG:"):
+            errors["epsg"] = 'CRS inválido. Use "EPSG:####".'
+        self.epsg = crs_padrao  # mantém compat com legado
+
+        # 2.2) Sensores
+        sensores = q1.get("sensores") or {}
+        any_sensor = any(bool(sensores.get(k)) for k in ("rgb", "ms", "thermal", "rgb_ms"))
+        if q1 and not any_sensor:
+            errors["config"] = "Selecione pelo menos um tipo de câmera/sensor."
+
+        # 2.3) Produtos × sensores
+        produtos = q1.get("produtos") or {}
+        raster = produtos.get("raster") or []
+        if "LST" in raster and not bool(sensores.get("thermal")):
+            errors["config"] = "'Produto térmico (LST)' requer sensor Térmico."
+        if ("IV" in raster) and not (sensores.get("rgb") or sensores.get("ms") or sensores.get("rgb_ms")):
+            errors["config"] = "'Índices de Vegetação' requer RGB e/ou Multiespectral."
+
+        # 2.4) Formatos
+        formatos = q1.get("formatos") or []
+        tem_prod = bool(raster or (produtos.get("vetor") or []))
+        if tem_prod and not formatos:
+            errors["config"] = "Escolha pelo menos um formato de entrega."
+        for f in formatos:
+            if f and f.upper() not in self.FORMATOS_VALIDOS:
+                errors["config"] = f"Formato inválido: {f}"
+
+        # 2.5) Vetoriais do cliente
+        vet = q1.get("vetores_cliente") or {}
+        if vet.get("usar"):
+            modo = (vet.get("modo") or "").upper()
+            if modo == "OUTRO":
+                epsg_cli = self._norm_epsg(vet.get("epsg") or "")
+                if not (epsg_cli and epsg_cli.upper().startswith("EPSG:")):
+                    errors["config"] = 'Informe o EPSG dos vetores do cliente no formato "EPSG:####".'
+                else:
+                    vet["epsg"] = epsg_cli
+            q1["vetores_cliente"] = vet
+
+        if errors:
+            raise ValidationError(errors)
+
+        cfg = self.config or {}
+        if q1:
+            cfg["q1"] = q1
+            self.config = cfg
+        # END
 
     # helper para parâmetros do processamento/WebODM
+    # START — to_processing_options com Quadro 1
     def to_processing_options(self) -> dict:
+        q1 = (self.config or {}).get("q1") or {}
+        sensores = q1.get("sensores") or {}
+        produtos = q1.get("produtos") or {}
+        vet = q1.get("vetores_cliente") or {}
+
         return {
-            "camera_tipo": self.camera_tipo,
-            "georef": self.georef,
-            "epsg": self.epsg or None,
+            "camera_tipo": self.camera_tipo,  # compat legado
+            "georef": self.georef,  # compat legado
+            "epsg": self.epsg or None,  # normalizado em clean()
             "altura_voo_m": self.altura_voo_m,
             "gsd_cm": self.gsd_cm,
             "overlap_frontal": self.overlap_frontal,
             "overlap_lateral": self.overlap_lateral,
             "usa_gcp": self.usa_gcp,
             "gcp_csv": self.gcp_csv.name if self.gcp_csv else None,
+
+            # Produtos legados (seu bloco atual)
             "produtos": {
                 "ortomosaico": self.prod_ortomosaico,
                 "dsm": self.prod_dsm,
                 "dtm": self.prod_dtm,
                 "nuvem_pts": self.prod_nuvem_pts,
                 "contornos": self.prod_contornos,
+                # NOVO: produtos do Quadro 1 (se vierem)
+                "raster_extras": produtos.get("raster") or [],
+                "vetor_extras": produtos.get("vetor") or [],
             },
-            "config": self.config or {},
+
+            # NOVO: escolhas do Quadro 1 (para o pipeline)
+            "q1": {
+                "finalidade": q1.get("finalidade") or None,
+                "objetivo_especifico": q1.get("objetivo_especifico") or None,
+                "formatos": q1.get("formatos") or [],
+                "sensores": {
+                    "rgb": bool(sensores.get("rgb")),
+                    "ms": bool(sensores.get("ms")),
+                    "thermal": bool(sensores.get("thermal")),
+                    "rgb_ms": bool(sensores.get("rgb_ms")),
+                },
+                "vetores_cliente": {
+                    "usar": bool(vet.get("usar")),
+                    "modo": vet.get("modo") or None,
+                    "epsg": vet.get("epsg") or None,
+                },
+            },
+
+            "config": self.config or {},  # mantém tudo
         }
+    # END

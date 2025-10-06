@@ -1,0 +1,20 @@
+
+  <!-- Título -->
+  <h1 class="mv-page-title">Configurações / Definições do Projeto</h1>
+
+  {# Banner de créditos (opcional) #}
+  {% if estimated_credits_needed %}
+    <div class="mvcard" style="background:#fff9e6; border-color:#ffcc4d; color:#7a4c00;">
+      {% if credits_status == 'insufficient' %}
+        Seus créditos ({{ user_credits|default:"0" }}) são <b>insuficientes</b> para este projeto (necessários {{ estimated_credits_needed }}).
+        <a href="{{ buy_credits_url|default:'#' }}" class="mv-btn mv-btn--primary">Comprar créditos</a>
+      {% else %}
+        Saldo baixo: {{ user_credits|default:"0" }} · estimado p/ este projeto: {{ estimated_credits_needed }}.
+        <a href="{{ buy_credits_url|default:'#' }}" class="mv-btn mv-btn--primary">Comprar créditos</a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+    <form id="mv-form" method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<ul class="errorlist">{{ form.non_field_errors }}</ul>{% endif %}

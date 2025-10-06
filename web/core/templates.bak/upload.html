@@ -1,0 +1,121 @@
+
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <title>MultiView • Upload</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 2rem; }
+      .wrap { max-width: 720px; }
+      .card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; }
+      input[type="text"] { width: 100%; padding: 8px; border: 1px solid #e5e7eb; border-radius: 8px; }
+      input[type="file"] { display: block; margin: 12px 0; }
+      button { padding: 10px 16px; border: 0; border-radius: 10px; background: #0a7; color: #fff; cursor: pointer; }
+      .muted { color: #6b7280; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+      .row { display:flex; gap:12px; align-items:center; }
+      .row > * { flex: 1 }
+      .mt { margin-top:12px }
+      .log { white-space: pre-wrap; background: #0a0a0a; color: #d1d5db; padding: 8px; border-radius: 8px; min-height: 100px; }
+      a { color: #0a7; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <h1>Upload para MinIO/S3 (pré-assinado)</h1>
+        <p class="muted">Este formulário pede uma URL pré-assinada ao backend e envia o arquivo direto ao bucket.</p>
+
+        <!-- >>> FORM CORRETO <<< -->
+        <form id="presign-form">
+          <div class="row">
+            <div>
+              <label for="prefix">Prefixo (opcional)</label>
+              <input id="prefix" type="text" placeholder="ex.: projects/123/datasets/abc" />
+            </div>
+          </div>
+
+          <input id="file" type="file" />
+          <button id="btn" type="submit">Enviar</button>
+        </form>
+
+        <div class="mt">
+          <div class="log mono" id="log"></div>
+        </div>
+      </div>
+      <p class="muted mt"><a href="/">← Voltar</a></p>
+    </div>
+
+    <script>
+      (function () {
+        const form = document.querySelector('#presign-form');
+        const inputFile = document.querySelector('#file');
+        const inputPrefix = document.querySelector('#prefix');
+        const logBox = document.querySelector('#log');
+
+        function log(msg, obj) {
+          const line = obj ? `${msg}\n${JSON.stringify(obj, null, 2)}\n` : `${msg}\n`;
+          logBox.textContent += line;
+          logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          logBox.textContent = '';
+
+          const file = inputFile.files && inputFile.files[0];
+          if (!file) {
+            alert('Escolha um arquivo.');
+            return;
+          }
+
+          try {
+            // 1) pedir o presign ao backend
+            const filename = file.name;
+            const prefix = (inputPrefix.value || '').trim();
+            const qs = new URLSearchParams({ filename, prefix });
+            log('> requisitando /api/uploads/presign ...');
+
+            const presResp = await fetch(`/api/uploads/presign?${qs.toString()}`);
+            if (!presResp.ok) {
+              const txt = await presResp.text();
+              throw new Error(`presign falhou: HTTP ${presResp.status} — ${txt}`);
+            }
+            const presign = await presResp.json();
+            log('', presign);
+
+            // 2) montar o form-data com os "fields" do presign + o arquivo
+            const formData = new FormData();
+            Object.entries(presign.fields).forEach(([k, v]) => formData.append(k, v));
+            formData.append('file', file);
+
+            // 3) enviar direto para o MinIO (S3 POST)
+            log('> enviando para S3/MinIO ...');
+            const uploadResp = await fetch(presign.url, {
+              method: 'POST',
+              body: formData
+            });
+
+            // sucesso: qualquer 2xx (inclui 204 do MinIO)
+            if (uploadResp.ok) {
+              const hint = presign.public_url_hint || '';
+              log('> upload OK!');
+              if (hint) log('arquivo em:', { url: hint });
+              alert('Upload concluído com sucesso!');
+              return;
+            }
+
+            // se não ok, mostrar corpo da resposta
+            const errTxt = await uploadResp.text();
+            throw new Error(`Falha no upload: HTTP ${uploadResp.status} — ${errTxt}`);
+
+          } catch (err) {
+            log('ERRO:', { message: String(err) });
+            alert('Falha no upload (veja log abaixo).');
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

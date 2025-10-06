@@ -2,38 +2,36 @@
 {% extends "core/base_public.html" %}
 {% load static %}
 
-{% block title %}Entrar • Multiview{% endblock %}
+{% block title %}Login{% endblock %}
+
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/auth.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/auth.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="login-wrapper">
-  <div class="login-hero" aria-hidden="true"></div>
+  <section class="auth-wrapper">
+    <div class="auth-card" role="form" aria-labelledby="loginTitle">
+      <h1 id="loginTitle">Acessar sua conta</h1>
 
-  <div class="login-card" role="form" aria-label="Formulário de login">
-    <img class="brand" src="{% static 'core/img/logo_multiview_verde.png' %}" alt="Multiview" style="height:28px;margin-bottom:12px;">
-    <h1>Acessar sua conta</h1>
+      {% if form.non_field_errors %}
+        <div class="alert error">{{ form.non_field_errors }}</div>
+      {% endif %}
 
-    {% if form.errors %}
-      <div class="alert" style="color:#b00020; margin-bottom:8px;">
-        Usuário ou senha inválidos.
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <label for="id_username">UsuÃƒÆ’Ã‚Â¡rio</label>
+        {{ form.username }}
+
+        <label for="id_password">Senha</label>
+        {{ form.password }}
+
+        <button type="submit" class="btn-primary">Entrar</button>
+      </form>
+
+      <div class="auth-links">
+        <a href="{% url 'password_reset' %}">Esqueceu a senha?</a>
       </div>
-    {% endif %}
-
-    <form method="post" action="{% url 'login' %}">
-      {% csrf_token %}
-      <label for="id_username">Usuário</label>
-      <input id="id_username" name="username" type="text" autofocus required>
-
-      <label for="id_password">Senha</label>
-      <input id="id_password" name="password" type="password" required>
-
-      <button type="submit">Entrar</button>
-      <div class="login-help">
-        <a href="{% url 'password_reset' %}">Esqueceu sua senha?</a>
-      </div>
-    </form>
-  </div>
-</div>
+    </div>
+  </section>
 {% endblock %}

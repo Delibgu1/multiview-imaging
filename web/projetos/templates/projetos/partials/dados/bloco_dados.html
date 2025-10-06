@@ -1,0 +1,259 @@
+
+{% load static %}
+
+{# projetos/partials/q2_projeto.html #}
+<section class="mvcard" id="q2-projeto">
+  <h3> Dados do Projeto <span class="mv-tag mv-tag--imp">Importante</span></h3>
+
+  <!-- LINHA 1: Nome | Código -->
+  <div class="mvgrid mv-2">
+    <div class="mvfield">
+      <label for="proj_nome">Nome do projeto <span class="mv-tag mv-tag--req">Obrigatório</span></label>
+      <input type="text" id="proj_nome" name="proj_nome" required
+             placeholder="Ex.: Fazenda Santa Clara – Safra 2025">
+    </div>
+
+    <div class="mvfield">
+      <label for="proj_codigo">Código interno / ref. do cliente <span class="mv-tag mv-tag--opt">Opcional</span></label>
+      <input type="text" id="proj_codigo" name="proj_codigo" placeholder="Ex.: FSC-25-A01">
+    </div>
+  </div>
+
+  <!-- LINHA 2: Descrição (full) -->
+  <div class="mvgrid">
+    <div class="mvfield" style="grid-column:1/-1">
+      <label for="proj_descricao">Descrição do projeto <span class="mv-tag mv-tag--rec">Recomendado</span></label>
+      <textarea id="proj_descricao" name="proj_descricao" rows="3"
+                placeholder="Objetivo, área de interesse, principais entregas…"></textarea>
+    </div>
+  </div>
+
+  <!-- AOI: Área de Interesse do Projeto -->
+  <div id="bloco-aoi" class="form-section">
+    <label for="aoi_geojson" class="form-label">
+      <strong>Área de interesse (AOI — Área de Interesse)</strong>
+      <span class="mv-tag mv-tag--opt">Opcional</span>
+      <button type="button" id="js-help-aoi-btn" class="mv-helpbtn"
+              aria-expanded="false" aria-label="Ajuda: AOI (Área de Interesse)">
+        <img src="{% static 'core/img/icon/duvida.svg' %}" alt="">
+      </button>
+    </label>
+
+
+    <!-- Escolha do método -->
+    <div class="aoi-methods form-row" style="gap:16px; margin-bottom:8px;">
+      <label><input type="radio" name="aoi_method" value="none" checked> Sem AOI agora</label>
+      <label><input type="radio" name="aoi_method" value="upload"> Upload de polígono (GeoJSON)</label>
+      <label><input type="radio" name="aoi_method" value="coords"> Digitar coordenadas dos vértices</label>
+    </div>
+
+    <!-- Pane: Upload GeoJSON -->
+    <div id="pane-aoi-upload" class="aoi-pane" style="display:none;">
+      <div class="mvgrid mv-2">
+
+        <div class="mvfield">
+          <label for="aoi_file">Arquivo GeoJSON</label>
+
+          <!-- input nativo fica oculto para receber o clique no label-botão -->
+          <input id="aoi_file" name="aoi_file" type="file" accept=".geojson,.json" style="display:none;">
+          <div class="flex items-center gap-2">
+            <label for="aoi_file" id="aoi_file_trigger" class="mv-btn mv-btn--secondary">Escolher arquivo</label>
+            <span id="aoi_file_name" class="mv-hint">Nenhum arquivo selecionado</span>
+          </div>
+        </div>
+
+        <div class="mvfield">
+          <label>Formato aceito</label>
+          <input type="text" value=".geojson / .json — geometria Polygon ou MultiPolygon (WGS84 / EPSG:4326)" readonly>
+          <div class="mv-hint">Feche o polígono (último vértice repete o primeiro).</div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- Pane: Coordenadas -->
+    <div id="pane-aoi-coords" class="aoi-pane" style="display:none;">
+      <div id="coords-list" class="coords-list" style="display:flex; flex-direction:column; gap:8px;">
+        <!-- primeira linha vazia -->
+        <div class="coord-row" style="display:flex; gap:8px; align-items:center;">
+          <input type="text" class="form-input lat" placeholder="Lat (ex.: -12.330100)" style="flex:1;">
+          <input type="text" class="form-input lon" placeholder="Lon (ex.: -55.850200)" style="flex:1;">
+          <button type="button" class="link remove-vertex" aria-label="Remover vértice">remover</button>
+        </div>
+      </div>
+
+      <div class="row-actions" style="display:flex; gap:8px; margin-top:8px;">
+        <button type="button" id="btn-add-vertex" class="mv-btn mv-btn--secondary">Incluir coordenadas do vértice</button>
+        <button type="button" id="btn-finish-coords" class=" mv-btn mv-btn--primary">Concluir</button>
+        <button type="button" id="btn-clear-coords" class=" mv-btn mv-btn--ghost">Limpar</button>
+      </div>
+    </div>
+
+    <!-- Campo oculto que vai receber o GeoJSON final (upload ou coords) -->
+    <textarea id="aoi_geojson" name="aoi_geojson" class="sr-only" style="position:absolute; left:-9999px;"></textarea>
+
+    <!-- Área calculada/declarada (padrão mvgrid/mvfield) -->
+    <div class="mvgrid mv-2" style="margin-top:10px;">
+      <div class="mvfield">
+        <label for="area_calculada">Área calculada (ha)</label>
+        <input id="area_calculada" name="area_calculada" type="text" value="—" readonly>
+      </div>
+      <div class="mvfield">
+        <label for="area_declarada">Área declarada (ha)</label>
+        <input id="area_declarada" name="area_declarada" type="text" inputmode="decimal" placeholder="Ex.: 152.37">
+      </div>
+    </div>
+
+    <!-- Aviso de inconsistência (mostrado no próximo passo quando houver cálculo) -->
+    <div id="aoi-consistencia" class="hint warning" style="display:none; margin-top:8px;">
+      <strong>Inconsistência:</strong> Declarada <span id="aoi-declarada">—</span> ha ·
+      Calculada <span id="aoi-calculada">—</span> ha ·
+      Δ <span id="aoi-delta">—</span> ha.
+      <span class="inline-actions">
+        <a href="#" id="acao-aoi-reupload" class="link">Enviar novo GeoJSON</a> ·
+        <a href="#" id="acao-aoi-editar" class="link">Editar coordenadas</a> ·
+        <a href="#" id="acao-aoi-ajustar" class="link">Ajustar área declarada</a>
+      </span>
+    </div>
+
+    {% include "projetos/partials/help_aoi.html" %}
+
+    <script type="module">
+        window.mvBindHelp?.('js-help-aoi-btn','help-aoi');
+    </script>
+
+
+  </div>
+
+  <!-- LINHA 3: Nome propriedade | Matrícula | Área -->
+  <div class="mvgrid mv-3">
+    <div class="mvfield">
+      <label for="prop_nome">Nome da propriedade</label>
+      <input type="text" id="prop_nome" name="prop_nome" placeholder="Ex.: Fazenda Santa Clara">
+    </div>
+
+    <div class="mvfield">
+      <label for="matricula_num">Matrícula (nº / cartório)</label>
+      <input type="text" id="matricula_num" name="matricula_num" placeholder="Ex.: 12.345 – 2º CRI de Sorriso">
+    </div>
+  </div>
+
+
+  <!-- LINHA 4: Titular | CPF/CNPJ | CCIR -->
+  <div class="mvgrid mv-3">
+    <div class="mvfield">
+      <label for="titular_nome">Proprietário / Titular (nome)</label>
+      <input type="text" id="titular_nome" name="titular_nome" placeholder="Nome completo">
+    </div>
+
+    <div class="mvfield">
+      <label for="titular_doc">CPF/CNPJ</label>
+      <input type="text" id="titular_doc" name="titular_doc" placeholder="Ex.: 123.456.789-00 ou 12.345.678/0001-99">
+    </div>
+
+    <div class="mvfield">
+      <label for="ccir_num">CCIR (nº/ano)</label>
+      <input type="text" id="ccir_num" name="ccir_num" placeholder="Ex.: 123456789 – 2024">
+    </div>
+  </div>
+
+  <!-- LINHA 5: Contatos proprietário (e-mail | fone) | contato responsável (e-mail) -->
+  <div class="mvgrid mv-3">
+    <div class="mvfield">
+      <label for="contato_email">Contato do proprietário — e-mail</label>
+      <input type="email" id="contato_email" name="contato_email" placeholder="email@exemplo.com">
+    </div>
+
+    <div class="mvfield">
+      <label for="contato_fone">Contato do proprietário — telefone</label>
+      <input type="tel" id="contato_fone" name="contato_fone" placeholder="(00) 00000-0000">
+    </div>
+
+    <div class="mvfield">
+      <label for="rt_email">Contato do responsável — e-mail</label>
+      <input type="email" id="rt_email" name="rt_email" placeholder="rt@exemplo.com">
+    </div>
+  </div>
+
+  <!-- LINHA 6: Contato responsável (fone) | UF | Município -->
+  <div class="mvgrid mv-3">
+    <div class="mvfield">
+      <label for="rt_fone">Contato do responsável — telefone</label>
+      <input type="tel" id="rt_fone" name="rt_fone" placeholder="(00) 00000-0000">
+    </div>
+
+    <div class="mvfield">
+      <label for="end_uf">Estado (UF)</label>
+      <select id="end_uf" name="end_uf">
+        <option value="">Selecione a UF…</option>
+      </select>
+    </div>
+
+    <div class="mvfield">
+      <label for="end_municipio">Município</label>
+      <select id="end_municipio" name="end_municipio" disabled>
+        <option value="">Selecione a UF primeiro…</option>
+      </select>
+    </div>
+  </div>
+
+
+  <!-- BLOCO OFICIAL — RT (aparece só quando Finalidade=Oficial) -->
+  <div class="mvfield mv-hide" id="blk-oficial-2" style="grid-column:1/-1; margin-top:12px;">
+    <label>Responsável técnico
+      <span class="mv-tag mv-tag--req js-ofc-tag">Obrigatório (em Oficial)</span>
+      <span class="mv-tag mv-tag--rec js-gestao-tag">Recomendado (em Gestão)</span>
+    </label>
+    <div class="mvgrid mv-2">
+      <div class="mvfield">
+        <label for="rt_nome" class="sr-only">Nome do responsável</label>
+        <input type="text" id="rt_nome" name="rt_nome" placeholder="Nome do responsável">
+      </div>
+      <div class="mvfield">
+        <label for="rt_conselho" class="sr-only">Conselho/Registro</label>
+        <input type="text" id="rt_conselho" name="rt_conselho"
+               placeholder="Conselho/Registro (ex.: CREA 123456/UF)">
+      </div>
+      <div class="mvfield" style="grid-column:1 / -1">
+        <label for="rt_art" class="sr-only">ART/RRT</label>
+        <input type="text" id="rt_art" name="rt_art" placeholder="ART/RRT (nº ou anexo posterior)">
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO OFICIAL — POS/PEC -->
+  <div class="mvgrid mv-hide" id="blk-oficial-3" style="grid-template-columns:1fr 1fr; gap:12px">
+    <div class="mvfield">
+      <label for="pos_metodo">Metodologia de posicionamento &amp; Exatidão
+        <span class="mv-tag mv-tag--req js-ofc-tag">Obrigatório (em Oficial)</span>
+      </label>
+      <select id="pos_metodo" name="pos_metodo">
+        <option value="">Selecione...</option>
+        <option value="PEC_CARTO">PEC Cartográfico</option>
+        <option value="PEC_PBAS">PEC Prancha/Básico</option>
+        <option value="OUTRO">Outro / conforme edital</option>
+      </select>
+    </div>
+    <div class="mvfield">
+      <label for="pec_meta">Classe PEC / Escala</label>
+      <select id="pec_meta" name="pec_meta">
+        <option value="">Classe PEC / Escala</option>
+        <option value="A">Classe A</option>
+        <option value="B">Classe B</option>
+        <option value="C">Classe C</option>
+      </select>
+    </div>
+  </div>
+
+
+
+
+  <!-- BLOCO OFICIAL — SARPAS (se ainda estiver no Q2) -->
+  <div class="mvfield mv-hide" id="blk-oficial-4" style="grid-column:1/-1">
+    <label for="sarpas">Autorizações de voo (SARPAS/ANAC)</label>
+    <input type="text" id="sarpas" name="sarpas" placeholder="Nº/ID do processo (opcional)">
+  </div>
+</section>
+
+

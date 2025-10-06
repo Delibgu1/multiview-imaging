@@ -1,0 +1,169 @@
+
+/* projetos_config.css */
+.pgc-wrap{
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 8px 16px 24px;
+}
+
+.pgc-title{
+  margin: 8px 2px 16px;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #0c2f16;
+}
+
+.pgc-grid{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+/* Cartões */
+.pgc-card{
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 8px 8px 8px rgba(0,85,28,.65); /* seu padrão de sombra */
+}
+
+.pgc-card__title{
+  margin: 0 0 10px 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0c2f16;
+}
+
+.pgc-fields{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 16px;
+}
+
+.pgc-field{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pgc-field > span{
+  font-weight: 600;
+  color: #1f2e1f;
+}
+
+.pgc-field input,
+.pgc-field textarea{
+  border: 1px solid rgba(0,0,0,.12);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font: inherit;
+}
+
+.pgc-actions{
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.pgc-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.08);
+  background: #fff;
+  text-decoration: none;
+  color: #123;
+  box-shadow: 8px 8px 8px rgba(0,85,28,.65);
+}
+
+.pgc-btn--primary{
+  background: #80CB2E;
+  color: #fff;
+  border-color: rgba(0,0,0,.06);
+}
+
+@media (max-width: 820px){
+  .pgc-fields{ grid-template-columns: 1fr; }
+}
+
+/* página de configurações do projeto */
+.mv-page--config{
+  padding-top: 10px;
+  padding-bottom: 140px;   /* evita que o conteúdo encoste no rodapé */
+}
+
+/* cartão branco do formulário com sombra padrão Sinérgica */
+.cfg-card{
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,.06);
+  box-shadow:
+    0 6px 12px rgba(0,0,0,.10),
+    0 18px 36px rgba(0,0,0,.12),
+    12px 14px 0 rgba(0,0,0,.06);
+  padding: 14px 16px;
+}
+
+/* título de página (opcional; combina com projetos) */
+.mv-page-title{
+  display:flex;
+  justify-content:flex-start; /* fica alinhado à esquerda como no seu print */
+  margin: 14px 0 8px;
+}
+.mv-page-title h1{
+  background: #fff;
+  color: #1f2e1f;
+  font-weight: 700;
+  font-size: 1.6rem;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.06);
+  box-shadow:
+    0 6px 12px rgba(0,0,0,.10),
+    0 18px 36px rgba(0,0,0,.12),
+    12px 14px 0 rgba(0,0,0,.06);
+}
+
+/* --- Cabeçalho/usuário no padrão -- */
+.mv-usercard{
+  background:#eaf5e4; border-radius:16px; padding:12px 16px;
+  width:max-content; box-shadow:0 8px 18px rgba(0,0,0,.2), inset 0 -1px 0 rgba(255,255,255,.3);
+  margin:10px auto 0  calc(50% - 350px); /* alinha com o centro “visual” como na página Projetos */
+  display:flex; gap:12px; align-items:center;
+}
+.mv-usercard__icon{
+  width:28px; height:28px; border-radius:999px; background:#354224;
+  mask:url("/static/core/img/icon/usuario.svg") center/contain no-repeat;
+  -webkit-mask:url("/static/core/img/icon/usuario.svg") center/contain no-repeat;
+}
+.mv-usercard__title{ font-weight:700; color:#0b2012; }
+.mv-usercard__subtitle{ color:#3c4c35; font-size:.9rem }
+
+/* --- Título Multiview (mesmo padrão da lista de projetos) --- */
+.mv-page-title{ text-align:center; margin:12px 0 10px }
+.mv-page-title h1{ color:#354224; font-size:28px; font-weight:800; letter-spacing:.2px; }
+.mv-page-title__ico{ height:30px; vertical-align:-7px; margin-right:8px }
+
+/* --- Cartão do formulário --- */
+.cfg-card{
+  background:#fff; border-radius:14px; padding:16px;
+  box-shadow:0 10px 24px rgba(0,0,0,.25), inset 0 -1px 0 rgba(255,255,255,.5);
+  width: min(960px, 92%); margin: 10px auto 24px;
+}
+.pgc-actions{ display:flex; gap:12px; justify-content:flex-end; margin-top:16px }
+.pgc-btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:10px 14px; border:1px solid #9ec778; border-radius:16px; background:#f3f9ef;
+  color:#0f1f12; text-decoration:none; box-shadow:0 6px 16px rgba(0,0,0,.18);
+}
+.pgc-btn__ico{ height:18px }
+.pgc-btn--primary{
+  background:#80CB2E; border-color:#80CB2E; color:#0b2012;
+  font-weight:700;
+}
+.pgc-btn[disabled]{ opacity:.55; pointer-events:none }

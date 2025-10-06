@@ -1,110 +1,122 @@
 
 {% extends "core/base_public.html" %}
-{% block title %}{{ titulo }} · Multiview{% endblock %}
+{% load static %}
+
+{% block title %}{{ titulo|default:"Definições do Projeto" }} · Multiview{% endblock %}
+
+{# Classe só nesta página, para isolar o CSS #}
+{% block body_class %}page-config{% endblock %}
+
+{# CSS isolado, não afeta outras telas #}
+{% block head_extra %}
+<link rel="stylesheet" href="{% static 'projetos/css/configuracoes.css' %}">
+{% endblock %}
+
 {% block content %}
-<section class="card" style="max-width:920px">
-  <header style="text-align:center;margin-bottom:10px">
-    <h1 style="margin:0">{{ titulo }}</h1>
+<section class="mv-wrap">
+  <header class="mv-header">
+    <h1>{{ titulo|default:"Definições do Projeto" }}</h1>
   </header>
 
-  <form method="post" enctype="multipart/form-data" class="form-grid">
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
-    <fieldset class="grid-2">
-      <div>
-        <label>Nome do projeto</label>
-        {{ form.nome }}
-      </div>
-      <div>
-        <label>Data do voo</label>
-        {{ form.data_voo }}
-      </div>
-
-      <div>
-        <label>Plataforma</label>
-        {{ form.plataforma }}
-      </div>
-      <div>
-        <label>Modelo da câmera</label>
-        {{ form.camera_modelo }}
-      </div>
-
-      <div>
-        <label>Tipo de câmera</label>
-        {{ form.camera_tipo }}
-      </div>
-      <div>
-        <label>Geo-referenciamento</label>
-        {{ form.georef }}
-      </div>
-
-      <div>
-        <label>EPSG</label>
-        {{ form.epsg }}
-      </div>
-      <div>
-        <label>Altura de voo (m)</label>
-        {{ form.altura_voo_m }}
-      </div>
-
-      <div>
-        <label>GSD (cm)</label>
-        {{ form.gsd_cm }}
-      </div>
-      <div>
-        <label>Overlap frontal (%)</label>
-        {{ form.overlap_frontal }}
-      </div>
-
-      <div>
-        <label>Overlap lateral (%)</label>
-        {{ form.overlap_lateral }}
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>GCP</legend>
-      <div class="grid-2">
-        <div>
-          <label>{{ form.usa_gcp }} Usarei pontos de controle (GCP)</label>
+    <!-- PROJETO -->
+    <section class="mv-card" aria-labelledby="sec-projeto">
+      <h3 id="sec-projeto">Projeto</h3>
+      <div class="mv-grid">
+        <div class="mv-field">
+          <label>Nome do projeto</label>
+          {{ form.nome }}
         </div>
-        <div>
+        <div class="mv-field">
+          <label>Data do voo</label>
+          {{ form.data_voo }}
+        </div>
+        <div class="mv-field">
+          <label>Descrição</label>
+          {{ form.descricao }}
+        </div>
+        <div class="mv-field">
+          <label>EPSG</label>
+          {{ form.epsg }}
+          <small>Ex.: SIRGAS2000/UTM 22S → <b>EPSG:31982</b></small>
+        </div>
+      </div>
+    </section>
+
+    <!-- VOO -->
+    <section class="mv-card" aria-labelledby="sec-voo">
+      <h3 id="sec-voo">Voo</h3>
+      <div class="mv-grid">
+        <div class="mv-field">
+          <label>Plataforma (drone)</label>
+          {{ form.plataforma }}
+        </div>
+        <div class="mv-field">
+          <label>Modelo da câmera</label>
+          {{ form.camera_modelo }}
+        </div>
+        <div class="mv-field">
+          <label>Tipo de câmera</label>
+          {{ form.camera_tipo }}
+        </div>
+        <div class="mv-field">
+          <label>Geo-referenciamento</label>
+          {{ form.georef }}
+        </div>
+        <div class="mv-field">
+          <label>Altura de voo (m)</label>
+          {{ form.altura_voo_m }}
+        </div>
+        <div class="mv-field">
+          <label>GSD (cm/pixel)</label>
+          {{ form.gsd_cm }}
+        </div>
+        <div class="mv-field">
+          <label>Overlap frontal (%)</label>
+          {{ form.overlap_frontal }}
+        </div>
+        <div class="mv-field">
+          <label>Overlap lateral (%)</label>
+          {{ form.overlap_lateral }}
+        </div>
+      </div>
+    </section>
+
+    <!-- GCP -->
+    <section class="mv-card" aria-labelledby="sec-gcp">
+      <h3 id="sec-gcp">Pontos de Controle (GCP)</h3>
+      <div class="mv-grid">
+        <div class="mv-field mv-span-2">
+          <label class="mv-switch">
+            {{ form.usa_gcp }} Usarei pontos de controle (GCP)
+          </label>
+        </div>
+        <div class="mv-field mv-span-2">
           <label>Arquivo GCP (.csv/.txt)</label>
           {{ form.gcp_csv }}
-          <small>Você poderá marcar os pontos nas imagens depois, via editor.</small>
+          <small>Cabeçalho típico: label,x,y,z,lon,lat,alt</small>
         </div>
       </div>
-    </fieldset>
+    </section>
 
-    <fieldset>
-      <legend>Produtos desejados</legend>
-      <div class="grid-3">
-        <label>{{ form.prod_ortomosaico }} Ortomosaico</label>
-        <label>{{ form.prod_dsm }} DSM</label>
-        <label>{{ form.prod_dtm }} DTM</label>
-        <label>{{ form.prod_nuvem_pts }} Nuvem de pontos</label>
-        <label>{{ form.prod_contornos }} Curvas de nível</label>
+    <!-- PRODUTOS -->
+    <section class="mv-card" aria-labelledby="sec-produtos">
+      <h3 id="sec-produtos">Produtos desejados</h3>
+      <div class="mv-grid">
+        <label class="mv-check">{{ form.prod_ortomosaico }} Ortomosaico</label>
+        <label class="mv-check">{{ form.prod_dsm }} DSM</label>
+        <label class="mv-check">{{ form.prod_dtm }} DTM</label>
+        <label class="mv-check">{{ form.prod_nuvem_pts }} Nuvem de pontos</label>
+        <label class="mv-check">{{ form.prod_contornos }} Curvas de nível</label>
       </div>
-    </fieldset>
+    </section>
 
-    <div class="actions">
-      <button type="submit">Salvar projeto</button>
-      <a href="{% url 'projetos:lista' %}" class="link">Cancelar</a>
+    <div class="mv-actions">
+      <a href="{% url 'projetos:lista' %}" class="btn btn-sec">Cancelar</a>
+      <button type="submit" class="btn">Salvar projeto</button>
     </div>
   </form>
 </section>
-
-<style>
-.form-grid label{font-weight:700;font-size:14px;display:block;margin-bottom:6px}
-.form-grid input, .form-grid select {
-  width:100%; border:1px solid #d6e5d6; border-radius:12px; padding:10px 12px;
-}
-fieldset{border:1px solid #e4eedf;border-radius:12px;padding:12px;margin:12px 0;background:#fff}
-legend{font-weight:800;padding:0 8px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.actions{display:flex;gap:12px;margin-top:10px}
-.actions .link{text-decoration:none;align-self:center}
-@media (max-width:780px){.grid-2,.grid-3{grid-template-columns:1fr}}
-</style>
 {% endblock %}

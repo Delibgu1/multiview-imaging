@@ -1,0 +1,71 @@
+
+{% load static %}
+<dialog id="help-formatos" class="mv-modal" aria-labelledby="help-formatos-title" aria-modal="true">
+  <div class="mv-modal__content">
+    <button type="button" class="mv-modal__close js-close-help" aria-label="Fechar">×</button>
+
+    <h3 id="help-formatos-title">Formatos preferidos (entrega)</h3>
+
+    <p>
+      Os resultados do projeto podem ser entregues em diferentes formatos.
+      Cada um possui vantagens específicas, de acordo com o uso pretendido.
+    </p>
+
+    <ul>
+      <li>
+        <strong>GeoPackage (.gpkg)</strong>
+        Formato moderno e compacto que armazena múltiplas camadas em um único arquivo.
+        <em>Ideal para uso em softwares GIS (QGIS, ArcGIS etc.)</em>, com excelente suporte a grandes volumes de dados.
+        <b>Prós:</b> único arquivo, economiza espaço, evita perda de dados.
+        <b>Contras:</b> compatibilidade menor com monitores de máquinas mais antigos.
+      </li>
+
+      <li>
+        <strong>Shapefile (.shp)</strong>
+        Formato clássico, ainda muito usado em cadastros rurais e sistemas de máquinas agrícolas.
+        <em>Compatível com a maioria dos monitores de GPS e controladores de máquinas</em>.
+        <b>Prós:</b> ampla aceitação, simples de usar em máquinas.
+        <b>Contras:</b> gera vários arquivos por camada (.shp, .dbf, .shx etc.), maior risco de perda, limitações de nomes e atributos.
+      </li>
+
+      <li>
+        <strong>GeoJSON (.geojson)</strong>
+        Baseado em texto (JSON), leve e fácil de manipular em aplicações web e apps móveis.
+        <em>Útil para integrações online, APIs e visualização rápida</em>.
+        <b>Prós:</b> legível, fácil de compartilhar, ocupa pouco espaço.
+        <b>Contras:</b> menos eficiente em grandes áreas (arquivos podem ficar pesados e lentos).
+      </li>
+
+      <li>
+        <strong>GeoTIFF (.tif)</strong>
+        Formato raster georreferenciado, usado para imagens (ortomosaicos, mapas de NDVI, curvas de nível rasterizadas).
+        <em>Compatível com todos os GIS e usado em análises avançadas</em>.
+        <b>Prós:</b> mantém metadados espaciais completos, precisão alta.
+        <b>Contras:</b> ocupa mais espaço em disco e exige mais memória em computadores mais simples.
+      </li>
+
+      <li>
+        <strong>COG (Cloud Optimized GeoTIFF)</strong>
+        Variação otimizada do GeoTIFF para uso direto em nuvem.
+        <em>Indicado para grandes áreas ou quando o usuário precisa acessar apenas trechos da imagem</em>.
+        <b>Prós:</b> rápido acesso online, sem necessidade de baixar o arquivo inteiro.
+        <b>Contras:</b> exige sistemas compatíveis com leitura via nuvem; pode não ser aceito em monitores de campo.
+      </li>
+    </ul>
+
+    <p>
+      ✔ <b>Dicas práticas:</b>
+      - Prefira <b>GeoPackage</b> para trabalhar em GIS com grande volume de dados.
+      - Prefira <b>Shapefile</b> quando for usar em monitores de máquinas ou GPS agrícolas.
+      - Use <b>GeoJSON</b> quando precisar compartilhar online ou integrar sistemas.
+      - Use <b>GeoTIFF</b> para imagens de alta precisão.
+      - Use <b>COG</b> quando trabalhar em ambientes de nuvem com grandes áreas.
+    </p>
+
+    <p>
+      <b>Armazenamento e performance:</b>
+      Formatos compactos (<em>GeoPackage, GeoJSON</em>) reduzem custos de armazenamento e facilitam o uso em dispositivos com menos memória,
+      enquanto <em>GeoTIFF e COG</em> são mais pesados mas essenciais quando a prioridade é qualidade máxima e análises raster.
+    </p>
+  </div>
+</dialog>

@@ -1,0 +1,317 @@
+
+{% load static %}
+
+<!-- === QUADRO 1 — OBJETIVO DO PROJETO =================================== -->
+<section class="mvcard" id="q1-objetivo">
+  <h3>
+    Objetivo do Projeto
+    <span class="mv-badge">guia os quadros seguintes</span>
+  </h3>
+
+  <div class="mvgrid mv-3">
+    <!-- Finalidade -->
+    <div class="mvfield">
+      <label>Finalidade do projeto <span style="color:#d33">*</span></label>
+      <div class="mv-inline" id="fld-finalidade">
+        <label><input type="radio" name="objetivo_finalidade" value="oficial"> Oficial</label>
+        <label><input type="radio" name="objetivo_finalidade" value="gestao"> Gestão / Privado</label>
+      </div>
+      <small class="mv-hint">“Oficial” (CAR, SIGEF, licenciamento, perícia) ou “Gestão/Privado” (agro, inspeção, topografia, etc.).</small>
+    </div>
+
+    <!-- Objetivo específico (filtrado pela finalidade) -->
+    <div class="mvfield">
+      <label for="objetivo_especifico">Objetivo específico <span style="color:#d33">*</span></label>
+      <select id="objetivo_especifico" name="objetivo_especifico" required>
+        <option value="" selected disabled>Selecione…</option>
+
+        <optgroup label="Oficial" data-group="oficial">
+          <option value="car">CAR / Análises Ambientais (SICAR)</option>
+          <option value="sigef">SIGEF / Georreferenciamento (INCRA)</option>
+          <option value="licenciamento">Licenciamento Ambiental / Laudo</option>
+          <option value="pericia">Perícia / Conformidade</option>
+          <option value="outro_oficial">Outro (descrever)</option>
+        </optgroup>
+
+        <optgroup label="Gestão / Privado" data-group="gestao">
+          <option value="agro_saude">Agricultura — Saúde de Plantas</option>
+          <option value="agro_solo">Agricultura — Solo / Taxa Variável</option>
+          <option value="topografia">Topografia / Terraplenagem / Volume</option>
+          <option value="inspecao">Inspeção de Ativos / Obras</option>
+          <option value="monitoramento">Monitoramento Recorrente</option>
+          <option value="outro_gestao">Outro (descrever)</option>
+        </optgroup>
+      </select>
+
+      <div class="mvfield mv-hide" id="objetivo_outro_wrap">
+        <label for="objetivo_outro">Descreva o objetivo</label>
+        <input type="text" id="objetivo_outro" name="objetivo_outro" placeholder="Ex.: Auditoria específica, estudo customizado…">
+      </div>
+
+      <small class="mv-hint">A lista se adapta à finalidade escolhida.</small>
+    </div>
+
+    <!-- Cultura (sempre visível; obrigatória em Gestão/Privado) -->
+    <div class="mvfield" id="grp-cultura">
+      <label>
+        Cultura (se aplicável)
+        <span class="mv-tag js-crop-req mv-hide">Obrigatório em Gestão/Privado</span>
+      </label>
+
+      <div class="mv-inline" style="gap:12px;flex-wrap:wrap">
+        <label for="crop" class="sr-only">Cultura</label>
+        <select id="crop" name="crop" style="min-width:260px">
+          <option value="">Selecione...</option>
+          <option value="algodao">Algodão</option>
+          <option value="arroz">Arroz</option>
+          <option value="banana">Banana</option>
+          <option value="cafe">Café</option>
+          <option value="cana">Cana-de-açúcar</option>
+          <option value="citros">Citros</option>
+          <option value="eucalipto">Eucalipto</option>
+          <option value="feijao">Feijão</option>
+          <option value="horti">Hortícolas</option>
+          <option value="frutiferas">Frutíferas perenes</option>
+          <option value="milho">Milho</option>
+          <option value="pastagem">Pastagem</option>
+          <option value="pinus">Pinus</option>
+          <option value="seringueira">Seringueira</option>
+          <option value="soja">Soja</option>
+          <option value="uvas">Uvas</option>
+          <option value="outro">Outra…</option>
+        </select>
+
+          <label for="crop_outro" class="sr-only">Outra Cultura</label>
+          <input type="text"
+               name="crop_outro"
+               id="crop_outro"
+               class="mv-hide"
+               placeholder="Informe a cultura"
+               style="min-width:260px">
+      </div>
+
+      <small class="mv-hint">
+        Em projetos de <strong>Gestão/Privado</strong> a cultura é obrigatória (para sugerirmos índices e parâmetros adequados).
+      </small>
+    </div>
+
+    <!-- Sensores -->
+    <div class="mvfield">
+      <label>Tipo de câmera / sensor <span style="color:#d33">*</span></label>
+      <div class="mv-inline">
+        <label><input type="checkbox" name="sensores" value="rgb"> RGB</label>
+        <label><input type="checkbox" name="sensores" value="ms"> Multiespectral</label>
+        <label><input type="checkbox" name="sensores" value="thermal"> Térmica</label>
+        <label><input type="checkbox" name="sensores" value="rgb_ms"> RGB + Multiespectral</label>
+      </div>
+      <small class="mv-hint">Define índices e recomendações nos próximos quadros.</small>
+    </div>
+
+    <!-- CRS de saída -->
+    <div class="mvfield">
+      <label>
+        CRS padrão para as saídas (raster e vetor)
+        <button type="button" id="js-help-crs-btn" class="mv-helpbtn" aria-expanded="false" aria-label="Ajuda sobre CRS" style="margin-left:6px">
+            <img src="{% static 'core/img/icon/duvida.svg' %}" alt="">
+        </button>
+      </label>
+
+      <!-- Dialog do CRS (partial) -->
+      {% include "projetos/partials/objetivo/helps/help_crs.html" %}
+      <label for="crs_saida" class="sr-only">CRS padrão para as saídas (raster e vetor)</label>
+      <select id="crs_saida" name="crs_saida" required>
+        <option value="" selected disabled>Selecione…</option>
+
+        <optgroup label="SIRGAS 2000 / UTM (Sul)">
+          <option value="EPSG:31978">UTM 18S — EPSG:31978</option>
+          <option value="EPSG:31979">UTM 19S — EPSG:31979</option>
+          <option value="EPSG:31980">UTM 20S — EPSG:31980</option>
+          <option value="EPSG:31981">UTM 21S — EPSG:31981</option>
+          <option value="EPSG:31982">UTM 22S — EPSG:31982</option>
+          <option value="EPSG:31983">UTM 23S — EPSG:31983</option>
+          <option value="EPSG:31984">UTM 24S — EPSG:31984</option>
+          <option value="EPSG:31985">UTM 25S — EPSG:31985</option>
+        </optgroup>
+
+        <optgroup label="WGS84 / UTM (Sul)">
+          <option value="EPSG:32718">UTM 18S — EPSG:32718</option>
+          <option value="EPSG:32719">UTM 19S — EPSG:32719</option>
+          <option value="EPSG:32720">UTM 20S — EPSG:32720</option>
+          <option value="EPSG:32721">UTM 21S — EPSG:32721</option>
+          <option value="EPSG:32722">UTM 22S — EPSG:32722</option>
+          <option value="EPSG:32723">UTM 23S — EPSG:32723</option>
+          <option value="EPSG:32724">UTM 24S — EPSG:32724</option>
+          <option value="EPSG:32725">UTM 25S — EPSG:32725</option>
+        </optgroup>
+
+        <optgroup label="Geográficos (latitude/longitude)">
+          <option value="EPSG:4674">SIRGAS 2000 geográfico — EPSG:4674</option>
+          <option value="EPSG:4326">WGS84 geográfico — EPSG:4326</option>
+        </optgroup>
+      </select>
+
+      <small class="mv-hint" id="crs_hint">
+        Usos <b>oficiais</b>: prefira <b>SIRGAS 2000 / UTM</b>. Integração com máquinas/GPS: <b>WGS84 / UTM</b> é comum.
+        Para visualização web global, pode-se usar WGS84 geográfico (EPSG:4326).
+      </small>
+    </div>
+
+    <!-- Vetores do cliente (apenas mostra/esconde o bloco do CRS do cliente) -->
+    {% include "projetos/partials/objetivo/helps/help_vetoriais.html" %}
+
+    <div class="mvcol" id="grp-vetoriais">   <!-- trocado de mvfield -> mvcol -->
+      <div class="mv-inline mv-inline-nowrap">
+        <label for="chk_envia_vetores" class="mv-check mv-label-inline">
+            <input type="checkbox" id="chk_envia_vetores">
+            <strong>Vou enviar arquivos vetoriais do cliente</strong>
+        </label>
+
+        <!-- Botão de ajuda: usa o mesmo padrão do CRS -->
+        <button type="button" id="js-help-vetoriais-btn" class="mv-helpbtn"
+                    aria-label="Ajuda: Arquivos vetoriais do cliente">
+              <img src="{% static 'core/img/icon/duvida.svg' %}" alt="">
+        </button>
+      </div>
+    </div>
+
+    <!-- CRS dos vetores do cliente -->
+    <div class="mvfield mv-hide" id="grp-crs-cliente">
+      <strong>CRS dos vetores do cliente (se houver)</strong>
+      <!-- OPÇÃO 1: MESMO DAS SAÍDAS -->
+      <label class="mv-radio">
+          <input type="radio" name="crs_cliente" value="MESMO" checked>
+          <span>Mesmo das saídas</span>
+      </label>
+
+      <!-- OPÇÃO 2: OUTRO EPSG -->
+      <label class="mv-radio">
+          <input type="radio" name="crs_cliente" value="OUTRO">
+          <span>Outro EPSG</span>
+      </label>
+
+      <!-- CAMPO EPSG (SÓ APARECE QUANDO “OUTRO” ESTIVER SELECIONADO) -->
+          <div id="crs_cliente_epsg_wrap" class="mvfield mv-hide">
+              <label for="crs_cliente_epsg" class="sr-only">EPSG dos vetores do cliente</label>
+              <input type="text" id="crs_cliente_epsg" name="crs_cliente_epsg"
+                      placeholder='Ex.: EPSG:31983'>
+    </div>
+</div>
+    <!-- Formatos preferidos (sempre visível) -->
+
+    {% include "projetos/partials/objetivo/helps/help_formatos.html" %}
+
+    <div class="mvcol" id="grp-formatos">
+      <div class="mv-inline mv-inline-nowrap" style="align-items:center; gap:8px;">
+        <strong>Formatos preferidos (entrega)</strong>
+        <button type="button" id="js-help-formatos-btn" class="mv-helpbtn"
+                aria-expanded="false" aria-label="Ajuda: formatos preferidos (entrega)">
+          <img src="{% static 'core/img/icon/duvida.svg' %}" alt="">
+        </button>
+      </div>
+
+        <label><input type="checkbox" name="fmt_vector" value="gpkg" checked> GeoPackage (.gpkg)</label>
+        <label><input type="checkbox" name="fmt_vector" value="shp"> Shapefile</label>
+        <label><input type="checkbox" name="fmt_vector" value="geojson"> GeoJSON </label>
+        <label>
+          <input type="checkbox" name="fmt_raster" value="geotiff" checked> GeoTIFF
+          <small class="note">(arquivos grdes; ideal p/ análises precisas em GIS)</small>
+        </label>
+        <label>
+          <input type="checkbox" name="fmt_raster" value="cog"> COG
+          <small class="note">(ótimo em nuvem; acesso rápido sem baixar tudo)</small>
+        </label>
+      </div>
+
+    <!-- Produtos desejados -->
+    <div class="mvfield mv-span-3" id="grp-produtos">
+      <label>Produtos desejados</label>
+
+      <!-- Raster -->
+      <div class="mvfield">
+        <label>Produtos desejados — Raster (imagens)</label>
+        <div class="mv-products-grid">
+          <label><input type="checkbox" id="prod_ortho" name="prod_ortomosaico" data-credit-mult="1.00" checked> Ortomosaico (GeoTIFF)</label>
+          <label><input type="checkbox" id="prod_dsm"   name="prod_dsm"   data-credit-mult="0.10"> DSM</label>
+          <label><input type="checkbox" id="prod_dtm"   name="prod_dtm"   data-credit-mult="0.10"> DTM</label>
+          <label><input type="checkbox" id="prod_curvas" name="prod_contornos" data-credit-mult="0.06"> Curvas de nível</label>
+          <label><input type="checkbox" id="prod_nuvem"  name="prod_nuvem_pts" data-credit-mult="0.08"> Nuvem de pontos</label>
+          <label><input type="checkbox" id="prod_malha"  name="prod_malha_3d"  data-credit-mult="0.06"> Malha 3D (texturizada)</label>
+          <label><input type="checkbox" id="prod_lst"   name="prod_lst"> Produto térmico (LST)</label>
+          <label><input type="checkbox" id="prod_relatorio" name="prod_relatorio" data-credit-mult="0.00"> Relatório de qualidade (RMS/cobertura)</label>
+          <label><input type="checkbox" id="prod_precision" name="prod_relatorio_precisao" data-credit-mult="0.02"> Relatório de precisão (GCP/RTK/PPK)</label>
+          <label><input type="checkbox" id="prod_iv" name="prod_iv" data-credit-mult="0.12"> Índices de Vegetação</label>
+        </div>
+      </div>
+
+      <!-- Vetoriais -->
+      <div class="mvfield">
+        <label>Produtos desejados — Vetoriais (camadas)</label>
+        <div class="mv-inline mv-col-3">
+          <label><input type="checkbox" id="vec_curvas"   name="vec_curvas"> Curvas de nível</label>
+          <label><input type="checkbox" id="vec_limite"   name="vec_limite"> Limite/contorno da área</label>
+          <label><input type="checkbox" id="vec_talhoes"  name="vec_talhoes"> Talhões / subáreas</label>
+          <label><input type="checkbox" id="vec_zonas_iv" name="vec_zonas_iv"> Zonas temáticas por IV</label>
+          <label><input type="checkbox" id="vec_grid"     name="vec_grid"> Grade de amostragem (pontos)</label>
+          <label><input type="checkbox" id="vec_pontos"   name="vec_pontos"> Pontos de interesse / GCPs</label>
+          <label><input type="checkbox" id="vec_precisao" name="vec_precisao"> Relatório de precisão (GCP/RTK/PPK)</label>
+        </div>
+      </div>
+
+      <!-- Blocos IV (mostrados conforme sensores + escolhas) -->
+      <div class="mvfield mv-iv-group mv-hide" id="grp-iv-rgb">
+        <div class="mv-iv-title">IV para RGB</div>
+        <div class="mv-inline mv-col-3">
+          <label><input type="checkbox" name="iv_rgb" value="vari"> VARI</label>
+          <label><input type="checkbox" name="iv_rgb" value="gndvi_rgb"> GNDVI (RGB)</label>
+          <label><input type="checkbox" name="iv_rgb" value="gli"> GLI</label>
+          <label><input type="checkbox" name="iv_rgb" value="grvi"> GRVI</label>
+          <label><input type="checkbox" name="iv_rgb" value="ngrdi"> NGRDI</label>
+          <label><input type="checkbox" name="iv_rgb" value="exg"> ExG</label>
+          <label><input type="checkbox" name="iv_rgb" value="exr"> ExR</label>
+          <label><input type="checkbox" name="iv_rgb" value="exgr"> ExGR</label>
+          <label><input type="checkbox" name="iv_rgb" value="cive"> CIVE</label>
+          <label><input type="checkbox" name="iv_rgb" value="mgrvi"> MGRVI / RGBVI</label>
+          <label><input type="checkbox" name="iv_rgb" value="tgi"> TGI</label>
+        </div>
+      </div>
+
+      <div id="grp-iv-ms" class="mv-hide mv-iv-group">
+        <div class="mv-iv-title">IV para Multiespectral</div>
+        <div class="mv-inline mv-col-3">
+          <label><input type="checkbox" name="iv_ms" value="ndvi"> NDVI</label>
+          <label><input type="checkbox" name="iv_ms" value="ndre"> NDRE</label>
+          <label><input type="checkbox" name="iv_ms" value="gndvi"> GNDVI</label>
+          <label><input type="checkbox" name="iv_ms" value="savi"> SAVI</label>
+          <label><input type="checkbox" name="iv_ms" value="osavi"> OSAVI</label>
+          <label><input type="checkbox" name="iv_ms" value="evi"> EVI</label>
+          <label><input type="checkbox" name="iv_ms" value="evi2"> EVI2</label>
+          <label><input type="checkbox" name="iv_ms" value="msavi2"> MSAVI2</label>
+          <label><input type="checkbox" name="iv_ms" value="rdvi"> RDVI</label>
+          <label><input type="checkbox" name="iv_ms" value="wdrvi"> WDRVI</label>
+          <label><input type="checkbox" name="iv_ms" value="ci_green"> CI_green</label>
+          <label><input type="checkbox" name="iv_ms" value="ci_rededge"> CI_red-edge</label>
+          <label><input type="checkbox" name="iv_ms" value="psri"> PSRI</label>
+          <label><input type="checkbox" name="iv_ms" value="ari"> ARI (1/2)</label>
+          <label><input type="checkbox" name="iv_ms" value="sipi"> SIPI</label>
+          <label><input type="checkbox" name="iv_ms" value="mcari"> MCARI</label>
+          <label><input type="checkbox" name="iv_ms" value="tcari_osavi"> TCARI/OSAVI</label>
+          <label><input type="checkbox" name="iv_ms" value="pri"> PRI*</label>
+        </div>
+        <small class="mv-hint">* PRI requer bandas específicas (≈531/570 nm). Se seu sensor não tiver, ignore.</small>
+      </div>
+
+      <div id="grp-iv-thermal" class="mv-hide mv-iv-group">
+        <div class="mv-iv-title">Produtos térmicos</div>
+        <div class="mv-inline mv-col-2">
+          <label><input type="checkbox" name="iv_th" value="lst"> LST (Temperatura de Superfície)</label>
+          <label><input type="checkbox" name="iv_th" value="hotspots"> Mapa de anomalias térmicas</label>
+        </div>
+      </div>
+    </div><!-- /Produtos -->
+
+
+
+
+
+  </div><!-- /mvgrid -->
+</section>

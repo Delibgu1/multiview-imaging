@@ -1,6 +1,6 @@
 {% extends 'core/base_public.html' %}
 {% load static %}
-{% block title %}Login • Multiview{% endblock %}
+{% block title %}Login ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Multiview{% endblock %}
 {% block head_extra %}
   <link rel="stylesheet" href="{% static 'core/css/auth.css' %}">
   {% if erro_login %}
@@ -18,11 +18,11 @@
     <div class="login-box">
       <h1 class="login-title">Login</h1>
       <p class="login-subtitle">uma ferramenta da
-        <img src="{% static 'core/img/Logo-sinergica.png' %}" alt="SinérgicaAgro" class="login-sinergica-logo">
+        <img src="{% static 'core/img/Logo-sinergica.png' %}" alt="SinÃƒÆ’Ã‚Â©rgicaAgro" class="login-sinergica-logo">
       </p>
       <form method="post" class="login-form">
         {% csrf_token %}
-        <input class="login-input" type="text" name="username" placeholder="Usuário" required>
+        <input class="login-input" type="text" name="username" placeholder="Usu&aacute;rio" required>
         <input class="login-input" type="password" name="password" placeholder="Senha" required>
         <button class="login-button" type="submit">Entrar</button>
       </form>
@@ -36,7 +36,7 @@
   <div id="dialogo-erro" class="dialogo-erro" style="display:none;">
     <div class="dialogo-erro__box">
       <strong>Falha no login</strong>
-      <p>Usuário ou senha inválidos.</p>
+      <p>UsuÃƒÆ’Ã‚Â¡rio ou senha invÃƒÆ’Ã‚Â¡lidos.</p>
       <button onclick="document.getElementById('dialogo-erro').style.display='none'">Fechar</button>
     </div>
   </div>

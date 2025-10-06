@@ -1,0 +1,11 @@
+
+.mv-page{display:flex; min-height:100dvh; flex-direction:column;}
+.mv-body{flex:1; padding:16px;}
+.mv-foot{padding:16px; opacity:.8;}
+
+.mv-titlewrap{margin:8px 0 12px;}
+.mv-title{display:flex; align-items:center; gap:10px; font-size:1.4rem; margin:0;}
+.mv-title__chip{display:inline-flex; width:36px; height:36px; border-radius:50%;
+  align-items:center; justify-content:center; background:var(--mv-green-100);}
+.mv-title__ico{width:22px; height:22px;}
+.mv-title__text{font-weight:800; color:var(--mv-ink);}

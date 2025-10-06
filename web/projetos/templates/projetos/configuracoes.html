@@ -1,0 +1,172 @@
+
+{% extends "core/base_public.html" %}
+{% load static %}
+
+{% block title %}{{ titulo|default:"Definições do Projeto" }} · Multiview{% endblock %}
+
+{% block content %}
+
+{# CSS local e autossuficiente: não depende de arquivo estático externo #}
+<style>
+  /* Wrapper com respiro para não encostar no rodapé (mesmo se o rodapé for fixed em algum global) */
+  #def-page { max-width: 1220px; margin: 0 auto; padding: 12px 16px 160px; }
+  .mv-header h1 { margin: 8px 0 16px; }
+
+  /* Card com padrão visual */
+  .mv-card{
+    background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:14px;
+    padding:18px; margin-bottom:22px;
+    box-shadow: inset 0 0 8px rgba(0,0,0,.08), 0 6px 18px rgba(0,0,0,.08);
+  }
+  .mv-card h3{ margin:0 0 12px; font-size:1.08rem; }
+
+  /* Grid base 1→2; o 3-col será forçado por seletor específico em ≥1024px */
+  .mv-grid{ display:grid; grid-template-columns: 1fr; gap:14px 18px; }
+  @media (min-width: 720px){ .mv-grid{ grid-template-columns: 1fr 1fr; } }
+
+  /* Forçar 3 colunas no desktop com especificidade alta */
+  @media (min-width: 1024px){
+    #def-page .mv-grid.mv-3 { grid-template-columns: 1fr 1fr 1fr !important; }
+  }
+
+  /* Campos */
+  .mv-field{ display:flex; flex-direction:column; gap:6px; }
+  .mv-field label{ font-weight:600; font-size:.95rem; }
+  .mv-field small{ opacity:.85; }
+
+  /* Inputs (aplicado aos widgets padrão do Django) */
+  .mv-field input[type="text"],
+  .mv-field input[type="number"],
+  .mv-field input[type="date"],
+  .mv-field input[type="datetime-local"],
+  .mv-field select,
+  .mv-field textarea{
+    width:100%; border:1px solid #d9d9d9; border-radius:10px; padding:10px 12px; background:#fff;
+  }
+  .mv-field textarea{ min-height:90px; resize:vertical; }
+
+  /* Utilitários de largura */
+  .mv-span-2{ grid-column: span 2; }
+  .mv-span-3{ grid-column: 1 / -1; }
+
+  /* Checkbox/labels linha */
+  .mv-check{ display:inline-flex; align-items:center; gap:8px; font-weight:600; }
+
+  /* Ações */
+  .mv-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:12px; }
+  .btn{ background:#5aa832; color:#fff; border:none; padding:10px 16px; border-radius:12px; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.12); }
+  .btn-sec{ background:#8a8a8a; }
+  .btn:hover{ filter:brightness(1.03); }
+
+  /* Só aqui: garanta que o rodapé não seja fixed neste template, se vier do base */
+  footer { position: static !important; }
+</style>
+
+<section id="def-page" class="mv-wrap">
+  <header class="mv-header">
+    <h1>{{ titulo|default:"Definições do Projeto" }}</h1>
+  </header>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- PROJETO -->
+    <section class="mv-card" aria-labelledby="sec-projeto">
+      <h3 id="sec-projeto">Projeto</h3>
+      <div class="mv-grid mv-3">
+        <div class="mv-field">
+          <label>Nome do projeto</label>
+          {{ form.nome }}
+        </div>
+        <div class="mv-field">
+          <label>Data do voo</label>
+          {{ form.data_voo }}
+        </div>
+        <div class="mv-field mv-span-3">
+          <label>Descrição</label>
+          {{ form.descricao }}
+        </div>
+        <div class="mv-field">
+          <label>EPSG</label>
+          {{ form.epsg }}
+          <small>Ex.: SIRGAS2000/UTM 22S → <b>EPSG:31982</b></small>
+        </div>
+      </div>
+    </section>
+
+    <!-- VOO -->
+    <section class="mv-card" aria-labelledby="sec-voo">
+      <h3 id="sec-voo">Voo</h3>
+      <div class="mv-grid mv-3">
+        <div class="mv-field">
+          <label>Plataforma (drone)</label>
+          {{ form.plataforma }}
+        </div>
+        <div class="mv-field">
+          <label>Modelo da câmera</label>
+          {{ form.camera_modelo }}
+        </div>
+        <div class="mv-field">
+          <label>Tipo de câmera</label>
+          {{ form.camera_tipo }}
+        </div>
+        <div class="mv-field">
+          <label>Geo-referenciamento</label>
+          {{ form.georef }}
+        </div>
+        <div class="mv-field">
+          <label>Altura de voo (m)</label>
+          {{ form.altura_voo_m }}
+        </div>
+        <div class="mv-field">
+          <label>GSD (cm/pixel)</label>
+          {{ form.gsd_cm }}
+        </div>
+        <div class="mv-field">
+          <label>Overlap frontal (%)</label>
+          {{ form.overlap_frontal }}
+        </div>
+        <div class="mv-field">
+          <label>Overlap lateral (%)</label>
+          {{ form.overlap_lateral }}
+        </div>
+      </div>
+    </section>
+
+    <!-- GCP -->
+    <section class="mv-card" aria-labelledby="sec-gcp">
+      <h3 id="sec-gcp">Pontos de Controle (GCP)</h3>
+      <div class="mv-grid mv-3">
+        <div class="mv-field mv-span-3">
+          <label class="mv-check">
+            {{ form.usa_gcp }} Usarei pontos de controle (GCP)
+          </label>
+        </div>
+        <div class="mv-field mv-span-3">
+          <label>Arquivo GCP (.csv/.txt)</label>
+          {{ form.gcp_csv }}
+          <small>Baixe um modelo em <a href="{% url 'projetos:gcp_modelo_csv' %}">gcp_modelo.csv</a></small>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUTOS -->
+    <section class="mv-card" aria-labelledby="sec-produtos">
+      <h3 id="sec-produtos">Produtos desejados</h3>
+      <div class="mv-grid mv-3">
+        <label class="mv-check">{{ form.prod_ortomosaico }} Ortomosaico</label>
+        <label class="mv-check">{{ form.prod_dsm }} DSM</label>
+        <label class="mv-check">{{ form.prod_dtm }} DTM</label>
+        <label class="mv-check">{{ form.prod_nuvem_pts }} Nuvem de pontos</label>
+        <label class="mv-check">{{ form.prod_contornos }} Curvas de nível</label>
+      </div>
+    </section>
+
+    <div class="mv-actions">
+      <a href="{% url 'projetos:index' %}" class="btn btn-sec">Cancelar</a>
+      <button type="submit" class="btn">Salvar projeto</button>
+    </div>
+  </form>
+</section>
+
+{% endblock %}

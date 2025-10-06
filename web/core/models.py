@@ -37,3 +37,4 @@ class Asset(models.Model):
     tiles_href = models.URLField(blank=True)
     footprint = models.PolygonField(srid=4326, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
