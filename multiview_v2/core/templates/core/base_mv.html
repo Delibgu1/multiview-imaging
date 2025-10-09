@@ -1,0 +1,85 @@
+
+{% load static %}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}SinérgicaAgro · Multiview{% endblock %}</title>
+
+  {# CSS globais existentes #}
+  <link rel="stylesheet" href="{% static 'core/css/site.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/estilos.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/layout_base.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/buttons.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/actions.css' %}">
+  <link rel="stylesheet" href="{% static 'core/elementos/css/modal.css' %}">
+
+  {# Componentes já existentes (atenção ao nome: mv_components.css) #}
+  <link rel="stylesheet" href="{% static 'core/css/components/mv_components.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/components/user_chip.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/components/title_header.css' %}">
+
+  {# CSS extra por página #}
+  {% block extra_css %}{% endblock %}
+
+  <script type="module" src="{% static 'core/elementos/js/modals.js' %}"></script>
+</head>
+
+<body class="layout-root mv-bg mv-bg--multiview">
+  <div class="mv-bg__image"></div>
+
+  <header class="mv-topbar-global">
+    <div class="mv-topbar-global__wrap">
+      {# LOGO REMOVIDO: <a class="mv-brand" ...> #}
+      <nav class="mv-nav">
+        {# Sem “Entrar”; se estiver autenticado pode manter o “Sair” #}
+        {% if request.user.is_authenticated %}
+          <span class="mv-nav__hi">Olá, {{ request.user.get_short_name|default:request.user.username }}</span>
+          <a class="mv-btn mv-btn--ghost" href="{% url 'core:logout' %}">Sair</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="mv-wrap">
+    {% if messages %}
+      <div class="mv-flashstack">
+        {% for m in messages %}<div class="mv-flash">{{ m }}</div>{% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="mv-page">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+
+  {% block footer %}
+  <footer class="mv-footer">
+    <div class="mv-footer__band--top"></div>
+    <div class="mv-footer__band--mid"></div>
+
+    <div class="mv-footer__content">
+      <div class="mv-footer__slot--left">
+        <img class="mv-footer__slogan" src="{% static 'core/img/slogan.png' %}"
+             alt="Cuidamos das suas imagens, para você focar nos seus negócios.">
+      </div>
+      <div class="mv-footer__slot--center">
+        <p class="mv-footer__line mv-footer__line--strong">Plataforma de Processamento de Imagens Multiview</p>
+        <p class="mv-footer__line">v0.1.0 — suporte.multiview@sinergica.com.br</p>
+        <p class="mv-footer__line">Todos os Direitos Reservados ®</p>
+      </div>
+      <div class="mv-footer__slot--right">
+        <img class="mv-footer__logo" src="{% static 'core/img/logo-multiview.png' %}" alt="Multiview">
+      </div>
+    </div>
+  </footer>
+  {% endblock %}
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

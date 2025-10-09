@@ -1,0 +1,47 @@
+﻿
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Multiview V2{% endblock %}</title>
+  {% load static %}
+
+  <!-- CSS principal do tema (direto da pasta web/core/static) -->
+  <link rel="icon" href="{% static 'core/img/favicon.ico' %}">
+  <link rel="stylesheet" href="{% static 'core/css/site.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/layout_base.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/menu.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/configuracoes.css' %}">
+  <!-- componentes (se existirem) -->
+  <link rel="stylesheet" href="{% static 'core/css/components/progress.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/components/title_header.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/components/user_chip.css' %}">
+  {% block head_extra %}{% endblock %}
+  <style>
+    body{margin:0;padding:0}
+    header,footer{padding:.75rem 1rem}
+    main{max-width:1200px;margin:1.5rem auto;padding:0 1rem}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title_header">
+      <img src="{% static 'core/img/foto_drone.png' %}" alt="logo" style="height:28px;vertical-align:middle;margin-right:.5rem">
+      <strong>Multiview V2</strong>
+    </div>
+    {% block top_actions %}{% endblock %}
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <small>© {{ now|date:"Y" }} Multiview — Todos os direitos reservados.</small>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

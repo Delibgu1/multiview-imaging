@@ -1,0 +1,227 @@
+﻿
+
+
+/* =========================================================
+   User chip (componente global)
+   ========================================================= */
+.mv-userchip-wrap{
+  display:flex; justify-content:flex-end; margin:6px 0 14px;
+}
+.mv-userchip{
+  display:flex; align-items:center; gap:12px;
+  background:#fff; border-radius:9999px; padding:10px 14px;
+  box-shadow:0 8px 18px rgba(0,0,0,.18);
+}
+.mv-userchip__avatar{
+  width:28px; height:28px; border-radius:50%;
+  background:#e8f1e3; display:grid; place-items:center; font-weight:700;
+}
+.mv-userchip__meta{ line-height:1.05; }
+.mv-userchip__name{ font-weight:700; }
+.mv-userchip__plan{ font-size:.9rem; opacity:.75; }
+.mv-chip-btn{
+  border:1px solid #1b3d0f; background:#fff; border-radius:9999px;
+  padding:6px 12px; font-weight:700; text-decoration:none;
+}
+.mv-chip-btn:hover{ filter:brightness(.98); }
+
+.mv-wrap{ max-width:var(--mv-maxw,1160px); margin:0 auto; padding:12px 16px 16px; }
+
+/* =========================================================
+   Título + Hero
+   ========================================================= */
+.mv-title{
+  display:block; text-align:center; font-weight:800;
+  margin:10px 0 8px;
+}
+.mv-hero{
+  display:block; width:35%; height:auto;
+  border-radius:16px; box-shadow:0 8px 18px rgba(0,0,0,.18);
+  margin:2px auto 10px;
+}
+
+/* =========================================================
+   Grid do menu
+   ========================================================= */
+.mv-menu{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(320px, 520px));
+  justify-content:center;
+  gap:18px;
+  margin-top: -10px;
+}
+
+
+/* ===== linha extra para o botão Sair (segue o mesmo grid) ===== */
+/* o extra é um ITEM do grid .mv-menu */
+.mv-menu-extras{
+  grid-column: 2;        /* mesma coluna do card "Dashboard"   */
+  justify-self: end;   /* alinha pela ESQUERDA da coluna      */
+  margin-right: 50px;        /* 0 para alinhar exatamente com os cards */
+  margin-top: 10px;      /* mantém o mesmo respiro do grid      */
+}
+
+/* estilo do botão */
+.mv-menu-extras .mv-btn--logout{
+  padding: 10px 40px;
+  border-radius: 12px;
+}
+
+/* quando o menu virar 1 coluna, centraliza o botão */
+@media (max-width: 1024px){
+  .mv-menu{ grid-template-columns: 1fr; }      /* se já existir isso em outro lugar, pode remover aqui */
+  .mv-menu-extras{
+    grid-column: 1;
+    justify-self: center;
+    margin-right: 50px;
+  }
+}
+
+/* =========================================================
+   Cards do menu — “botões com ícone” (sombras DIFUSAS)
+   ========================================================= */
+.mv-menu, .mv-menu ul{ list-style:none; padding:0; margin:0; }
+.mv-menu a{ outline:none; text-decoration:none; }
+
+/* base do card */
+/* ===== Botões do menu (cards) — sombra difusa só ↓→ ===== */
+.mv-card{
+  display:flex; align-items:center; gap:16px;
+  padding:18px 20px;
+  background:#fff; border-radius:16px;
+  border:1px solid rgba(0,0,0,.07);
+  /* nada de box-shadow central */
+  box-shadow: none;
+
+  /* camadas de drop-shadow: offsets positivos = baixo/direita */
+  filter:
+    drop-shadow(8px 10px 16px rgba(0,0,0,.22))
+    drop-shadow(18px 22px 36px rgba(0,0,0,.14))
+    drop-shadow(28px 34px 56px rgba(0,0,0,.08));
+  transition: transform .12s ease, filter .12s ease, border-color .12s ease;
+}
+.mv-card:hover{
+  transform: translateY(-2px);
+  border-color: rgba(0,0,0,.12);
+  filter:
+    drop-shadow(10px 12px 20px rgba(0,0,0,.24))
+    drop-shadow(22px 26px 44px rgba(0,0,0,.16))
+    drop-shadow(34px 40px 66px rgba(0,0,0,.10));
+}
+
+.mv-card:focus-visible {
+  outline: 2px solid rgba(0,85,28,.35);
+  outline-offset: 3px;
+}
+
+.mv-card {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fadeup .5s ease forwards;
+}
+@keyframes fadeup {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Ícone/tipografia (mantém como já estava) */
+.mv-card__ico{
+  width:55px; height:55px; border-radius:12px;
+  display:grid; place-items:center; flex-shrink:0;
+  background:#f5f9f1;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
+}
+.mv-card__ico img{ width:35px; height:35px; display:block; opacity:.95; }
+.mv-card__body{ display:grid; gap:6px; }
+.mv-card__title{ margin:0; font-weight:800; }
+.mv-card__body p{ margin:0; opacity:.85; }
+
+/* ===== Botão Sair — mesma lógica de sombra difusa só ↓→ ===== */
+.mv-btn--logout{
+  background:#80CB2E !important;
+  color:#1f2e1f;
+  border:1px solid #6ab525;
+  border-radius:12px;
+  padding:12px 18px;
+
+  box-shadow:none;
+  filter:
+    drop-shadow(8px 10px 14px rgba(0,85,28,.22))
+    drop-shadow(18px 22px 32px rgba(0,85,28,.14))
+    drop-shadow(28px 34px 48px rgba(0,85,28,.08));
+  transition: transform .12s ease, filter .12s ease;
+}
+.mv-btn--logout:hover{
+  transform: translateY(-1px);
+  filter:
+    drop-shadow(10px 12px 18px rgba(0,85,28,.24))
+    drop-shadow(22px 26px 40px rgba(0,85,28,.16))
+    drop-shadow(34px 40px 58px rgba(0,85,28,.10));
+}
+
+.mv-btn--logout:hover {
+  filter: brightness(1.02) saturate(1.2);
+  box-shadow:
+    0 22px 48px rgba(0,85,28,.30),
+    16px 18px 0 rgba(0,0,0,.10);
+}
+
+.mv-btn--logout:active{
+  transform: translateY(0);
+  filter:
+    drop-shadow(8px 10px 14px rgba(0,85,28,.20))
+    drop-shadow(16px 20px 30px rgba(0,85,28,.12));
+}
+
+/* =========================
+   1) Cor do texto dos cards
+   ========================= */
+/* O card inteiro é <a>. Forçamos todas as pseudo-classes a herdarem a cor do pai
+   e removemos decoração de link. */
+.mv-card,
+.mv-card:link,
+.mv-card:visited,
+.mv-card:hover,
+.mv-card:active {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+/* Se houver regras antigas mais específicas, garantimos os textos internos também */
+.mv-card__title,
+.mv-card__body,
+.mv-card__body p {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+/* =========================
+   2) Ícones sem “caixinha”
+   ========================= */
+/* Tira fundo/borda/sombra da moldura do ícone */
+.mv-card__ico{
+  width: 52px;         /* ~do tamanho do “quadrinho” anterior */
+  height: 52px;
+  display: grid;       /* mantém centralização */
+  place-items: center;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* O próprio ícone ocupa o espaço todo da moldura anterior */
+.mv-card__ico img,
+.mv-card__ico svg{
+  width: 52px;
+  height: 52px;
+  display: block;
+  opacity: 1;
+  filter: none;
+}
+
+/* (opcional) se você usava a variação “ortho”, neutralize qualquer fundo */
+.mv-card__ico--ortho{
+  background: transparent !important;
+  box-shadow: none !important;
+}

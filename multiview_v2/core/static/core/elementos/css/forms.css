@@ -1,0 +1,20 @@
+
+.mvgrid{display:grid; gap:var(--mv-gap)}
+.mvgrid.mv-2{grid-template-columns:1fr 1fr}
+.mvgrid.mv-3{grid-template-columns:1fr 1fr 1fr}
+
+.mvfield label{display:block; font-weight:600; margin:2px 0 6px; color:var(--mv-ink-2)}
+.mvfield input,.mvfield select,.mvfield textarea{
+  width:100%; padding:10px 12px; border:1px solid var(--mv-gray-300);
+  border-radius:10px; background:var(--mv-white); color:var(--mv-ink);
+}
+.mvfield input[readonly]{background:var(--mv-gray-200)}
+.mv-hint{color:var(--mv-gray-700); font-size:.875rem; margin-top:6px}
+.mv-err{color:#cc3a3a; font-size:.875rem; margin-top:6px}
+
+/* Sinalizador de campo obrigatório */
+.req {
+  color: #d33;
+  font-weight: 600;
+  margin-left: 2px;
+}

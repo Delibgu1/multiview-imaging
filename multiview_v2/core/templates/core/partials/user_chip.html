@@ -1,0 +1,17 @@
+
+{% load static %}
+<div class="mv-userchip-wrap">
+  <div class="mv-user-chip">
+    <div class="mv-user-chip__left">
+      <img class="mv-user-chip__avatar" src="{% static 'core/img/icon/usuario.svg' %}" alt="">
+      <div class="mv-user-chip__text">
+        <p class="mv-user-chip__name">{{ request.user.username|default:"Convidado" }}</p>
+        <span class="mv-user-chip__meta">
+          {{ request.user.profile.plan_name|default:"Plano Básico" }} · Créditos: {{ request.user.profile.credits|default:"—" }}
+        </span>
+      </div>
+    </div>
+    <a class="mv-user-chip__buy" href="/creditos/comprar/">Comprar créditos</a>
+  </div>
+</div>
+

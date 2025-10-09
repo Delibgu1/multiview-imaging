@@ -1,0 +1,80 @@
+﻿{% extends "core/base_mv.html" %}
+{% load static %}
+
+{% block title %}Menu · Multiview V2{% endblock %}
+
+{% block content %}
+  {% include "core/partials/user_chip.html" %}
+
+  <h1 class="mv-title">Menu Principal</h1>
+  <img class="mv-hero" src="{% static 'core/img/foto_drone_1600.jpg' %}" alt="Imagem aérea">
+
+  <div class="mv-menu">
+
+    <a class="mv-card mv-card--withicon" href="/processamento/">
+      <span class="mv-card__ico">
+        <img src="{% static 'core/img/icon/ortomozaico.svg' %}" alt="">
+      </span>
+      <span class="mv-card__body">
+        <p class="mv-card__title">Modelagem Fotogramétrica</p>
+        <p>Uploads, processamento e resultados.</p>
+      </span>
+    </a>
+
+    <a class="mv-card mv-card--withicon" href="/agronomia/">
+      <span class="mv-card__ico">
+        <img src="{% static 'core/img/icon/inteligencia_agro.svg' %}" alt="">
+      </span>
+      <span class="mv-card__body">
+        <p class="mv-card__title">Inteligência Agronômica</p>
+        <p>Solicitar análises, relatórios e produtos agronômicos.</p>
+      </span>
+    </a>
+
+    <a class="mv-card mv-card--withicon" href="/creditos/">
+      <span class="mv-card__ico">
+        <img src="{% static 'core/img/icon/creditos.svg' %}" alt="">
+      </span>
+      <span class="mv-card__body">
+        <p class="mv-card__title">Créditos & Planos</p>
+        <p>Adicionar créditos, plano e extrato.</p>
+      </span>
+    </a>
+
+    <a class="mv-card mv-card--withicon" href="/usuarios/">
+      <span class="mv-card__ico">
+        <img src="{% static 'core/img/icon/usuario.svg' %}" alt="">
+      </span>
+      <span class="mv-card__body">
+        <p class="mv-card__title">Usuários</p>
+        <p>Empresas, membros e preferências.</p>
+      </span>
+    </a>
+
+    <a class="mv-card mv-card--withicon" href="/guias/">
+      <span class="mv-card__ico">
+        <img src="{% static 'core/img/icon/guias.svg' %}" alt="">
+      </span>
+      <span class="mv-card__body">
+        <p class="mv-card__title">Guias & Boas Práticas</p>
+        <p>Voo, GCPs, RTK/PPK, NDVI, relatórios.</p>
+      </span>
+    </a>
+
+    <a class="mv-card mv-card--withicon" href="/dashboard/">
+      <span class="mv-card__ico">
+        <img src="{% static 'core/img/icon/dashiboard.svg' %}" alt="">
+      </span>
+      <span class="mv-card__body">
+        <p class="mv-card__title">Dashboard de Resumo de Projetos</p>
+        <p>Acesse, consulte, clone e edite seus projetos.</p>
+      </span>
+    </a>
+
+    <div class="mv-menu-extras">
+      <a href="/logout/" class="mv-btn mv-btn--secondary mv-btn--logout">Sair</a>
+    </div>
+
+  </div>
+{% endblock %}
+

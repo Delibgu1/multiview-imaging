@@ -1,0 +1,44 @@
+
+/* Layout com footer colado no fim */
+html, body { height: 100%; }
+.mv-page { min-height: 100vh; display: flex; flex-direction: column; }
+.mv-main { flex: 1 0 auto; }
+.mv-footer { margin-top: auto; }
+
+/* Contêiner e cards */
+.mv-container { width: min(1100px, 92vw); margin-inline: auto; }
+.mv-cards-vert { display: grid; gap: 16px; }
+.mv-cards-2    { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 960px) { .mv-cards-2 { grid-template-columns: 1fr; } }
+
+.mv-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  padding: 18px 18px 12px;
+}
+
+
+/* --- Linha de rótulo com help à direita --- */
+.mv-labelrow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:6px;
+}
+
+/* --- Botão de ajuda padrão --- */
+.mv-helpbtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:26px; height:26px;
+  border-radius:9999px;
+  background:#eef7e6;
+  border:1px solid #b7d899;
+  box-shadow:0 1px 0 rgba(0,0,0,.05);
+  cursor:pointer;
+}
+.mv-helpbtn img{ width:16px; height:16px; }
+.mv-helpbtn:focus-visible{ outline:2px solid #114722; outline-offset:2px; }

@@ -1,0 +1,13 @@
+
+:root{
+  /* Cores */
+  --mv-green-900:#114722; --mv-green-700:#2b6b3f; --mv-green-600:#3f8b50;
+  --mv-green-500:#55a562; --mv-green-300:#80CB2E; --mv-green-200:#cfe9d3;
+  --mv-green-100:#eef5e6; --mv-ink:#1c271c; --mv-ink-2:#415041;
+  --mv-gray-900:#111; --mv-gray-700:#545; --mv-gray-500:#8a908a;
+  --mv-gray-300:#dfe4df; --mv-gray-200:#edf1ed; --mv-white:#fff;
+
+  /* Espaço, raio, sombra */
+  --mv-r:16px; --mv-gap:12px; --mv-pad:12px;
+  --mv-shadow:0 12px 28px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.12);
+}

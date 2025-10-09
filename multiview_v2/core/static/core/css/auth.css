@@ -1,0 +1,40 @@
+/* core/static/core/css/auth.css (corrigido) */
+.login-container{display:flex;align-items:center;justify-content:center;width:100%;}
+.login-box{
+  background:#fff;border-radius:16px;padding:24px;width:360px;
+  box-shadow:0 10px 30px rgba(0,0,0,.10);
+}
+/* Garanta consistência de largura */
+.login-box, .login-box *{ box-sizing:border-box; }
+
+.login-title{margin:0 0 6px 0;text-align:center;color:#00371C}
+.login-subtitle{margin:0 0 16px 0;text-align:center;color:#00371C;display:flex;align-items:center;gap:8px;justify-content:center}
+.login-sinergica-logo{height:80px;vertical-align:middle} /* 4x maior */
+
+/* Todos os elementos do form com a MESMA largura */
+.login-form{display:grid;grid-template-columns:1fr;gap:10px}
+.login-form > * { width:100%; }
+
+/* Sombras internas (INSET) posicionadas logo ABAIXO da borda superior e à DIREITA da borda esquerda */
+.login-input{
+  padding:10px 12px;border:1px solid #e3e8ee;border-radius:10px;outline:none;background:#fff;color:#222;
+  box-shadow:
+    inset 2px 0 4px rgba(0,55,28,.35),  /* esquerda (interna) */
+    inset 0 2px 4px rgba(0,55,28,.35);  /* topo (interna) */
+}
+.login-input:focus{border-color:#00371C}
+
+/* Botão com sombra externa (NÃO ALTERAR) */
+.login-button{
+  padding:10px 12px;border:none;border-radius:10px;background:#72A348;color:#fff;font-weight:700;cursor:pointer;
+  box-shadow: 3px 3px 8px rgba(0,55,28,.35);
+}
+.login-button:hover{filter:brightness(.96)}
+
+/* Links mais abaixo e com espaçamento amplo */
+.login-links{margin-top:18px;display:flex;gap:32px;justify-content:center}
+.login-link{color:#00371C;text-decoration:underline}
+
+/* Diálogo de erro */
+.dialogo-erro{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center}
+.dialogo-erro__box{background:#fff;border-radius:12px;padding:18px;min-width:260px;box-shadow:0 10px 30px rgba(0,0,0,.2)}

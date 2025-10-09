@@ -1,0 +1,20 @@
+﻿{% extends "core/base_mv.html" %}
+{% block title %}Base Cartografica · Multiview V2{% endblock %}
+
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+  <h2>Base Cartografica</h2>
+  <p>Crie e gerencie seus projetos de ortomosaico, MDT/MDS e nuvem de pontos.</p>
+
+  <div style="margin:1rem 0;">
+    <a href="/processamento/novo/" class="mv-btn mv-btn--primary">+ Novo Projeto</a>
+  </div>
+
+  <h3>Projetos recentes</h3>
+  <ul id="lista-projetos">
+    <li>(placeholder) Projeto de exemplo — 0 tarefas</li>
+  </ul>
+{% endblock %}
+
+{% block extra_js %}{% endblock %}

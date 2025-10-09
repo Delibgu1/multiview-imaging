@@ -1,0 +1,262 @@
+
+/* ========= Projetos (lista) ========= */
+:root{
+  --verde-chip:#EFF8E5;
+  --verde-sombra:rgba(0,85,28,.65);
+  --verde-titulo:#354224;
+  --verde-badge:#80CB2E;
+  --card-bg:#fff;
+  --borda:rgba(0,0,0,.06);
+  /* altura aproximada do rodapé + folga (ajuste se necessário) */
+  --footer-h: 110px;
+}
+
+.page-wrap{
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 16px calc(var(--footer-h) + 20px); /* garante ~20px de respiro antes do rodapé fixo */
+}
+
+/* --- topbar --- */
+.mv-topbar{ display:flex; justify-content:flex-end; padding:12px 8px 0; }
+.mv-userbox{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; min-width:280px; max-width:360px;
+  border-radius:14px; background:var(--verde-chip);
+  border:1px solid rgba(0,0,0,.05); color:#1f2e1f;
+  box-shadow: 8px 8px 8px var(--verde-sombra);
+}
+.mv-usericon .mv-icon{ width:22px; height:22px; fill:#2f6930; }
+.mv-username{ font-weight:700 }
+.mv-userplan{ font-size:.9rem; opacity:.85 }
+
+/* --- título alto --- */
+/* wrapper para dar o respiro superior (≈20px) */
+.mv-titlewrap{
+  max-width: 1120px;
+  margin: 20px auto 8px;     /* ~20px do topo, como pediu */
+  padding: 0 16px;
+}
+
+/* linha do título com sublinhado-acento */
+.mv-title{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* barra de acento (diferente de botão) */
+.mv-title--banner::after{
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  bottom: -6px;              /* “glow” fica sob o texto */
+  margin: 0 auto;
+  width: clamp(240px, 32vw, 520px);
+  height: 36px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #80CB2E, #74b82a);
+  filter: blur(8px);
+  opacity: .55;              /* mais suave que botão */
+  z-index: 0;
+}
+.mv-title-ico{
+  width: 34px;   /* ~30% maior */
+  height: 34px;
+  z-index: 1;
+}
+
+.mv-title-text{
+  font-size: 1.35rem;        /* um pouco maior */
+  font-weight: 700;
+  color: #354224;
+  z-index: 1;
+}
+
+
+.mv-title::after{
+  content:"";
+  position:absolute;
+  left:6px; right:6px; bottom:0;
+  height:8px; border-radius:10px;
+  background: radial-gradient(100% 120% at 50% 50%,
+              rgba(128,203,46,.34) 0%,
+              rgba(128,203,46,.10) 60%,
+              transparent 100%);
+  filter: blur(.2px);
+  pointer-events:none;
+}
+
+
+/* --- card link novo projeto --- */
+.novo-card{
+  display:flex; align-items:center; gap:14px; justify-content:center;
+  text-decoration:none; color:#173019;
+  background:var(--card-bg);
+  border:1px solid var(--borda);
+  border-radius:14px;
+  padding:16px 18px;
+  box-shadow: 8px 8px 8px var(--verde-sombra);
+  width:100%;
+  max-width:760px;
+  margin: 0 auto 18px;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.novo-card:hover{ transform:translateY(-2px); }
+.novo-ico{ width:52px; height:52px; display:block; }   /* +30% */
+.novo-texto{ font-weight:600; font-size:1.12rem; }
+
+/* --- lista de projetos --- */
+.lista-card{
+  background:var(--card-bg);
+  border:1px solid var(--borda);
+  border-radius:14px;
+  box-shadow: 8px 8px 8px var(--verde-sombra);
+  margin: 0 auto 20px;            /* termina com ~20px antes do rodapé */
+  overflow: hidden;                /* para o header/tabela não “vazar” sombras */
+}
+
+.lista-header{ padding: 16px 18px 10px; border-bottom:1px solid var(--borda); }
+.lista-header-title{
+  display:flex; align-items:center; justify-content:center; gap:14px;
+  color:#1a2a18;
+  font-weight:600;
+  font-size:1.12rem;
+}
+.lista-ico{ width:46px; height:46px; } /* +30% */
+
+/* tabela com cabeçalho fixo e scroll interno */
+.lista-tabela-wrap{
+  overflow:auto;
+  /* Altura máxima calculada para não invadir o rodapé, respeitando o padding do page-wrap */
+  max-height: calc(100vh - 320px);
+}
+.lista-tabela{ width:100%; border-collapse:separate; border-spacing:0; }
+.lista-tabela thead th{
+  position:sticky; top:0; z-index:2;
+  background:#f6f8f6;
+  text-align:left;
+  font-weight:600;
+  font-size:.98rem;
+  padding:12px 12px;
+  border-bottom:1px solid var(--borda);
+}
+.lista-tabela tbody td{
+  padding:12px 12px;
+  border-bottom:1px solid #eee;
+  vertical-align:middle;
+}
+.lista-tabela td.ico{ width:120px; text-align:center; }
+.lista-tabela td.ico img{ width:28px; height:28px; }
+
+.nome-link{ color:#0d3c1a; text-decoration:none; }
+.nome-link:hover{ text-decoration:underline; }
+
+/* estado vazio centralizado + mensagem */
+.vazio td{ padding:42px 12px; }
+.vazio-box{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  width:100%;
+  min-height:220px;
+}
+.vazio-msg{ color:#223; opacity:.9; }
+
+/* botão “fantasma” */
+/* Botões base */
+.mv-btn{
+  display:inline-block;
+  padding:10px 14px;
+  border-radius:12px;
+  text-decoration:none;
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+/* Botão fantasma (branco com borda) */
+.mv-btn--ghost{
+  background:#fff;
+  border:1px solid rgba(0,0,0,.08);
+  color:#0d3c1a;
+  box-shadow:6px 6px 6px rgba(0,85,28,.35);
+}
+.mv-btn--ghost:hover{ transform: translateY(-1px); }
+
+/* Botão verde (primário sinérgica) */
+.mv-btn--ok{
+  background:#80CB2E;          /* VERDE */
+  color:#354224;                /* texto */
+  border:1px solid rgba(0,0,0,.06);
+  box-shadow:8px 8px 8px rgba(0,85,28,.55);
+}
+.mv-btn--ok:hover{ transform: translateY(-1px); }
+
+/* Ícone dentro do botão voltar */
+.mv-btn--back .mv-btn-ico{
+  width:22px; height:22px; margin-right:8px;
+  display:inline-block; vertical-align:middle;
+}
+.mv-btn--back span{ vertical-align:middle; }
+
+
+/* botão ícone (down/clone) */
+.btn-ico{ display:inline-flex; align-items:center; justify-content:center; }
+.btn-ico img{ width:28px; height:28px; }
+
+/* responsivo */
+@media (max-width: 900px){
+  .lista-tabela thead{ font-size:.94rem; }
+  .lista-tabela td, .lista-tabela th{ padding:10px; }
+  .novo-card{ max-width:100%; }
+}
+
+/* linha do botão voltar */
+.mv-backrow{
+  max-width: 1120px;     /* mesmo container da página */
+  margin: 18px auto 22px;
+  padding: 0 16px;
+  display: flex;
+  justify-content: flex-end; /* alinha com o chip do usuário à direita */
+}
+
+/* botão voltar herda o look dos outros botões fantasma */
+.mv-btn--back .mv-btn-ico{
+  width: 22px; height: 22px; margin-right: 8px; display: inline-block;
+  vertical-align: middle;
+}
+.mv-btn--back span{ vertical-align: middle; }
+
+
+/* ===== Modal simples (sinergica style) ===== */
+.mv-modal{ position:fixed; inset:0; display:grid; place-items:center;
+  opacity:0; visibility:hidden; transition:.15s ease all; z-index:50; }
+.mv-modal.is-open{ opacity:1; visibility:visible; }
+
+.mv-modal__backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.25); }
+
+.mv-modal__dialog{
+  position:relative; width:min(540px, 92vw); background:#fff;
+  border:1px solid rgba(0,0,0,.06); border-radius:16px;
+  box-shadow: 10px 12px 14px rgba(0,85,28,.65);
+  overflow:hidden; transform:translateY(6px); transition:.15s ease transform;
+}
+.mv-modal.is-open .mv-modal__dialog{ transform:none; }
+
+.mv-modal__header{ display:flex; align-items:center; justify-content:space-between;
+  padding:14px 18px; border-bottom:1px solid #eef0ee; }
+.mv-modal__x{ border:0; background:transparent; font-size:22px; line-height:1; cursor:pointer; }
+
+.mv-modal__body{ padding:18px; color:#1b2b18; }
+.mv-modal__footer{ display:flex; gap:10px; justify-content:flex-end; padding:12px 18px 18px; }
+
+.mv-btn{ display:inline-block; padding:10px 14px; border-radius:12px; text-decoration:none; cursor:pointer; }
+.mv-btn--ghost{ background:#fff; border:1px solid rgba(0,0,0,.08); color:#0d3c1a;
+  box-shadow:6px 6px 6px rgba(0,85,28,.35); }
+.mv-btn--ok{ background:#80CB2E; color:#354224; border:1px solid rgba(0,0,0,.06);
+  box-shadow:8px 8px 8px rgba(0,85,28,.55); }
+.mv-btn--ok:hover, .mv-btn--ghost:hover{ transform:translateY(-1px); }
+

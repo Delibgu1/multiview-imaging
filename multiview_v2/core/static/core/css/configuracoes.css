@@ -1,0 +1,144 @@
+
+/* ---- Config apenas desta página ---- */
+{% extends "core/base_public.html" %}
+{% load static %}
+
+{% block title %}Configurações do Projeto · Multiview{% endblock %}
+
+{# Classe só nesta página, para escopar o CSS local #}
+{% block body_class %}page-config{% endblock %}
+
+{# CSS desta página (isolado) #}
+{% block head_extra %}
+<link rel="stylesheet" href="{% static 'projetos/css/configuracoes.css' %}">
+{# FAILSAFE: se por algum motivo o body_class não for aplicado, este override
+   garante que o rodapé não ficará fixed NESTA PÁGINA. Não afeta as demais. #}
+<style>
+  footer { position: static !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="mv-wrap">
+  <header class="mv-header">
+    <h1>Configurações do Projeto</h1>
+  </header>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- PROJETO -->
+    <section class="mv-card" aria-labelledby="sec-projeto">
+      <h3 id="sec-projeto">Projeto</h3>
+      <div class="mv-grid mv-grid-3">
+        <div class="mv-field">
+          <label>Nome do Projeto</label>
+          <input type="text" name="nome" placeholder="Ex.: Talhão Norte - Safra 25/26">
+        </div>
+        <div class="mv-field">
+          <label>Data do voo</label>
+          <input type="date" name="data_voo">
+        </div>
+        <div class="mv-field">
+          <label>Responsável</label>
+          <input type="text" name="responsavel" placeholder="Ex.: João Silva">
+        </div>
+
+        <div class="mv-field">
+          <label>EPSG</label>
+          <input type="text" name="epsg" placeholder="Ex.: 31982">
+          <small>Ex.: SIRGAS2000/UTM 22S → <b>EPSG:31982</b></small>
+        </div>
+        <div class="mv-field mv-span-2">
+          <label>Descrição</label>
+          <textarea name="descricao" rows="3" placeholder="Notas do projeto..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- VOO -->
+    <section class="mv-card" aria-labelledby="sec-voo">
+      <h3 id="sec-voo">Voo</h3>
+      <div class="mv-grid mv-grid-3">
+        <div class="mv-field">
+          <label>Drone</label>
+          <input type="text" name="drone" placeholder="Ex.: DJI Phantom 4 RTK">
+        </div>
+        <div class="mv-field">
+          <label>Câmera / Sensor</label>
+          <input type="text" name="camera" placeholder="Ex.: RGB, Multiespectral, Lidar...">
+        </div>
+        <div class="mv-field">
+          <label>Altitude (m)</label>
+          <input type="number" step="0.01" name="altitude" placeholder="Ex.: 120">
+        </div>
+
+        <div class="mv-field">
+          <label>GSD (cm/pixel)</label>
+          <input type="number" step="0.01" name="gsd" placeholder="Ex.: 2.5">
+        </div>
+        <div class="mv-field">
+          <label>Sob. longitudinal (%)</label>
+          <input type="number" step="1" name="overlap_frontal" placeholder="Ex.: 75">
+        </div>
+        <div class="mv-field">
+          <label>Sob. lateral (%)</label>
+          <input type="number" step="1" name="overlap_lateral" placeholder="Ex.: 65">
+        </div>
+
+        <div class="mv-field">
+          <label class="mv-check">
+            <input type="checkbox" name="rtk_ppk"> RTK/PPK habilitado
+          </label>
+          <small>Se desmarcado, planeje GCPs.</small>
+        </div>
+        <div class="mv-field">
+          <label>Nº estimado de GCPs</label>
+          <input type="number" step="1" name="gcp_count" placeholder="Ex.: 8">
+        </div>
+      </div>
+    </section>
+
+    <!-- PROCESSAMENTO -->
+    <section class="mv-card" aria-labelledby="sec-proc">
+      <h3 id="sec-proc">Processamento</h3>
+      <div class="mv-grid mv-grid-3">
+        <div class="mv-field">
+          <label>Produtos</label>
+          <select multiple name="produtos">
+            <option>DTM</option>
+            <option>NDVI</option>
+            <option>Curvas de nível</option>
+            <option>Ortomosaico</option>
+            <option>DSM</option>
+            <option>Nuvem de pontos</option>
+          </select>
+          <small>Use CTRL/SHIFT para múltiplos.</small>
+        </div>
+
+        <div class="mv-field">
+          <label>Resolução de saída (cm)</label>
+          <input type="number" step="0.1" name="resolucao" placeholder="Ex.: 3.0">
+        </div>
+
+        <div class="mv-field">
+          <label class="mv-check">
+            <input type="checkbox" name="relatorio"> Gerar relatório com métricas
+          </label>
+          <small>Resumo de qualidade, RMS, cobertura e miniaturas.</small>
+        </div>
+
+        <div class="mv-field mv-span-3">
+          <label>Observações</label>
+          <textarea name="obs" rows="4" placeholder="Restrições de voo, marcos, etc."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <div class="mv-actions">
+      <a href="{% url 'projetos:lista' %}" class="btn btn-sec">Cancelar</a>
+      <button type="submit" class="btn">Salvar</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

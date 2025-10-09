@@ -1,0 +1,12 @@
+
+.mv-helpbtn{display:inline-flex; align-items:center; justify-content:center;
+  width:28px; height:28px; border-radius:50%; border:1px solid var(--mv-gray-300); background:#fff}
+
+.mv-dialog-help{border:0; padding:0; width:min(880px,92vw); border-radius:14px; box-shadow:var(--mv-shadow)}
+.mv-dialog-help::backdrop{background:rgba(0,0,0,.35)}
+.mv-dialog-card{background:#fff; border-radius:14px; overflow:hidden}
+.mv-dialog-hd{display:flex; align-items:center; gap:8px; padding:16px 18px 10px}
+.mv-dialog-hd h4{margin:0; font-size:1.05rem; font-weight:700}
+.mv-dialog-bd{padding:0 18px 18px; line-height:1.5}
+.mv-dialog-close{margin-left:auto; width:32px; height:32px; border:0; background:transparent; font-size:22px; border-radius:8px}
+.mv-dialog-close:hover{background:#f2f5f2}

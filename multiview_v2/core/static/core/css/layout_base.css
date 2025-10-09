@@ -1,0 +1,152 @@
+
+/* ===== Layout base — regra única de rolagem =====
+   - O body é o ÚNICO que rola (aparece só quando precisa)
+   - Nada de overflow nos wrappers (.mv-page, .mv-main)
+   - Rodapé fica no fim quando o conteúdo é curto                 */
+
+html, body { height: 100%; }
+
+body {
+  min-height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Wrappers SEM rolagem própria */
+.mv-page {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;          /* <— antes era 100%; isso forçava a página a “crescer” */
+}
+
+.mv-main {
+  flex: 1 0 auto;            /* cresce/encolhe com o conteúdo */
+  min-height: 0;             /* evita "scroll fantasma" com flex */
+  overflow: visible;         /* NUNCA cria rolagem aqui */
+}
+
+/* Rodapé sempre no fim quando a página é curta */
+.mv-footer { margin-top: auto; }
+
+/* Conteinerização padrão (sem overflow interno) */
+.mv-container   { width: min(1100px, 92vw); margin-inline: auto; }
+.mv-cards-vert  { display: grid; gap: 16px; }
+.mv-cards-2     { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 960px){ .mv-cards-2{ grid-template-columns: 1fr; } }
+
+.mv-card{
+  background:#fff; border-radius:16px;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+  padding:18px 18px 12px;
+}
+
+/* Garanta que nenhum container padrão gere rolagem própria */
+.mv-container, .mv-card, .mv-content, .mv-container-root { overflow: visible; }
+
+/* Blindagem leve */
+.mv-page, .mv-main { overflow: visible !important; }
+
+
+/* === Quadro 1 (Objetivo do Projeto) – Grid responsivo em 3 colunas === */
+.q1-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+/* spans utilitários */
+.q1-span-2 { grid-column: span 2; }
+.q1-span-3 { grid-column: 1 / -1; }     /* ocupa as 3 colunas */
+
+/* campos com layout consistente */
+.q1-grid .mvfield{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Responsividade: 2 colunas e depois 1 coluna */
+@media (max-width: 1100px){
+  .q1-grid{ grid-template-columns: 1fr 1fr; }
+  .q1-span-3{ grid-column: 1 / -1; }
+}
+@media (max-width: 700px){
+  .q1-grid{ grid-template-columns: 1fr; }
+  .q1-span-2, .q1-span-3{ grid-column: 1 / -1; }
+}
+
+/* === Ajustes finos para CRS dos arquivos vetoriais === */
+#grp-vetores-crs {
+  display: block;
+}
+
+#grp-vetores-crs .mv-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;          /* distância help/texto */
+  margin: 6px 0;
+}
+
+#grp-vetores-crs .mv-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;          /* <<< distância bolinha ↔ texto */
+  font-weight: 400;
+}
+
+#grp-vetores-crs .mv-radio input[type="radio"] {
+  margin: 0;         /* zera margem herdada */
+}
+
+#grp-vetores-crs .mv-line-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+/* === Corrige faixa extra abaixo do rodapé === */
+html, body{
+  height:100%;
+}
+
+body.mv-bg--multiview{
+  background: var(--mv-bg-multiview);
+  display:flex;
+  flex-direction:column;
+}
+
+.mv-footer{
+  margin-top:auto;        /* cola o footer no fim */
+}
+
+/* === Harmoniza o fundo da página com o tema Multiview === */
+html{
+  height: 100%;
+  background: var(--mv-bg-multiview);   /* #72A348 */
+}
+
+body.mv-bg--multiview{
+  min-height: 100vh;                    /* garante cobertura total da viewport */
+  background: var(--mv-bg-multiview);   /* redundante, mas explícito */
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mv-page{ min-height: 0; }              /* mantém sem “esticar” além do necessário */
+.mv-footer{ margin-top: auto; }         /* continua colando no fim */
+
+/* === Remove borda/sombra do contêiner raiz para não “sobrar faixa” === */
+body.mv-bg--multiview,
+body.layout-root.mv-bg--multiview,
+.layout-root {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* === Uniformiza o fundo do documento inteiro === */
+html {
+  background: var(--mv-bg-multiview) !important;  /* #72A348 */
+}

@@ -1,0 +1,26 @@
+
+/* --- Top row do card (aviso à esquerda, passo à direita) --- */
+.mv-card__toprow{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px; margin-bottom:12px;
+}
+
+/* Aviso/atenção à esquerda */
+.mv-attn{ display:flex; align-items:center; gap:8px; color:#2F3E2A; font-size:14px; }
+.mv-attn__icon{ width:16px; height:16px; flex:0 0 auto; }
+
+/* Passo à direita: largura da barra = largura do texto */
+.mv-steps{ display:inline-flex; flex-direction:column; align-items:stretch; } /* shrink-to-fit */
+.mv-steps__label{ font-weight:600; font-size:14px; color:#2F3E2A; line-height:1.1; }
+.mv-steps__bar{
+  width:100%; height:8px; margin-top:6px; border-radius:999px; overflow:hidden;
+  background:#E6EEDC; position:relative;
+}
+.mv-steps__fill{
+  height:100%; width:var(--pct, 0%); background:#72A348; border-radius:inherit;
+}
+
+/* Responsivo: empilha em telas menores */
+@media (max-width: 640px){
+  .mv-card__toprow{ flex-direction:column; align-items:flex-start; gap:8px; }
+}
